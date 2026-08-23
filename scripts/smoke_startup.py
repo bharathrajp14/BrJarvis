@@ -78,8 +78,22 @@ def main() -> int:
 
     def check_router_empty_backend_behavior():
         from router import AgentRouter, AgentProfile
-        router = AgentRouter({})
-        res = router.run(AgentProfile.GEMINI, [], "")
+
+        # This invariant exercises the legacy empty-backend contract.  The
+        # optional YAML gateway is intentionally disabled for this isolated
+        # check so a developer's local .env cannot turn it into a provider
+        # connectivity test or return a successful fallback response.
+        previous_gateway_setting = os.environ.get("JARVIS_AI_GATEWAY_ENABLED")
+        os.environ["JARVIS_AI_GATEWAY_ENABLED"] = "false"
+        try:
+            router = AgentRouter({})
+            res = router.run(AgentProfile.GEMINI, [], "")
+        finally:
+            if previous_gateway_setting is None:
+                os.environ.pop("JARVIS_AI_GATEWAY_ENABLED", None)
+            else:
+                os.environ["JARVIS_AI_GATEWAY_ENABLED"] = previous_gateway_setting
+
         normalized = res.lower()
         assert any(
             marker in normalized

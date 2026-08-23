@@ -16,19 +16,62 @@ logger = logging.getLogger("JARVIS.API.Connectors")
 router = APIRouter(tags=["Connectors"])
 
 _CONFIG_DIR = Path(__file__).resolve().parent.parent.parent / "config"
-_API_FILE = _CONFIG_DIR / "api_keys.json"
+_SETTINGS_FILE = _CONFIG_DIR / "connector_settings.json"
+_LEGACY_API_FILE = _CONFIG_DIR / "api_keys.json"
 _CONNECTORS_CACHE: dict | None = None
 _CONNECTORS_CACHE_TS = 0.0
 _CACHE_TTL_SECONDS = 3.0
 
 
-def _read_full_config() -> dict:
+def _migrate_legacy_connector_secrets() -> None:
+    """Move legacy connector API keys to the OS vault and scrub the old JSON file."""
+    if not _LEGACY_API_FILE.exists():
+        return
     try:
-        if _API_FILE.exists():
-            return json.loads(_API_FILE.read_text(encoding="utf-8"))
-    except Exception:
-        pass
+        legacy = json.loads(_LEGACY_API_FILE.read_text(encoding="utf-8"))
+        if not isinstance(legacy, dict):
+            return
+        secret_entries = {
+            str(key): str(value).strip()
+            for key, value in legacy.items()
+            if str(key).lower().endswith(("_api_key", "_token")) and isinstance(value, str) and value.strip()
+        }
+        if not secret_entries:
+            return
+        from brjarvis.security.credentials import get_credential_vault
+
+        vault = get_credential_vault()
+        for key, value in secret_entries.items():
+            connector_id = key.rsplit("_", 1)[0].lower()
+            vault.store_credential(
+                _credential_reference(connector_id),
+                value,
+                metadata={"connector_id": connector_id, "kind": "api_key", "migrated_from": "api_keys.json"},
+            )
+        sanitized = {key: value for key, value in legacy.items() if key not in secret_entries}
+        temp_file = _LEGACY_API_FILE.with_suffix(".json.migrated")
+        temp_file.write_text(json.dumps(sanitized, indent=2, sort_keys=True), encoding="utf-8")
+        temp_file.replace(_LEGACY_API_FILE)
+        logger.warning("Migrated %d legacy connector secrets to secure storage", len(secret_entries))
+    except Exception as exc:
+        # Never delete legacy values if secure migration did not complete.
+        logger.error("Legacy connector secret migration could not complete securely: %s", exc)
+
+
+def _read_settings() -> dict:
+    """Read connector settings only; secret values belong in CredentialVault."""
+    _migrate_legacy_connector_secrets()
+    try:
+        if _SETTINGS_FILE.exists():
+            payload = json.loads(_SETTINGS_FILE.read_text(encoding="utf-8"))
+            return payload if isinstance(payload, dict) else {}
+    except (OSError, json.JSONDecodeError, TypeError) as exc:
+        logger.warning("Unable to read connector settings metadata: %s", exc)
     return {}
+
+
+def _credential_reference(connector_id: str) -> str:
+    return f"connector:{connector_id}:api_key"
 
 
 class ConnectorCallRequest(BaseModel):
@@ -70,10 +113,10 @@ def _categorize_connector(cid: str) -> str:
     return "System & MCP"
 
 
-@router.get("/api/connectors")
-@router.get("/api/v1/connectors")
+@router.get("/connectors")
 async def get_connectors_list():
     """List all dynamically discovered App Connectors with live status, tool inventories & auth hints."""
+    _migrate_legacy_connector_secrets()
     global _CONNECTORS_CACHE, _CONNECTORS_CACHE_TS
     now = time.time()
     if _CONNECTORS_CACHE is not None and (now - _CONNECTORS_CACHE_TS) < _CACHE_TTL_SECONDS:
@@ -125,15 +168,13 @@ async def get_connectors_list():
     return payload
 
 
-@router.get("/api/connector/status")
-@router.get("/api/v1/connector/status")
+@router.get("/connector/status")
 async def connector_status():
     """Return status of all registered connectors in the Connector Hub."""
     return await get_connectors_list()
 
 
-@router.get("/api/connector/list")
-@router.get("/api/v1/connector/list")
+@router.get("/connector/list")
 async def connector_list():
     """Return all connectors and their available tools dictionary."""
     try:
@@ -154,8 +195,7 @@ async def connector_list():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/api/connector/call")
-@router.post("/api/v1/connector/call")
+@router.post("/connector/call")
 async def connector_call(req: ConnectorCallRequest):
     """Call a specific connector tool by connector ID/name and tool name."""
     try:
@@ -174,8 +214,7 @@ async def connector_call(req: ConnectorCallRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/api/connector/test")
-@router.post("/api/v1/connector/test")
+@router.post("/connector/test")
 async def connector_test(req: ConnectorTestRequest):
     """Test live connectivity and latency for a specific connector."""
     conn_id = req.get_connector()
@@ -221,8 +260,7 @@ async def connector_test(req: ConnectorTestRequest):
         }
 
 
-@router.post("/api/connector/config")
-@router.post("/api/v1/connector/config")
+@router.post("/connector/config")
 async def save_connector_config(req: ConnectorConfigRequest):
     """Save API key or configuration settings for a specific connector."""
     global _CONNECTORS_CACHE
@@ -231,15 +269,23 @@ async def save_connector_config(req: ConnectorConfigRequest):
         conn_id = req.get_connector()
         if not conn_id:
             raise HTTPException(status_code=400, detail="Missing 'connector' or 'connector_id' in request.")
-        data = _read_full_config()
         conn_name = conn_id.lower().strip()
-        key_name = f"{conn_name}_api_key"
+        settings = _read_settings()
 
         if req.api_key:
             val = req.api_key.strip()
-            data[key_name] = val
-            os.environ[key_name.upper()] = val
+            if not val:
+                raise HTTPException(status_code=422, detail="api_key cannot be empty.")
+            from brjarvis.security.credentials import get_credential_vault
 
+            credential_ref = _credential_reference(conn_name)
+            get_credential_vault().store_credential(
+                credential_ref,
+                val,
+                metadata={"connector_id": conn_name, "kind": "api_key"},
+            )
+            # Keep provider adapters compatible at runtime without serializing the secret.
+            os.environ[f"{conn_name.upper()}_API_KEY"] = val
             if "github" in conn_name:
                 os.environ["GITHUB_TOKEN"] = val
             elif "notion" in conn_name:
@@ -255,15 +301,20 @@ async def save_connector_config(req: ConnectorConfigRequest):
                 os.environ["YOUTUBE_API_KEY"] = val
 
         if req.settings and isinstance(req.settings, dict):
-            data[f"{conn_name}_settings"] = req.settings
+            settings[f"{conn_name}_settings"] = req.settings
             for k, v in req.settings.items():
                 if isinstance(v, str) and v.strip():
                     os.environ[k.upper()] = v.strip()
 
         _CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-        _API_FILE.write_text(json.dumps(data, indent=4), encoding="utf-8")
-        logger.info("[ConnectorConfig] Saved configuration for '%s'", req.connector)
-        return {"status": "ok", "message": f"Saved configuration for '{req.connector}'"}
+        _SETTINGS_FILE.write_text(json.dumps(settings, indent=2, sort_keys=True), encoding="utf-8")
+        logger.info("[ConnectorConfig] Saved metadata for '%s'", conn_name)
+        return {
+            "status": "ok",
+            "connector": conn_name,
+            "credential_ref": _credential_reference(conn_name) if req.api_key else None,
+            "message": f"Saved configuration for '{conn_name}'",
+        }
     except Exception as e:
         logger.error("[ConnectorConfig] Error saving config: %s", e)
         raise HTTPException(status_code=500, detail=str(e))

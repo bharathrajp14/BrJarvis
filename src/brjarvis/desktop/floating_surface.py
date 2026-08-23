@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 import os
 import sys
-from typing import Any, Optional
+from typing import Any, Mapping, Optional
 
 from brjarvis.desktop.floating_runtime import FloatingRuntimeAdapter, FloatingWidgetState
 

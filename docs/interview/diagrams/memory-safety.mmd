@@ -1,0 +1,28 @@
+flowchart LR
+    Q[User request] --> CLASSIFY{Memory mode}
+    CLASSIFY -->|Fresh task| FRESH[Clear old working context]
+    CLASSIFY -->|Relevant/full| RECALL[Recall useful facts]
+    FRESH --> PROMPT[Build prompt]
+    RECALL --> PROMPT
+
+    PROMPT --> WORKING[Working memory\ncurrent conversation]
+    PROMPT --> CANON[Canonical memory\npreferences, projects, facts]
+    PROMPT --> VECTOR[Vector recall\nsimilar meaning]
+    PROMPT --> LESSONS[Lessons / experience\nwhat worked before]
+
+    SAVE[Save new fact] --> CONFLICT{Conflict check}
+    CONFLICT -->|New / trusted| STORE[(Canonical store)]
+    CONFLICT -->|Old fact replaced| SUPERSEDE[Supersede old record]
+    SUPERSEDE --> STORE
+
+    ACTION[Tool proposal] --> POLICY[Policy engine]
+    POLICY -->|Read-only| ALLOW[Allow]
+    POLICY -->|High risk| CONFIRM[Ask user]
+    POLICY -->|Unsafe resource / error| DENY[Deny]
+
+    classDef memory fill:#dbeafe,stroke:#2563eb,color:#111827;
+    classDef safety fill:#fee2e2,stroke:#dc2626,color:#111827;
+    classDef store fill:#fef3c7,stroke:#d97706,color:#111827;
+    class WORKING,CANON,VECTOR,LESSONS,RECALL,FRESH,PROMPT,CLASSIFY memory;
+    class POLICY,ALLOW,CONFIRM,DENY,ACTION safety;
+    class STORE,SUPERSEDE,CONFLICT store;

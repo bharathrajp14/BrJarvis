@@ -1,0 +1,26 @@
+stateDiagram-v2
+    [*] --> CREATED
+    CREATED --> UNDERSTANDING
+    UNDERSTANDING --> PLANNING
+    PLANNING --> PREFLIGHT
+    PREFLIGHT --> WAITING_FOR_USER: Need missing information
+    PREFLIGHT --> WAITING_FOR_APPROVAL: Risky action
+    PREFLIGHT --> RUNNING: Ready
+    WAITING_FOR_USER --> RUNNING: User answers
+    WAITING_FOR_APPROVAL --> RUNNING: User approves
+    WAITING_FOR_APPROVAL --> CANCELLED: User rejects
+    RUNNING --> RUNNING: Execute next step
+    RUNNING --> RECOVERING: Crash / restart
+    RECOVERING --> RUNNING: Checkpoint found
+    RECOVERING --> FAILED: Cannot recover
+    RUNNING --> PARTIAL_SUCCESS: Some criteria pass
+    RUNNING --> COMPLETED_UNVERIFIED: Work ended, evidence incomplete
+    RUNNING --> SUCCESS_VERIFIED: All criteria and evidence pass
+    RUNNING --> TASK_FAILED_RESULT_MISMATCH: Output does not match goal
+    RUNNING --> CANCELLED: User cancels
+    SUCCESS_VERIFIED --> [*]
+    FAILED --> [*]
+    CANCELLED --> [*]
+    PARTIAL_SUCCESS --> [*]
+    COMPLETED_UNVERIFIED --> [*]
+    TASK_FAILED_RESULT_MISMATCH --> [*]

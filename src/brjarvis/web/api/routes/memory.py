@@ -37,7 +37,7 @@ class AddContactRequest(BaseModel):
     aliases: List[str] = []
 
 
-@router.get("/api/memory")
+@router.get("/memory")
 async def list_memories(scope: str = "all"):
     """List persistent memories."""
     from brjarvis.memory.persistent_store import load_entries
@@ -59,7 +59,7 @@ async def list_memories(scope: str = "all"):
     return {"memories": entries}
 
 
-@router.post("/api/memory")
+@router.post("/memory")
 async def save_memory_entry(req: SaveMemoryRequest):
     """Save/update a persistent memory entry."""
     from brjarvis.memory.persistent_store import MemoryEntry, save_memory
@@ -75,7 +75,7 @@ async def save_memory_entry(req: SaveMemoryRequest):
     return {"message": f"Memory '{req.name}' saved successfully."}
 
 
-@router.delete("/api/memory/{name}")
+@router.delete("/memory/{name}")
 async def delete_memory_entry(name: str, scope: str = "user"):
     """Delete a persistent memory entry."""
     from brjarvis.memory.persistent_store import delete_memory
@@ -84,7 +84,7 @@ async def delete_memory_entry(name: str, scope: str = "user"):
     return {"message": f"Memory '{name}' deleted successfully."}
 
 
-@router.get("/api/contacts")
+@router.get("/contacts")
 async def get_contacts_endpoint(query: str = Query("", description="Search filter query")):
     """Get contacts list from UnifiedContactStore with optional search filter."""
     from brjarvis.memory.contact_manager import get_contact_store
@@ -94,7 +94,7 @@ async def get_contacts_endpoint(query: str = Query("", description="Search filte
     return {"total": len(results), "contacts": results}
 
 
-@router.post("/api/contacts")
+@router.post("/contacts")
 async def add_contact_endpoint(req: AddContactRequest):
     """Add a new contact directly to the UnifiedContactStore."""
     from brjarvis.memory.contact_manager import get_contact_store
@@ -107,12 +107,12 @@ async def add_contact_endpoint(req: AddContactRequest):
             email=req.email,
             aliases=req.aliases,
         )
-        return {"status": "success", "message": f"Contact '{req.name}' added.", "result": str(result)}
+        return {"status": "success", "message": f"Contact '{req.name}' added.", "contact": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to add contact: {e}")
 
 
-@router.post("/api/import/contacts")
+@router.post("/import/contacts")
 async def import_contacts_endpoint(
     file: UploadFile = File(None),
     content: str = Form(None),
@@ -126,16 +126,21 @@ async def import_contacts_endpoint(
     if file:
         file_bytes = await file.read()
         text_str = file_bytes.decode("utf-8", errors="replace")
-        if file.filename.lower().endswith(".vcf") or "BEGIN:VCARD" in text_str.upper():
+        filename = file.filename or "contacts.txt"
+        if filename.lower().endswith(".vcf") or "BEGIN:VCARD" in text_str.upper():
             res = store.import_vcf(text_str)
         else:
             res = store.import_csv(text_str)
-        return {"status": "success", "file_name": file.filename, "result": res}
+        return {"status": "success", "file_name": filename, "result": res}
 
     if file_path:
-        p = Path(file_path)
-        if not p.exists():
-            raise HTTPException(status_code=404, detail=f"File not found at '{file_path}'")
+        p = Path(file_path).expanduser().resolve()
+        try:
+            p.relative_to(paths.WORKSPACE_ROOT.resolve())
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail="file_path must be inside the configured workspace root.") from exc
+        if not p.exists() or not p.is_file():
+            raise HTTPException(status_code=404, detail="Contact import file was not found.")
         if p.suffix.lower() == ".vcf":
             res = store.import_vcf(p)
         else:
@@ -152,7 +157,7 @@ async def import_contacts_endpoint(
     raise HTTPException(status_code=400, detail="Provide a file upload, file_path, or text content to import.")
 
 
-@router.post("/api/import/file")
+@router.post("/import/file")
 async def import_file_endpoint(
     file: UploadFile = File(None),
     file_path: str = Form(None),
@@ -163,7 +168,8 @@ async def import_file_endpoint(
     if file:
         temp_dir = paths.TEMP_ROOT / "uploads"
         temp_dir.mkdir(parents=True, exist_ok=True)
-        save_path = temp_dir / file.filename
+        filename = Path(file.filename or "upload.bin").name
+        save_path = temp_dir / filename
         file_bytes = await file.read()
         save_path.write_bytes(file_bytes)
         res = import_file_to_knowledge(save_path)
@@ -176,7 +182,7 @@ async def import_file_endpoint(
     raise HTTPException(status_code=400, detail="Provide a file upload or file_path to import.")
 
 
-@router.post("/api/remember")
+@router.post("/remember")
 async def remember_note(req: RememberRequest):
     """Save a voice or text note into captures/ and update 3D galaxy live."""
     try:
@@ -217,7 +223,7 @@ async def remember_note(req: RememberRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/api/galaxy/data")
+@router.get("/galaxy/data")
 async def get_galaxy_data():
     """Return 3D Knowledge Galaxy nodes and links from scanned notes."""
     try:

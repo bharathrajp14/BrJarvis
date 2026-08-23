@@ -21,7 +21,7 @@ class CreateNotificationRequest(BaseModel):
     action_link: Optional[str] = None
 
 
-@router.get("/api/notifications")
+@router.get("/notifications")
 async def list_notifications(
     category: Optional[str] = None,
     unread_only: bool = False,
@@ -38,7 +38,7 @@ async def list_notifications(
     }
 
 
-@router.post("/api/notifications")
+@router.post("/notifications")
 async def create_notification(req: CreateNotificationRequest):
     """Create a new notification entry."""
     store = get_workspace_store()
@@ -52,7 +52,7 @@ async def create_notification(req: CreateNotificationRequest):
     return {"status": "success", "notification": notif.to_dict()}
 
 
-@router.patch("/api/notifications/{notification_id}/read")
+@router.patch("/notifications/{notification_id}/read")
 async def mark_notification_read(notification_id: str):
     """Mark single notification as read."""
     store = get_workspace_store()
@@ -62,7 +62,7 @@ async def mark_notification_read(notification_id: str):
     return {"status": "success", "notification_id": notification_id}
 
 
-@router.post("/api/notifications/read-all")
+@router.post("/notifications/read-all")
 async def mark_all_notifications_read():
     """Mark all unread notifications as read."""
     store = get_workspace_store()

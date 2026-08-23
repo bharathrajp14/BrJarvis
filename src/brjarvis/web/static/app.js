@@ -1,4 +1,4 @@
-﻿// web/app.js — BR JARVIS Next-Generation AI Workspace Client Engine v41.0.0
+﻿// web/app.js — BR JARVIS Next-Generation AI Workspace Client Engine v41.0.3
 (function (window, document) {
     'use strict';
 
@@ -248,6 +248,7 @@
         if (viewId === 'connectorsView') window.fetchConnectors();
         if (viewId === 'skillsView') window.fetchSkills();
         if (viewId === 'knowledgeView') window.fetchMemories();
+        if (viewId === 'careerView') window.loadCareerProfile();
     };
 
         // ── DESKTOP WORKSPACE HANDOFF ──
@@ -394,8 +395,20 @@
         if (attachFileBtn && chatFileInput) {
             attachFileBtn.addEventListener('click', () => chatFileInput.click());
             chatFileInput.addEventListener('change', async () => {
-                if (chatFileInput.files && chatFileInput.files.length) {
-                    window.showToast('Attachment', `Selected: ${chatFileInput.files[0].name}`, 'info');
+                const file = chatFileInput.files && chatFileInput.files[0];
+                if (!file) return;
+                const form = new FormData();
+                form.append('file', file, file.name);
+                window.showToast('Attachment', `Importing ${file.name}…`, 'info');
+                try {
+                    const response = await window.apiFetch(`${API_BASE}/api/import/file`, { method: 'POST', body: form });
+                    const payload = await response.json().catch(() => ({}));
+                    if (!response.ok) throw new Error(payload?.error?.message || payload?.detail || `HTTP ${response.status}`);
+                    window.showToast('Attachment imported', payload.message || `${file.name} is available to the knowledge workflow.`, 'success');
+                } catch (error) {
+                    window.showToast('Attachment import failed', String(error), 'error');
+                } finally {
+                    chatFileInput.value = '';
                 }
             });
         }
@@ -818,7 +831,7 @@
                 <div class="msg-bubble system">
                     <div class="msg-author">⚡ BR JARVIS COGNITIVE CORE</div>
                     <div class="msg-body">
-                        Welcome to <strong>BR JARVIS v41.0.0 Workspace</strong>. Type a question or task request to begin.
+                        Welcome to <strong>BR JARVIS v41.0.3 Workspace</strong>. Type a question or task request to begin.
                     </div>
                 </div>
             `;
@@ -1275,6 +1288,50 @@
     };
 
     // ── CAREER OS STUDIO ──
+    window.loadCareerProfile = async function () {
+        const snapshot = document.getElementById('careerResumeSnapshot');
+        if (!snapshot) return;
+        try {
+            const res = await window.apiFetch(`${API_BASE}/api/career/profile`);
+            if (!res.ok) throw new Error(`Profile request failed (${res.status})`);
+            const data = await res.json();
+            const profile = data.profile || {};
+            const validation = data.validation || {};
+            const contact = profile.contact || {};
+            const preferences = profile.preferences || {};
+            const skills = (profile.skills || []).reduce((total, group) => total + (group.skills || []).length, 0);
+
+            const setText = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = value || '—';
+            };
+            setText('careerSnapshotName', contact.full_name || 'Career Profile');
+            setText('careerSnapshotSummary', profile.summary || 'Resume-backed profile ready for tailoring and ATS analysis.');
+            setText('careerSnapshotExperience', (profile.experience || []).length);
+            setText('careerSnapshotProjects', (profile.projects || []).length);
+            setText('careerSnapshotSkills', skills);
+
+            const meta = document.getElementById('careerSnapshotMeta');
+            if (meta) {
+                const roles = (preferences.target_roles || []).slice(0, 4);
+                const chips = [contact.location, contact.email, ...roles].filter(Boolean);
+                meta.innerHTML = chips.map(item => `<span>${escapeHTML(item)}</span>`).join('');
+            }
+            const badge = document.getElementById('careerProfileCompletenessBadge');
+            const score = validation.completeness_score ?? validation.score;
+            if (badge && score !== undefined) {
+                badge.classList.add('resume-synced');
+                setText('careerCompletenessScore', `${score}%`);
+            }
+            const json = document.getElementById('canonicalProfileJson');
+            if (json) json.textContent = JSON.stringify(profile, null, 2);
+        } catch (error) {
+            console.debug('Career profile load error:', error);
+            const summary = document.getElementById('careerSnapshotSummary');
+            if (summary) summary.textContent = 'Resume profile is available locally; refresh the workspace connection to load live validation.';
+        }
+    };
+
     window.switchCareerTab = function (tabId) {
         document.querySelectorAll('.career-subtab').forEach(t => t.style.display = 'none');
         document.querySelectorAll('#careerTabPills .filter-pill').forEach(p => p.classList.remove('active'));
@@ -1291,6 +1348,7 @@
 
         if (tabId === 'pipelineTab') window.loadCareerApplications();
         if (tabId === 'jobsTab') window.executeJobSearch();
+        if (tabId === 'profileTab') window.loadCareerProfile();
     };
 
     window.executeJobSearch = async function () {
@@ -1426,7 +1484,10 @@
                     panel.appendChild(badge);
                 });
             })
-            .catch(() => {});
+                        .catch(err => {
+                const panel = document.getElementById('connectorPanel');
+                if (panel) panel.innerHTML = `<div class="sidebar-empty-state">Connector status unavailable: ${escapeHTML(String(err))}</div>`;
+            });
     }
 
     window.fetchConnectors = function () {
@@ -1450,7 +1511,9 @@
                     grid.appendChild(card);
                 });
             })
-            .catch(() => {});
+                        .catch(err => {
+                grid.innerHTML = `<div class="sidebar-empty-state">Connector data unavailable: ${escapeHTML(String(err))}</div>`;
+            });
     };
 
     window.fetchContacts = function () {
@@ -1471,7 +1534,9 @@
                     grid.appendChild(card);
                 });
             })
-            .catch(() => {});
+                        .catch(err => {
+                grid.innerHTML = `<div class="sidebar-empty-state">Contact data unavailable: ${escapeHTML(String(err))}</div>`;
+            });
     };
 
     window.useSkillInChat = function (command) {

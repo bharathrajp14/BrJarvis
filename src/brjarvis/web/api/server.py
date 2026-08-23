@@ -310,43 +310,36 @@ def create_app() -> FastAPI:
         )
 
     # Mount Route Routers
-    app.include_router(auth_router)
+    app.include_router(auth_router, prefix="/api")
     app.include_router(health_router)
-    app.include_router(tasks_router)
-    app.include_router(conversations_router)
-    app.include_router(projects_router)
-    app.include_router(artifacts_router)
+    app.include_router(tasks_router, prefix="/api")
+    app.include_router(conversations_router, prefix="/api")
+    app.include_router(projects_router, prefix="/api")
+    app.include_router(artifacts_router, prefix="/api")
     app.include_router(search_router)
-    app.include_router(notifications_router)
+    app.include_router(notifications_router, prefix="/api")
     app.include_router(automations_router)
     app.include_router(devices_router)
     app.include_router(routines_router)
     app.include_router(skills_router)
-    app.include_router(connectors_router)
-    app.include_router(memory_router)
+    app.include_router(connectors_router, prefix="/api")
+    app.include_router(memory_router, prefix="/api")
     app.include_router(chat_router)
     app.include_router(voice_router)
     app.include_router(ws_router)
     app.include_router(career_router)
 
-    # Versioned /api/v1 prefixes for all routers
-    app.include_router(auth_router, prefix="/api/v1")
-    app.include_router(health_router, prefix="/api/v1")
+    # Versioned mounts are explicit for routers whose decorators are canonical
+    # relative paths. Legacy routers retain their own tested `/api/v1` aliases
+    # and are not mounted again, preventing `/api/v1/api/...` drift.
     app.include_router(tasks_router, prefix="/api/v1")
-    app.include_router(conversations_router, prefix="/api/v1")
     app.include_router(projects_router, prefix="/api/v1")
     app.include_router(artifacts_router, prefix="/api/v1")
-    app.include_router(search_router, prefix="/api/v1")
-    app.include_router(notifications_router, prefix="/api/v1")
-    app.include_router(automations_router, prefix="/api/v1")
-    app.include_router(devices_router, prefix="/api/v1")
-    app.include_router(routines_router, prefix="/api/v1")
-    app.include_router(skills_router, prefix="/api/v1")
     app.include_router(connectors_router, prefix="/api/v1")
     app.include_router(memory_router, prefix="/api/v1")
-    app.include_router(chat_router, prefix="/api/v1")
-    app.include_router(voice_router, prefix="/api/v1")
-    app.include_router(career_router, prefix="/api/v1")
+    app.include_router(auth_router, prefix="/api/v1")
+    app.include_router(notifications_router, prefix="/api/v1")
+    app.include_router(conversations_router, prefix="/api/v1")
 
     # Mount Static Files & Web Client
     # Critical: HTML/JS/CSS served with no-cache so the Service Worker and browser

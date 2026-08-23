@@ -1,5 +1,5 @@
-﻿// web/sw.js — BR JARVIS Progressive Web App Service Worker v40.2.0
-const CACHE_NAME = "brjarvis-v41.0.0";
+﻿// web/sw.js — BR JARVIS Progressive Web App Service Worker v41.0.3
+const CACHE_NAME = "brjarvis-v41.0.3";
 const ASSETS_TO_CACHE = [
   "/",
   "/web/index.html",
@@ -13,7 +13,7 @@ const ASSETS_TO_CACHE = [
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log("[ServiceWorker] Caching core PWA shell assets for v40.2.0");
+      console.log("[ServiceWorker] Caching core PWA shell assets for v41.0.3");
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );

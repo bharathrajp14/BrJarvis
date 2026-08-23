@@ -148,8 +148,7 @@ def _is_authorized(request: Request, authorization: Optional[str], x_api_key: Op
     return False
 
 
-@router.get("/api/auth/status", response_model=AuthStatusResponse)
-@router.get("/api/v1/auth/status", response_model=AuthStatusResponse)
+@router.get("/auth/status", response_model=AuthStatusResponse)
 async def get_auth_status(
     request: Request, authorization: Optional[str] = Header(None), x_api_key: Optional[str] = Header(None)
 ):
@@ -163,8 +162,7 @@ async def get_auth_status(
     )
 
 
-@router.post("/api/auth/login", response_model=LoginResponse)
-@router.post("/api/v1/auth/login", response_model=LoginResponse)
+@router.post("/auth/login", response_model=LoginResponse)
 async def login(login_req: LoginRequest, response: Response):
     """Authenticate with API key and establish a session."""
     if not SERVER_API_KEY or not hmac.compare_digest(login_req.api_key.strip(), SERVER_API_KEY):
@@ -186,8 +184,7 @@ async def login(login_req: LoginRequest, response: Response):
     )
 
 
-@router.post("/api/auth/desktop-handoff", response_model=DesktopHandoffResponse)
-@router.post("/api/v1/auth/desktop-handoff", response_model=DesktopHandoffResponse)
+@router.post("/auth/desktop-handoff", response_model=DesktopHandoffResponse)
 async def create_desktop_handoff(
     req: DesktopHandoffRequest,
     request: Request,
@@ -207,8 +204,7 @@ async def create_desktop_handoff(
     return DesktopHandoffResponse(url=f"{redirect}{separator}handoff={handoff}", expires_in=int(_HANDOFF_TTL_SECONDS))
 
 
-@router.post("/api/auth/desktop-handoff/redeem")
-@router.post("/api/v1/auth/desktop-handoff/redeem")
+@router.post("/auth/desktop-handoff/redeem")
 async def redeem_desktop_handoff(req: DesktopHandoffRedeemRequest, response: Response):
     """Consume a one-time desktop handoff and establish the normal browser session cookie."""
     _prune_expired()
@@ -227,8 +223,7 @@ async def redeem_desktop_handoff(req: DesktopHandoffRedeemRequest, response: Res
     return {"success": True, "expires_in": int(_SESSION_TTL_SECONDS)}
 
 
-@router.post("/api/auth/ws-ticket", response_model=TicketResponse)
-@router.post("/api/v1/auth/ws-ticket", response_model=TicketResponse)
+@router.post("/auth/ws-ticket", response_model=TicketResponse)
 async def request_ws_ticket(
 
     request: Request, authorization: Optional[str] = Header(None), x_api_key: Optional[str] = Header(None)

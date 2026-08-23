@@ -449,7 +449,30 @@ class JarvisOrchestrator:
         cleaned = re.sub(r"<\|.*?\|>", "", cleaned)
         return cleaned.strip()
 
+    def _prompt_injection_block(self, user_input: str) -> str | None:
+        """Return a safety response for high-risk prompt injection, if detected."""
+        try:
+            from brjarvis.guardian.prompt_injection_shield import get_prompt_injection_shield
+
+            shield = get_prompt_injection_shield()
+            injection_result = shield.inspect(user_input)
+            if injection_result.is_injection and injection_result.risk_level in ("high", "critical"):
+                logger.warning(
+                    "[Guardian] Prompt Injection blocked: risk=%s, patterns=%s",
+                    injection_result.risk_level,
+                    injection_result.detected_patterns,
+                )
+                return (
+                    "[Guardian Alert] Request blocked by safety policy due to detected adversarial "
+                    "prompt injection pattern: "
+                    f"{', '.join(injection_result.detected_patterns)}."
+                )
+        except Exception as shield_error:
+            logger.debug("[Guardian] Prompt injection inspection note: %s", shield_error)
+        return None
+
     def _build_system(self, user_prompt: str = "") -> str:
+
         name = os.environ.get("JARVIS_ASSISTANT_NAME", "BR").strip()
         sys_prompt = (
             f"You are {name}, an ultra-fast autonomous AI assistant. Think step-by-step, act decisively, avoid filler.\n"
@@ -1132,20 +1155,11 @@ class JarvisOrchestrator:
     def chat(self, user_input: str) -> str:
         """Run a synchronous ReAct chat turn and return the final response."""
         # ── Guardian / Prompt Injection Defense ───────────────────────────────
-        try:
-            from brjarvis.guardian.prompt_injection_shield import get_prompt_injection_shield
+        injection_block = self._prompt_injection_block(user_input)
+        if injection_block:
+            return injection_block
 
-            shield = get_prompt_injection_shield()
-            injection_result = shield.inspect(user_input)
-            if injection_result.is_injection and injection_result.risk_level in ("high", "critical"):
-                logger.warning(
-                    "[Guardian] 🚨 Prompt Injection blocked: risk=%s, patterns=%s",
-                    injection_result.risk_level,
-                    injection_result.detected_patterns,
-                )
-                return f"[Guardian Alert] Request blocked by safety policy due to detected adversarial prompt injection pattern: {', '.join(injection_result.detected_patterns)}."
-        except Exception as _shield_err:
-            logger.debug("[Guardian] Prompt injection inspection note: %s", _shield_err)
+
 
         mode_result = self._parse_mode(user_input)
         if mode_result:
@@ -1249,7 +1263,13 @@ class JarvisOrchestrator:
 
     def chat_stream(self, user_input: str) -> Iterator[str]:
         """Stream a ReAct chat turn, yielding response chunks as they arrive."""
+        injection_block = self._prompt_injection_block(user_input)
+        if injection_block:
+            yield injection_block
+            return
+
         mode_result = self._parse_mode(user_input)
+
         if mode_result:
             yield mode_result
             return

@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="BR JARVIS v41.0.0 — Next-Generation Web AI Workspace: Autonomous Task Engine, Multi-Project Control Plane & Cognitive Memory.">
+    <meta name="description" content="BR JARVIS v41.0.3 — Next-Generation Web AI Workspace: Autonomous Task Engine, Multi-Project Control Plane & Cognitive Memory.">
     <link rel="manifest" href="/web/manifest.json">
     <meta name="color-scheme" content="dark">
 
-    <title>BR JARVIS — Next-Generation AI Workspace v41.0.0</title>
+    <title>BR JARVIS — Next-Generation AI Workspace v41.0.3</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
-    <link rel="stylesheet" href="/web/style.css?v=41.0.0">
+    <link rel="stylesheet" href="/web/style.css?v=41.0.3">
 
     <!-- ── SW CACHE BUSTER ── -->
     <script>
@@ -25,7 +25,7 @@
                 if ('caches' in window) {
                     caches.keys().then(function (names) {
                         names.forEach(function (name) {
-                            if (name !== 'br-jarvis-v41.0.0') caches.delete(name);
+                            if (name !== 'br-jarvis-v41.0.3') caches.delete(name);
                         });
                     });
                 }
@@ -55,7 +55,7 @@
                     <span class="status-pulse"></span>
                     <span class="brand-title">BR JARVIS</span>
                 </div>
-                <span class="os-badge">v41.0.0 WORKSPACE</span>
+                <span class="os-badge">v41.0.3 WORKSPACE</span>
                 <span class="guardian-badge" id="guardianBadge">GUARDIAN 🛡️</span>
                 <button class="galaxy-btn" id="authKeyTrigger" onclick="window.showServerAuthModal()" title="Configure Server Authentication Key">🔑 AUTH</button>
                 <a href="/web/galaxy.html" target="_blank" class="galaxy-btn" rel="noopener">🌌 GALAXY</a>
@@ -241,7 +241,7 @@
                         <div class="msg-bubble system" id="welcomeBubble">
                             <div class="msg-author">⚡ BR JARVIS COGNITIVE CORE</div>
                             <div class="msg-body">
-                                Welcome to **BR JARVIS v41.0.0 Workspace**. State persistence, task planning, tool activity ledger, and artifact provenance are active.
+                                Welcome to **BR JARVIS v41.0.3 Workspace**. State persistence, task planning, tool activity ledger, and artifact provenance are active.
                             </div>
                         </div>
                     </div>
@@ -373,6 +373,22 @@
                             </span>
                         </div>
                     </div>
+
+                    <!-- Resume-verified profile snapshot -->
+                    <section class="career-resume-snapshot" id="careerResumeSnapshot" aria-label="Resume-verified Career OS profile">
+                        <div class="career-snapshot-main">
+                            <div class="career-snapshot-kicker">RESUME-VERIFIED PROFILE</div>
+                            <h2 id="careerSnapshotName">Bharath Raj P</h2>
+                            <p id="careerSnapshotSummary">Loading your resume-backed profile...</p>
+                            <div class="career-snapshot-meta" id="careerSnapshotMeta"></div>
+                        </div>
+                        <div class="career-snapshot-side">
+                            <div class="career-stat"><strong id="careerSnapshotExperience">—</strong><span>Experience</span></div>
+                            <div class="career-stat"><strong id="careerSnapshotProjects">—</strong><span>Projects</span></div>
+                            <div class="career-stat"><strong id="careerSnapshotSkills">—</strong><span>Skills</span></div>
+                            <button class="btn btn-secondary" onclick="window.loadCareerProfile()">↻ REFRESH PROFILE</button>
+                        </div>
+                    </section>
 
                     <!-- Career OS Sub-Tab Navigation -->
                     <div class="filter-pills-row career-tab-pills" id="careerTabPills">
@@ -735,7 +751,7 @@
 
         <!-- Shared platform contracts load before the legacy client for a compatibility migration. -->
     <script type="module" src="/web/platform/bootstrap.js?v=0.1.0"></script>
-    <script src="/web/app.js?v=41.0.0"></script>
+    <script src="/web/app.js?v=41.0.3"></script>
 
 </body>
 

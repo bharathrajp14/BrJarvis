@@ -139,7 +139,7 @@
   },
   "gethelp": {
     "name": "GetHelp.exe",
-    "path": "C:\\Program Files\\WindowsApps\\Microsoft.GetHelp_10.2409.42092.0_x64__8wekyb3d8bbwe\\GetHelp.exe",
+    "path": "C:\\Program Files\\WindowsApps\\Microsoft.GetHelp_10.2409.42162.0_x64__8wekyb3d8bbwe\\GetHelp.exe",
     "type": "executable",
     "source": "Registry App Paths"
   },
@@ -152,12 +152,6 @@
   "mspaint": {
     "name": "mspaint.exe",
     "path": "C:\\Program Files\\WindowsApps\\Microsoft.Paint_11.2605.71.0_x64__8wekyb3d8bbwe\\PaintApp\\mspaint.exe",
-    "type": "executable",
-    "source": "Registry App Paths"
-  },
-  "ngrok": {
-    "name": "ngrok.exe",
-    "path": "C:\\Program Files\\WindowsApps\\ngrok.ngrok_3.39.9.0_x64__1g87z0zv29zzc\\ngrok.exe",
     "type": "executable",
     "source": "Registry App Paths"
   },
@@ -281,6 +275,12 @@
     "type": "shortcut",
     "source": "Start Menu"
   },
+  "proton mail": {
+    "name": "Proton Mail",
+    "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Proton Mail.lnk",
+    "type": "shortcut",
+    "source": "Start Menu"
+  },
   "roller champions": {
     "name": "Roller Champions",
     "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Roller Champions.url",
@@ -386,6 +386,12 @@
   "postman": {
     "name": "Postman",
     "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Postman\\Postman.lnk",
+    "type": "shortcut",
+    "source": "Start Menu"
+  },
+  "proton drive": {
+    "name": "Proton Drive",
+    "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Proton\\Proton Drive.lnk",
     "type": "shortcut",
     "source": "Start Menu"
   },
@@ -503,6 +509,12 @@
     "type": "shortcut",
     "source": "Start Menu"
   },
+  "com_usr_daemon_pro": {
+    "name": "com_usr_daemon_pro",
+    "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\com_usr_daemon_pro.lnk",
+    "type": "shortcut",
+    "source": "Start Menu"
+  },
   "command prompt": {
     "name": "Command Prompt",
     "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\System Tools\\Command Prompt.lnk",
@@ -524,6 +536,12 @@
   "telegram": {
     "name": "Telegram",
     "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Telegram Desktop\\Telegram.lnk",
+    "type": "shortcut",
+    "source": "Start Menu"
+  },
+  "turbovpn": {
+    "name": "TurboVPN",
+    "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\TurboVPN\\TurboVPN.lnk",
     "type": "shortcut",
     "source": "Start Menu"
   },
@@ -572,6 +590,12 @@
   "audiorelay": {
     "name": "AudioRelay",
     "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\AudioRelay.lnk",
+    "type": "shortcut",
+    "source": "Start Menu"
+  },
+  "hma vpn": {
+    "name": "HMA VPN",
+    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\HMA VPN.lnk",
     "type": "shortcut",
     "source": "Start Menu"
   },
@@ -857,6 +881,12 @@
     "type": "shortcut",
     "source": "Start Menu"
   },
+  "proton vpn": {
+    "name": "Proton VPN",
+    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Proton\\Proton VPN.lnk",
+    "type": "shortcut",
+    "source": "Start Menu"
+  },
   "idle (python 3.14 64-bit)": {
     "name": "IDLE (Python 3.14 64-bit)",
     "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Python 3.14\\IDLE (Python 3.14 64-bit).lnk",
@@ -884,6 +914,12 @@
   "qbittorrent": {
     "name": "qBittorrent",
     "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\qBittorrent\\qBittorrent.lnk",
+    "type": "shortcut",
+    "source": "Start Menu"
+  },
+  "qoder ide": {
+    "name": "Qoder IDE",
+    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Qoder IDE\\Qoder IDE.lnk",
     "type": "shortcut",
     "source": "Start Menu"
   },
@@ -1091,12 +1127,6 @@
     "type": "executable",
     "source": "Standard Directory"
   },
-  "new_code": {
-    "name": "new_Code",
-    "path": "C:\\Users\\bhara\\AppData\\Local\\Programs\\Microsoft VS Code\\new_Code.exe",
-    "type": "executable",
-    "source": "Standard Directory"
-  },
   "antigravity_tools": {
     "name": "antigravity_tools",
     "path": "C:\\Users\\bhara\\AppData\\Local\\Antigravity Tools\\antigravity_tools.exe",
@@ -1136,6 +1166,24 @@
   "mongodbcompass": {
     "name": "MongoDBCompass",
     "path": "C:\\Users\\bhara\\AppData\\Local\\MongoDBCompass\\MongoDBCompass.exe",
+    "type": "executable",
+    "source": "Standard Directory"
+  },
+  "build_electro": {
+    "name": "Build_Electro",
+    "path": "C:\\Users\\bhara\\AppData\\Local\\Temp\\Build_Electro.exe",
+    "type": "executable",
+    "source": "Standard Directory"
+  },
+  "proton%20drive%20setup%203.0.4": {
+    "name": "Proton%20Drive%20Setup%203.0.4",
+    "path": "C:\\Users\\bhara\\AppData\\Local\\Temp\\Proton%20Drive%20Setup%203.0.4.exe",
+    "type": "executable",
+    "source": "Standard Directory"
+  },
+  "protonmail-desktop": {
+    "name": "ProtonMail-desktop",
+    "path": "C:\\Users\\bhara\\AppData\\Local\\Temp\\ProtonMail-desktop.exe",
     "type": "executable",
     "source": "Standard Directory"
   },
@@ -1427,6 +1475,24 @@
     "type": "executable",
     "source": "Standard Directory"
   },
+  "installtapx64": {
+    "name": "installtapx64",
+    "path": "C:\\Program Files (x86)\\TurboVPN\\installtapx64.exe",
+    "type": "executable",
+    "source": "Standard Directory"
+  },
+  "tun2socks": {
+    "name": "tun2socks",
+    "path": "C:\\Program Files (x86)\\TurboVPN\\tun2socks.exe",
+    "type": "executable",
+    "source": "Standard Directory"
+  },
+  "turbo_vpn-service": {
+    "name": "turbo_vpn-service",
+    "path": "C:\\Program Files (x86)\\TurboVPN\\turbo_vpn-service.exe",
+    "type": "executable",
+    "source": "Standard Directory"
+  },
   "actionsmcphost": {
     "name": "ActionsMcpHost",
     "path": "C:\\Users\\bhara\\AppData\\Local\\Microsoft\\WindowsApps\\ActionsMcpHost.exe",
@@ -1571,15 +1637,15 @@
     "type": "executable",
     "source": "Uninstall Registry"
   },
-  "copilot": {
-    "name": "Copilot",
-    "path": "C:\\Program Files (x86)\\Microsoft\\Copilot\\Application\\mscopilot.exe",
-    "type": "executable",
-    "source": "Uninstall Registry"
-  },
   "microsoft edge": {
     "name": "Microsoft Edge",
     "path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+    "type": "executable",
+    "source": "Uninstall Registry"
+  },
+  "turbovpn 3.7.0.0": {
+    "name": "TurboVPN 3.7.0.0",
+    "path": "C:\\Program Files (x86)\\TurboVPN\\TurboVPN.exe",
     "type": "executable",
     "source": "Uninstall Registry"
   },

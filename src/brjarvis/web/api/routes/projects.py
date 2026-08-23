@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
@@ -29,7 +30,7 @@ class UpdateProjectRequest(BaseModel):
     pinned: Optional[bool] = None
 
 
-@router.get("/api/projects")
+@router.get("/projects")
 async def list_projects():
     """List all workspace projects."""
     store = get_workspace_store()
@@ -37,7 +38,7 @@ async def list_projects():
     return {"total": len(projects), "projects": [p.to_dict() for p in projects]}
 
 
-@router.post("/api/projects")
+@router.post("/projects")
 async def create_project(req: CreateProjectRequest):
     """Create a new workspace project."""
     if not req.name.strip():
@@ -52,7 +53,7 @@ async def create_project(req: CreateProjectRequest):
     return {"status": "success", "project": proj.to_dict()}
 
 
-@router.get("/api/projects/{project_id}")
+@router.get("/projects/{project_id}")
 async def get_project_details(project_id: str):
     """Get project details including files, conversations, tasks, and artifacts."""
     store = get_workspace_store()
@@ -72,7 +73,7 @@ async def get_project_details(project_id: str):
     }
 
 
-@router.patch("/api/projects/{project_id}")
+@router.patch("/projects/{project_id}")
 async def update_project(project_id: str, req: UpdateProjectRequest):
     """Update project metadata, instructions, and settings."""
     store = get_workspace_store()
@@ -89,7 +90,7 @@ async def update_project(project_id: str, req: UpdateProjectRequest):
     return {"status": "success", "project": updated.to_dict()}
 
 
-@router.delete("/api/projects/{project_id}")
+@router.delete("/projects/{project_id}")
 async def delete_project(project_id: str):
     """Delete a project workspace."""
     store = get_workspace_store()
@@ -99,7 +100,7 @@ async def delete_project(project_id: str):
     return {"status": "success", "message": f"Project {project_id} deleted."}
 
 
-@router.get("/api/projects/{project_id}/files")
+@router.get("/projects/{project_id}/files")
 async def list_project_files(project_id: str):
     """List all files attached to a project."""
     store = get_workspace_store()
@@ -107,7 +108,7 @@ async def list_project_files(project_id: str):
     return {"total": len(files), "files": [f.to_dict() for f in files]}
 
 
-@router.post("/api/projects/{project_id}/files")
+@router.post("/projects/{project_id}/files")
 async def upload_project_file(
     project_id: str,
     file: UploadFile = File(...),
@@ -120,14 +121,15 @@ async def upload_project_file(
 
     target_dir = paths.ARTIFACT_ROOT / "projects" / project_id
     target_dir.mkdir(parents=True, exist_ok=True)
-    target_path = target_dir / file.filename
+    filename = Path(file.filename or "upload.bin").name
+    target_path = target_dir / filename
 
     content = await file.read()
     target_path.write_bytes(content)
 
     rec = store.add_project_file(
         project_id=project_id,
-        filename=file.filename,
+        filename=filename,
         file_path=str(target_path),
         file_size=len(content),
         mime_type=file.content_type or "application/octet-stream",
@@ -136,7 +138,7 @@ async def upload_project_file(
     return {"status": "success", "file": rec.to_dict()}
 
 
-@router.delete("/api/projects/{project_id}/files/{file_id}")
+@router.delete("/projects/{project_id}/files/{file_id}")
 async def delete_project_file(project_id: str, file_id: str):
     """Remove a file from the project workspace."""
     store = get_workspace_store()

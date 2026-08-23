@@ -43,7 +43,7 @@ class PostMessageRequest(BaseModel):
     backend: Optional[str] = "gemini"
 
 
-@router.get("/api/conversations")
+@router.get("/conversations")
 async def list_conversations(
     project_id: Optional[str] = None,
     include_archived: bool = False,
@@ -61,7 +61,7 @@ async def list_conversations(
     return {"total": len(convs), "conversations": [c.to_dict() for c in convs]}
 
 
-@router.post("/api/conversations")
+@router.post("/conversations")
 async def create_conversation(req: CreateConversationRequest):
     """Create a new persistent conversation record."""
     store = get_workspace_store()
@@ -72,7 +72,7 @@ async def create_conversation(req: CreateConversationRequest):
     return {"status": "success", "conversation": conv.to_dict()}
 
 
-@router.get("/api/conversations/{conversation_id}")
+@router.get("/conversations/{conversation_id}")
 async def get_conversation_details(conversation_id: str):
     """Get full conversation metadata, messages, linked tasks, and artifacts."""
     store = get_workspace_store()
@@ -90,7 +90,7 @@ async def get_conversation_details(conversation_id: str):
     }
 
 
-@router.patch("/api/conversations/{conversation_id}")
+@router.patch("/conversations/{conversation_id}")
 async def update_conversation(conversation_id: str, req: UpdateConversationRequest):
     """Update title, pinned, archived, or project association."""
     store = get_workspace_store()
@@ -108,7 +108,7 @@ async def update_conversation(conversation_id: str, req: UpdateConversationReque
     return {"status": "success", "conversation": updated.to_dict()}
 
 
-@router.delete("/api/conversations/{conversation_id}")
+@router.delete("/conversations/{conversation_id}")
 async def delete_conversation(conversation_id: str):
     """Permanently delete a conversation and its messages."""
     store = get_workspace_store()
@@ -118,7 +118,7 @@ async def delete_conversation(conversation_id: str):
     return {"status": "success", "message": f"Conversation {conversation_id} deleted."}
 
 
-@router.post("/api/conversations/{conversation_id}/branch")
+@router.post("/conversations/{conversation_id}/branch")
 async def branch_conversation(conversation_id: str, req: CreateBranchRequest):
     """Create a conversational branch from an earlier message."""
     store = get_workspace_store()
@@ -134,7 +134,7 @@ async def branch_conversation(conversation_id: str, req: CreateBranchRequest):
     return {"status": "success", "branch_id": branch_id, "conversation_id": conversation_id}
 
 
-@router.post("/api/conversations/{conversation_id}/duplicate")
+@router.post("/conversations/{conversation_id}/duplicate")
 async def duplicate_conversation(conversation_id: str):
     """Duplicate an existing conversation with history into a new one."""
     store = get_workspace_store()
@@ -144,7 +144,7 @@ async def duplicate_conversation(conversation_id: str):
     return {"status": "success", "conversation": new_conv.to_dict()}
 
 
-@router.get("/api/conversations/{conversation_id}/messages")
+@router.get("/conversations/{conversation_id}/messages")
 async def list_conversation_messages(conversation_id: str, branch_id: Optional[str] = None):
     """Get messages for a conversation, optionally filtered by branch."""
     store = get_workspace_store()
@@ -152,7 +152,7 @@ async def list_conversation_messages(conversation_id: str, branch_id: Optional[s
     return {"total": len(messages), "messages": [m.to_dict() for m in messages]}
 
 
-@router.post("/api/conversations/{conversation_id}/messages")
+@router.post("/conversations/{conversation_id}/messages")
 async def add_conversation_message(conversation_id: str, req: PostMessageRequest):
     """Persist a message into the conversation."""
     store = get_workspace_store()
@@ -174,7 +174,7 @@ async def add_conversation_message(conversation_id: str, req: PostMessageRequest
     return {"status": "success", "message": msg.to_dict()}
 
 
-@router.get("/api/conversations/{conversation_id}/export")
+@router.get("/conversations/{conversation_id}/export")
 async def export_conversation(conversation_id: str, format: str = Query("markdown", pattern="^(markdown|json|text)$")):
     """Export conversation transcript in Markdown, JSON, or Text."""
     store = get_workspace_store()

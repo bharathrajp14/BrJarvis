@@ -1,6 +1,6 @@
 import type { ApiEnvelope, ApiErrorShape, CommandRequest, CommandResponse } from '../contracts/api';
 import type { AppSnapshot, Artifact, Capability, Task, TaskStatus } from '../contracts/domain';
-import { initialSnapshot } from './mock-data';
+import { emptySnapshot } from './empty-state';
 
 export class ApiError extends Error {
   readonly code: string;
@@ -17,7 +17,6 @@ export class ApiError extends Error {
 }
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '';
-const explicitDemoMode = (import.meta.env.VITE_DEMO_MODE as string | undefined) === 'true';
 
 function key() {
   return globalThis.crypto?.randomUUID?.() ?? `ui-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -32,6 +31,21 @@ function taskStatus(value: unknown): TaskStatus {
   if (normalized.includes('plan')) return 'planning';
   if (normalized.includes('run') || normalized.includes('active')) return 'running';
   return 'queued';
+}
+
+function normalizeApproval(raw: Record<string, unknown>, taskId: string) {
+  const details = (raw.details ?? {}) as Record<string, unknown>;
+  const risk = String(raw.risk_level ?? raw.risk ?? 'medium').toLowerCase();
+  return {
+    id: String(raw.request_id ?? raw.id ?? `${taskId}-approval`),
+    taskId,
+    action: String(raw.description ?? raw.action ?? 'Approval required'),
+    target: String(details.target ?? details.resource ?? 'Protected operation'),
+    risk: (risk === 'high' || risk === 'critical' ? 'high' : risk === 'low' ? 'low' : 'medium') as 'low' | 'medium' | 'high',
+    scope: String(details.scope ?? 'Runtime policy'),
+    reason: String(details.reason ?? raw.description ?? 'The task is waiting for operator approval.'),
+    expiresIn: String(raw.expires_in ?? '—'),
+  };
 }
 
 function normalizeTask(raw: Record<string, unknown>, index: number): Task {
@@ -83,17 +97,23 @@ export class ApiClient {
   }
 
   async snapshot(signal?: AbortSignal): Promise<AppSnapshot> {
-    if (explicitDemoMode) return structuredClone(initialSnapshot);
     try {
-      const [taskResult, artifactResult, healthResult, connectorResult] = await Promise.allSettled([
+      const [taskResult, artifactResult, healthResult, connectorResult, projectResult, memoryResult, notificationResult] = await Promise.allSettled([
         this.request<{ tasks?: Record<string, unknown>[]; total?: number }>('/api/agent/tasks?limit=50', { signal }),
         this.request<{ artifacts?: Record<string, unknown>[]; total?: number }>('/api/artifacts', { signal }),
         this.request<Record<string, unknown>>('/health', { signal }),
         this.request<Record<string, unknown>>('/api/v1/connectors', { signal }),
+        this.request<{ projects?: Record<string, unknown>[] }>('/api/projects', { signal }),
+        this.request<{ memories?: Record<string, unknown>[] }>('/api/memory', { signal }),
+        this.request<{ notifications?: Record<string, unknown>[] }>('/api/notifications?limit=20', { signal }),
       ]);
-      const tasks = taskResult.status === 'fulfilled' && Array.isArray(taskResult.value.tasks)
-        ? taskResult.value.tasks.map(normalizeTask)
-        : initialSnapshot.tasks;
+      const rawTasks = taskResult.status === 'fulfilled' && Array.isArray(taskResult.value.tasks) ? taskResult.value.tasks : [];
+      const tasks = rawTasks.map(normalizeTask);
+      const approvals = rawTasks.flatMap((raw, index) => {
+        const taskId = String(raw.task_id ?? raw.id ?? `task-${index + 1}`);
+        const rawApprovals = Array.isArray(raw.approvals) ? raw.approvals : raw.approval_request ? [raw.approval_request] : [];
+        return rawApprovals.filter((item): item is Record<string, unknown> => Boolean(item && typeof item === 'object')).map((item) => normalizeApproval(item, taskId));
+      });
       const artifacts: Artifact[] = artifactResult.status === 'fulfilled' && Array.isArray(artifactResult.value.artifacts)
         ? artifactResult.value.artifacts.map((raw, index) => ({
           id: String(raw.id ?? raw.artifact_id ?? `artifact-${index + 1}`),
@@ -104,27 +124,55 @@ export class ApiClient {
           size: String(raw.size ?? '—'),
           updatedAt: String(raw.updated_at ?? 'Recently'),
         }))
-        : initialSnapshot.artifacts;
+        : [];
       const health = healthResult.status === 'fulfilled' ? healthResult.value : {};
       const connectorPayload = connectorResult.status === 'fulfilled' ? connectorResult.value : {};
+      const projects = projectResult.status === 'fulfilled' && Array.isArray(projectResult.value.projects) ? projectResult.value.projects : [];
+      const memories = memoryResult.status === 'fulfilled' && Array.isArray(memoryResult.value.memories) ? memoryResult.value.memories : [];
+      const notifications = notificationResult.status === 'fulfilled' && Array.isArray(notificationResult.value.notifications) ? notificationResult.value.notifications : [];
       const connectorCount = Array.isArray(connectorPayload.connectors) ? connectorPayload.connectors.length : 0;
+      const workspace = projects.flatMap((project, projectIndex) => {
+        const record = project as Record<string, unknown>;
+        return [{ id: String(record.project_id ?? record.id ?? `project-${projectIndex + 1}`), name: String(record.name ?? 'Project'), kind: 'folder' as const, path: String(record.path ?? '/workspace'), detail: String(record.description ?? 'Live project') }];
+      });
+      const timeline = notifications.map((notification, index) => {
+        const record = notification as Record<string, unknown>;
+        const severity = String(record.severity ?? 'info').toLowerCase();
+        return {
+          id: String(record.notification_id ?? record.id ?? `notification-${index + 1}`),
+          time: String(record.created_at ?? record.created ?? 'Recently'),
+          label: String(record.title ?? 'Notification'),
+          detail: String(record.message ?? ''),
+          tone: severity === 'error' || severity === 'critical' ? 'warning' : severity === 'success' ? 'success' : severity === 'warning' ? 'accent' : 'neutral',
+        } as const;
+      });
       const capabilities: Capability[] = [
         { id: 'runtime', label: 'Core runtime', state: health.status === 'online' ? 'healthy' : 'degraded', detail: health.status === 'online' ? 'Task orchestration online' : 'Runtime health needs attention', latency: 'Live' },
-        { id: 'workspace', label: 'Workspace index', state: 'healthy', detail: 'Workspace intelligence available', latency: 'Live' },
-        { id: 'provider', label: 'Reasoning gateway', state: 'healthy', detail: 'Provider status available through runtime', latency: String(health.backend ?? '—') },
+        { id: 'workspace', label: 'Workspace projects', state: projectResult.status === 'fulfilled' ? 'healthy' : 'unavailable', detail: projectResult.status === 'fulfilled' ? `${projects.length} project${projects.length === 1 ? '' : 's'} returned` : 'Workspace API unavailable', latency: 'Live' },
+        { id: 'provider', label: 'Reasoning gateway', state: health.backend ? 'healthy' : 'unavailable', detail: health.backend ? 'Provider status reported by runtime' : 'Provider status unavailable', latency: String(health.backend ?? '—') },
         { id: 'connectors', label: 'Connectors', state: connectorCount > 0 ? 'healthy' : 'degraded', detail: `${connectorCount} connector${connectorCount === 1 ? '' : 's'} discovered`, latency: 'Live' },
       ];
-      return { ...structuredClone(initialSnapshot), tasks, artifacts, capabilities, activeTaskId: tasks[0]?.id ?? initialSnapshot.activeTaskId, connection: 'connected' };
+      return {
+        ...structuredClone(emptySnapshot),
+        tasks,
+        approvals,
+        artifacts,
+        capabilities,
+        workspace,
+        memoryCount: memories.length,
+        timeline,
+        activeTaskId: tasks[0]?.id ?? '',
+        connection: taskResult.status === 'fulfilled' || healthResult.status === 'fulfilled' ? 'connected' : 'offline',
+      };
     } catch {
-      const fallback = structuredClone(initialSnapshot);
-      fallback.connection = 'offline';
-      fallback.capabilities = fallback.capabilities.map((capability) => ({ ...capability, state: capability.id === 'runtime' ? 'offline' : 'degraded', detail: 'Live backend unavailable; showing local recovery state' }));
-      return fallback;
+      const offline = structuredClone(emptySnapshot);
+      offline.connection = 'offline';
+      offline.capabilities = [{ id: 'runtime', label: 'Core runtime', state: 'offline', detail: 'Live backend unavailable', latency: '—' }];
+      return offline;
     }
   }
 
   async resolveApproval(taskId: string, approvalId: string, approved: boolean, signal?: AbortSignal): Promise<void> {
-    if (explicitDemoMode) return;
     await this.request(`/api/agent/tasks/${encodeURIComponent(taskId)}/approve`, {
       method: 'POST',
       body: JSON.stringify({ request_id: approvalId, approved }),
@@ -134,26 +182,6 @@ export class ApiClient {
   }
 
   async createTask(command: CommandRequest, signal?: AbortSignal): Promise<CommandResponse> {
-    if (explicitDemoMode) {
-      const task: Task = {
-        id: `task-${Math.floor(Math.random() * 9000) + 1000}`,
-        title: command.goal,
-        status: 'planning',
-        mode: command.mode,
-        progress: 8,
-        updatedAt: 'Just now',
-        duration: '00:00',
-        provider: command.mode === 'fast' ? 'Deterministic local' : command.mode === 'smart' ? 'Proxy brain' : 'Deep reasoning gateway',
-        summary: 'BRJARVIS acknowledged the command and is preparing an execution plan.',
-        artifactCount: 0,
-        steps: [
-          { id: 'plan', label: 'Understand request', status: 'active', detail: 'Classifying intent and constraints' },
-          { id: 'context', label: 'Select relevant context', status: 'queued' },
-          { id: 'execute', label: 'Execute and verify', status: 'queued' },
-        ],
-      };
-      return { task, acknowledgement: 'Command accepted. BRJARVIS is preparing a verified execution path.', pathReason: `${command.mode} path selected for the requested latency and complexity budget.` };
-    }
     const response = await this.request<Record<string, unknown>>('/api/agent/tasks', {
       method: 'POST',
       body: JSON.stringify({ goal: command.goal, active_devices: [] }),
@@ -161,7 +189,14 @@ export class ApiClient {
       headers: { 'Idempotency-Key': command.idempotencyKey },
     });
     const taskId = String(response.task_id ?? response.id ?? `task-${key()}`);
-    const task = normalizeTask({ task_id: taskId, goal: command.goal, status: 'planning', mode: command.mode, progress: 5, provider: 'BRJARVIS runtime' }, 0);
+    let taskRecord: Record<string, unknown> = { task_id: taskId, goal: command.goal };
+    try {
+      taskRecord = await this.request<Record<string, unknown>>(`/api/agent/tasks/${encodeURIComponent(taskId)}`, { signal });
+    } catch {
+      // The create response is still authoritative enough to show a queued row;
+      // do not invent progress or completion state while the detail read settles.
+    }
+    const task = normalizeTask(taskRecord, 0);
     return { task, acknowledgement: 'Command accepted by the BRJARVIS runtime. The task is now being planned.', pathReason: `${command.mode} mode requested; backend execution policy remains authoritative.` };
   }
 }

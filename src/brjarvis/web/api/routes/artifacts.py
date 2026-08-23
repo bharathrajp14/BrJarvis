@@ -47,7 +47,7 @@ class VerifyArtifactRequest(BaseModel):
     verified: bool = True
 
 
-@router.get("/api/artifacts")
+@router.get("/artifacts")
 async def list_artifacts(
     conversation_id: Optional[str] = None,
     task_id: Optional[str] = None,
@@ -65,7 +65,7 @@ async def list_artifacts(
     return {"total": len(artifacts), "artifacts": [_artifact_payload(a) for a in artifacts]}
 
 
-@router.get("/api/artifacts/{artifact_id}")
+@router.get("/artifacts/{artifact_id}")
 async def get_artifact(artifact_id: str):
     """Get artifact record and provenance details."""
     store = get_workspace_store()
@@ -75,7 +75,7 @@ async def get_artifact(artifact_id: str):
     return _artifact_payload(art)
 
 
-@router.get("/api/artifacts/{artifact_id}/download")
+@router.get("/artifacts/{artifact_id}/download")
 async def download_artifact(artifact_id: str):
     """Download the actual artifact file securely."""
     store = get_workspace_store()
@@ -92,7 +92,7 @@ async def download_artifact(artifact_id: str):
     )
 
 
-@router.get("/api/artifacts/{artifact_id}/preview")
+@router.get("/artifacts/{artifact_id}/preview")
 async def preview_artifact(artifact_id: str):
     """Get preview content for text/markdown/code/json artifacts."""
     store = get_workspace_store()
@@ -143,7 +143,7 @@ async def preview_artifact(artifact_id: str):
     }
 
 
-@router.post("/api/artifacts/{artifact_id}/verify")
+@router.post("/artifacts/{artifact_id}/verify")
 async def verify_artifact(artifact_id: str, req: VerifyArtifactRequest):
     """Update verification status of an artifact."""
     store = get_workspace_store()

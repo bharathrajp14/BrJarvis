@@ -1,0 +1,38 @@
+flowchart TB
+    U[User] --> S{Choose a surface}
+    S --> CLI[CLI]
+    S --> WEB[Web dashboard / FastAPI]
+    S --> VOICE[Voice / floating widget]
+    S --> CAREER[Career OS]
+
+    CLI --> BOOT[Shared bootstrap]
+    WEB --> BOOT
+    VOICE --> BOOT
+    CAREER --> BOOT
+
+    BOOT --> RT[One AssistantRuntime]
+    RT --> ORCH[JarvisOrchestrator]
+    RT --> ROUTER[AgentRouter]
+    RT --> MEM[Unified memory]
+    RT --> EVENTS[Event bus]
+
+    ORCH --> ROUTER
+    ORCH --> TOOLS[Tool registry + connectors]
+    ORCH --> TASKS[Task state + checkpoints]
+    ORCH --> VERIFY[Verification / evidence]
+
+    ROUTER --> MODELS[LLM backends\nGPT, Gemini, Claude, Ollama, etc.]
+    TOOLS --> POLICY[Fail-closed policy]
+    POLICY --> OS[Files, apps, browser, devices]
+    MEM --> STORE[(SQLite / vector / history)]
+    TASKS --> STORE
+    EVENTS --> STORE
+
+    classDef entry fill:#dbeafe,stroke:#2563eb,color:#111827;
+    classDef core fill:#dcfce7,stroke:#16a34a,color:#111827;
+    classDef safety fill:#fee2e2,stroke:#dc2626,color:#111827;
+    classDef storage fill:#fef3c7,stroke:#d97706,color:#111827;
+    class CLI,WEB,VOICE,CAREER entry;
+    class BOOT,RT,ORCH,ROUTER,MEM,EVENTS,TASKS,VERIFY core;
+    class POLICY,OS safety;
+    class STORE storage;

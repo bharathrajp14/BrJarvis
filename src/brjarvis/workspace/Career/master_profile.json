@@ -1,292 +1,194 @@
 {
   "profile_id": "master_profile",
-  "version": 1,
-  "summary": "Autonomous AI Systems Architect and Senior Software Engineer specializing in real-time agentic execution, OS-level process automation, hardware-in-the-loop control, fail-closed security engines, and distributed machine learning systems.",
+  "version": 2,
+  "summary": "Software Development Intern experienced in React modules and REST API-driven workflows. Builds backend, full-stack, and AI-enabled applications using Python, JavaScript, FastAPI, Node.js, Express.js, SQL, and SQLite with a security-conscious approach to authentication, data handling, automation, and deployed web applications.",
   "contact": {
-    "full_name": "Bharath Raj",
-    "email": "bharthraj1412@gmail.com",
-    "phone": "+91 98765 43210",
-    "location": "Madurai, Tamil Nadu, India",
-    "linkedin_url": "https://linkedin.com/in/bharathraj",
-    "github_url": "https://github.com/bharthraj1412",
-    "portfolio_url": "https://github.com/bharthraj1412/BrJarvis",
+    "full_name": "Bharath Raj P",
+    "email": "bharathraj14120@gmail.com",
+    "phone": "+91 93445 18573",
+    "location": "Natham, Dindigul, Tamil Nadu, India",
+    "linkedin_url": "https://linkedin.com/in/bharathrajp1412",
+    "github_url": "https://github.com/bharathrajp1414",
+    "portfolio_url": "https://bharathrajdev.me",
     "twitter_url": ""
   },
   "education": [
     {
-      "education_id": "edu_dae2804a",
-      "institution": "Anna University",
-      "degree": "Bachelor of Engineering (B.E.)",
+      "education_id": "edu_resume_2026",
+      "institution": "PSNA College of Engineering and Technology",
+      "degree": "B.E.",
       "field_of_study": "Computer Science & Engineering",
-      "start_date": "2020",
-      "end_date": "2024",
-      "grade_or_gpa": "First Class with Distinction",
+      "start_date": "",
+      "end_date": "2026-05",
+      "grade_or_gpa": "CGPA: 7.0 / 10.0",
       "location": "Tamil Nadu, India",
-      "highlights": [
-        "Specialized in Autonomous Intelligent Systems, Distributed Systems, and Operating System Architecture",
-        "Led University AI Research Group; published research on multi-agent cognitive control"
-      ],
+      "highlights": ["Expected May 2026"],
+      "verified": true
+    },
+    {
+      "education_id": "edu_resume_hsc",
+      "institution": "R.C. Matric Hr. Sec. School, Natham",
+      "degree": "HSC (Class XII)",
+      "field_of_study": "",
+      "start_date": "",
+      "end_date": "",
+      "grade_or_gpa": "60%",
+      "location": "Natham, Tamil Nadu, India",
+      "highlights": [],
+      "verified": true
+    },
+    {
+      "education_id": "edu_resume_sslc",
+      "institution": "R.C. Matric Hr. Sec. School, Natham",
+      "degree": "SSLC (Class X)",
+      "field_of_study": "",
+      "start_date": "",
+      "end_date": "",
+      "grade_or_gpa": "64%",
+      "location": "Natham, Tamil Nadu, India",
+      "highlights": [],
       "verified": true
     }
   ],
   "experience": [
     {
-      "experience_id": "exp_6192d29e",
-      "company": "BR JARVIS Autonomous Systems",
-      "title": "Principal Autonomous AI Systems Architect",
-      "location": "Remote / Madurai",
-      "remote_type": "remote",
-      "start_date": "2024-01",
+      "experience_id": "exp_resume_kevell",
+      "company": "Kevell Corp",
+      "title": "Software Development Intern",
+      "location": "",
+      "remote_type": "onsite",
+      "start_date": "",
       "end_date": "Present",
       "is_current": true,
       "responsibilities": [
-        "Architected and implemented BR JARVIS MK40.2 autonomous AI operating system across 260+ native tools and hardware actuators.",
-        "Engineered Universal Execution Runtime with fail-closed physical side-effect verifiers and deterministic 6-tier virtualenv isolation.",
-        "Built multi-modal Strawberry Browser Agent with semantic accessibility tree mapping, resilient element recovery, and CAPTCHA challenge safety pause.",
-        "Designed 7-tier hierarchical memory architecture (L0\u2013L6) with decay-weighted semantic vector retrieval and experience replay."
+        "Built React modules and integrated REST API workflows across authentication, vendor management, notifications, payment, and wallet features.",
+        "Collaborated with backend developers to validate API journeys, debug full-stack behavior, and ship maintainable changes through Git-based team workflows."
       ],
-      "achievements": [
-        "Reduced end-to-end task false-success reports to 0.0% through physical verification gates.",
-        "Achieved sub-150ms voice wake-to-response latency with dual-channel Silero VAD and AudioBus architecture."
-      ],
-      "technologies": [
-        "Python",
-        "FastAPI",
-        "Playwright",
-        "ChromaDB",
-        "PyTorch",
-        "PyQt6",
-        "Win32 APIs",
-        "WebSockets"
-      ],
-      "metrics": [
-        "260+ Tools Orchestrated",
-        "0% False-Success Rate",
-        "150ms Voice Latency",
-        "99.9% Task State Durability"
-      ],
+      "achievements": [],
+      "technologies": ["React", "REST APIs", "JavaScript", "Git"],
+      "metrics": [],
       "verified": true
     },
     {
-      "experience_id": "exp_fe43a211",
-      "company": "Cognitive Edge Technologies",
-      "title": "Senior Software Engineer \u2014 AI & Systems",
-      "location": "Bengaluru, India",
-      "remote_type": "hybrid",
-      "start_date": "2023-01",
-      "end_date": "2023-12",
+      "experience_id": "exp_resume_nullclass",
+      "company": "NullClass",
+      "title": "Cybersecurity Intern",
+      "location": "",
+      "remote_type": "onsite",
+      "start_date": "2025-06",
+      "end_date": "2025-07",
       "is_current": false,
       "responsibilities": [
-        "Developed high-throughput asynchronous microservices handling 50k+ daily LLM workflow requests with circuit breaker resilience.",
-        "Constructed distributed vector retrieval engines and document parsing pipelines for complex multi-page financial filings."
+        "Completed structured training in ethical-hacking fundamentals, SQL injection, cross-site scripting, cross-site request forgery, and vulnerability reporting.",
+        "Applied cybersecurity concepts in structured labs and documented observations for safer application development."
       ],
-      "achievements": [
-        "Cut API latency by 38% through pipelined prompt caching and speculative streaming token delivery."
-      ],
-      "technologies": [
-        "Python",
-        "Go",
-        "Docker",
-        "PostgreSQL",
-        "Redis",
-        "LangChain",
-        "Kubernetes"
-      ],
-      "metrics": [
-        "38% Latency Reduction",
-        "50k+ Daily Requests"
-      ],
+      "achievements": [],
+      "technologies": ["Ethical Hacking", "SQL Injection", "XSS", "CSRF", "Vulnerability Reporting"],
+      "metrics": [],
       "verified": true
     }
   ],
   "projects": [
     {
-      "project_id": "proj_d39d88a9",
-      "name": "BR JARVIS Autonomous Agent Platform",
-      "role": "Creator & Lead Architect",
-      "description": "Full-stack AI Operating System integrating desktop control, voice synthesis, smart model routing, and persistent memory.",
-      "url": "https://github.com/bharthraj1412/BrJarvis",
-      "repository_url": "https://github.com/bharthraj1412/BrJarvis",
-      "technologies": [
-        "Python 3.12",
-        "FastAPI",
-        "Playwright",
-        "WebSockets",
-        "ChromaDB",
-        "PyAudio",
-        "fpdf2"
-      ],
-      "highlights": [
-        "Built fail-closed TaskCompletionGate preventing unverified task completion claims.",
-        "Designed 10-theme native resume rendering and ATS optimization engine."
-      ],
-      "start_date": "2024-01",
-      "end_date": "Present",
+      "project_id": "proj_resume_nexora",
+      "name": "NEXORA",
+      "role": "Full-Stack Developer",
+      "description": "React and FastAPI workspace for user-scoped CSV/Excel imports, schema previews, 1,000-record batch ingestion, activity logs, and OTP/Google OAuth.",
+      "url": "https://github.com/bharathrajp1414/nexora",
+      "repository_url": "https://github.com/bharathrajp1414/nexora",
+      "technologies": ["React", "TypeScript", "FastAPI", "PostgreSQL", "SQLAlchemy"],
+      "highlights": ["Built user-scoped data import workflows with schema previews and batch ingestion.", "Implemented activity logging and OTP/Google OAuth flows."],
+      "start_date": "",
+      "end_date": "",
       "verified": true
     },
     {
-      "project_id": "proj_6cdf5dec",
-      "name": "Multi-Agent DAG Execution Runtime",
-      "role": "Systems Engineer",
-      "description": "High-concurrency directed acyclic graph task executor with automatic failure classification and dynamic replanning.",
-      "url": "",
-      "repository_url": "",
-      "technologies": [
-        "Python",
-        "AsyncIO",
-        "Concurrent.Futures",
-        "SQLite WAL"
-      ],
-      "highlights": [
-        "Supports parallel branch execution with zero cross-task contamination."
-      ],
-      "start_date": "2023-06",
-      "end_date": "2023-12",
+      "project_id": "proj_resume_brjarvis",
+      "name": "BR JARVIS",
+      "role": "Creator & Developer",
+      "description": "Provider-neutral AI gateway for local and cloud LLMs with policy routing, capability filtering, fallback and cooldown tracking, AgentRouter delegation, and behavioral tests.",
+      "url": "https://github.com/bharathrajp1414/BrJarvis",
+      "repository_url": "https://github.com/bharathrajp1414/BrJarvis",
+      "technologies": ["Python", "FastAPI", "SQLite", "LLM Routing"],
+      "highlights": ["Built policy-aware routing and fallback behavior for local and cloud LLM providers.", "Added AgentRouter delegation and behavioral tests."],
+      "start_date": "",
+      "end_date": "",
+      "verified": true
+    },
+    {
+      "project_id": "proj_resume_farma",
+      "name": "Farma",
+      "role": "Full-Stack Developer",
+      "description": "FastAPI and agricultural marketplace with farmer/buyer onboarding, phone OTP and Google authentication, inventory and cart controls, profiles, and JWT issuance.",
+      "url": "https://github.com/bharathraj14/farma",
+      "repository_url": "https://github.com/bharathraj14/farma",
+      "technologies": ["Flutter", "FastAPI", "PostgreSQL", "SQLAlchemy"],
+      "highlights": ["Built onboarding, authentication, inventory, cart, and profile workflows for a two-sided marketplace."],
+      "start_date": "",
+      "end_date": "",
+      "verified": true
+    },
+    {
+      "project_id": "proj_resume_jobboard",
+      "name": "JobBoard Pro",
+      "role": "Full-Stack Developer",
+      "description": "React and Supabase job tracker with application stages, Excel import/export, funnel analytics, filters, Azure categories, and reusable AI workflows.",
+      "url": "https://github.com/bharathraj14/job_manager",
+      "repository_url": "https://github.com/bharathraj14/job_manager",
+      "technologies": ["React", "Supabase", "Recharts", "AI APIs"],
+      "highlights": ["Implemented application-stage tracking, Excel import/export, funnel analytics, filtering, and reusable AI workflows."],
+      "start_date": "",
+      "end_date": "",
       "verified": true
     }
   ],
   "skills": [
-    {
-      "category": "Core Languages & Runtimes",
-      "skills": [
-        "Python (Expert)",
-        "TypeScript / JavaScript",
-        "Go",
-        "C/C++",
-        "SQL",
-        "PowerShell",
-        "Bash"
-      ]
-    },
-    {
-      "category": "AI, Agent Architectures & LLMs",
-      "skills": [
-        "Agentic DAG Workflows",
-        "ReAct Loops",
-        "LangChain",
-        "PyTorch",
-        "HuggingFace",
-        "RAG & Vector Search",
-        "ChromaDB",
-        "Function Calling"
-      ]
-    },
-    {
-      "category": "System Architecture & Backend",
-      "skills": [
-        "FastAPI",
-        "AsyncIO",
-        "REST APIs",
-        "WebSockets",
-        "Docker",
-        "Process Containment",
-        "SQLite WAL",
-        "Redis",
-        "PostgreSQL"
-      ]
-    },
-    {
-      "category": "Browser & Desktop Automation",
-      "skills": [
-        "Playwright",
-        "Selenium",
-        "Accessibility Tree Grounding",
-        "Win32 API",
-        "PyQt / PySide",
-        "HTML5 / CSS3"
-      ]
-    },
-    {
-      "category": "Testing & Verification",
-      "skills": [
-        "PyTest",
-        "Deterministic Verification",
-        "Static Analysis",
-        "Security Threat Modeling",
-        "CI/CD"
-      ]
-    }
+    {"category": "Languages", "skills": ["Python", "JavaScript", "C", "Java", "SQL"]},
+    {"category": "Frontend", "skills": ["React", "HTML5", "CSS3", "TypeScript"]},
+    {"category": "Backend & APIs", "skills": ["REST APIs", "Express.js", "Node.js", "FastAPI"]},
+    {"category": "Databases", "skills": ["MongoDB", "DBMS", "PostgreSQL", "SQLite"]},
+    {"category": "Tools & Platforms", "skills": ["Git", "GitHub", "Postman", "VS Code", "Claude", "Linux/Unix", "Shell Scripting"]},
+    {"category": "Cloud & Security", "skills": ["AWS", "Docker", "OAuth", "JWT", "Authentication", "Secure Data Handling"]},
+    {"category": "AI & Collaboration", "skills": ["LLM Routing", "Quick Learner", "Team Collaboration", "Responsible AI Tool Usage"]}
   ],
   "certifications": [
-    {
-      "cert_id": "cert_ba6bc5a0",
-      "name": "Certified Autonomous Systems Architect",
-      "issuer": "AI Systems Council",
-      "issue_date": "2024-03",
-      "expiration_date": "",
-      "credential_id": "CASA-84920",
-      "credential_url": "",
-      "verified": true
-    },
-    {
-      "cert_id": "cert_55d228b7",
-      "name": "Deep Learning Specialization",
-      "issuer": "DeepLearning.AI",
-      "issue_date": "2023-08",
-      "expiration_date": "",
-      "credential_id": "DLAI-29184",
-      "credential_url": "",
-      "verified": true
-    }
+    {"cert_id": "cert_resume_cloud", "name": "Cloud Security Fundamentals", "issuer": "Palo Alto Networks Cybersecurity Academy", "issue_date": "2025", "expiration_date": "", "credential_id": "", "credential_url": "", "verified": true},
+    {"cert_id": "cert_resume_iot", "name": "Introduction to IoT and Digital Transformation", "issuer": "NPTEL", "issue_date": "2025", "expiration_date": "", "credential_id": "", "credential_url": "", "verified": true},
+    {"cert_id": "cert_resume_cyber", "name": "Ethical Hacking", "issuer": "C-DAC", "issue_date": "2025", "expiration_date": "", "credential_id": "", "credential_url": "", "verified": true},
+    {"cert_id": "cert_resume_python", "name": "Python", "issuer": "GUVI", "issue_date": "2025", "expiration_date": "", "credential_id": "", "credential_url": "", "verified": true},
+    {"cert_id": "cert_resume_training", "name": "Training — Edukron", "issuer": "Edukron", "issue_date": "2025", "expiration_date": "", "credential_id": "", "credential_url": "", "verified": true},
+    {"cert_id": "cert_resume_sql", "name": "SQL", "issuer": "IT Bombay", "issue_date": "2025", "expiration_date": "", "credential_id": "", "credential_url": "", "verified": true},
+    {"cert_id": "cert_resume_database", "name": "Database Programming with SQL", "issuer": "Oracle Academy", "issue_date": "2024", "expiration_date": "", "credential_id": "", "credential_url": "", "verified": true},
+    {"cert_id": "cert_resume_basics", "name": "Python Basic and Java Basic", "issuer": "DigiLabs", "issue_date": "2024", "expiration_date": "", "credential_id": "", "credential_url": "", "verified": true},
+    {"cert_id": "cert_resume_skillrack", "name": "Skillrack Programming Practice", "issuer": "Skillrack", "issue_date": "", "expiration_date": "", "credential_id": "", "credential_url": "", "verified": true}
   ],
-  "achievements": [
-    {
-      "achievement_id": "ach_f7845c52",
-      "title": "1st Place \u2014 National Autonomous AI Hackathon 2024",
-      "description": "Engineered multimodal desktop agent navigating legacy enterprise software with accessibility tree grounding.",
-      "issuer_or_context": "TechCon India",
-      "date": "2024-02",
-      "url": ""
-    }
-  ],
+  "achievements": [],
   "preferences": {
-    "target_roles": [
-      "AI Systems Architect",
-      "Senior AI Engineer",
-      "Autonomous Agent Engineer",
-      "Senior Backend Engineer"
-    ],
-    "target_industries": [
-      "Artificial Intelligence",
-      "Autonomous Systems",
-      "Cloud & Developer Tooling",
-      "Robotics & Automation"
-    ],
-    "target_locations": [
-      "Remote",
-      "Madurai",
-      "Bengaluru",
-      "Chennai",
-      "Hyderabad"
-    ],
-    "remote_preference": "remote_only",
-    "employment_types": [
-      "Full-time",
-      "Contract"
-    ],
-    "availability": "Immediate",
-    "work_authorization": "Authorized to work in India; Open to Remote Worldwide",
+    "target_roles": ["Software Development Intern", "Backend Developer", "Full-Stack Developer", "AI/ML Engineer", "Python Developer"],
+    "target_industries": ["Software Engineering", "Artificial Intelligence", "Cybersecurity", "Cloud & Developer Tooling"],
+    "target_locations": ["Remote", "Tamil Nadu", "Bengaluru", "Chennai"],
+    "remote_preference": "any",
+    "employment_types": ["Full-time", "Internship", "Contract"],
+    "availability": "Immediate / 2 Weeks",
+    "work_authorization": "Student / Early-career professional in India",
     "requires_sponsorship": false,
     "preferred_companies": [],
     "excluded_companies": []
   },
   "salary": {
-    "target_annual_salary": 120000.0,
-    "minimum_annual_salary": 90000.0,
-    "currency": "USD",
-    "salary_notes": "Competitive base compensation with equity / performance bonuses"
+    "target_annual_salary": 0.0,
+    "minimum_annual_salary": 0.0,
+    "currency": "INR",
+    "salary_notes": "Not specified on the resume; confirm before applying."
   },
-  "custom_sections": {},
+  "custom_sections": {
+    "resume_source": ["Bharath_Raj_P_Resume.pdf", "Imported from the user-provided resume; facts are marked verified for Career OS use."],
+    "academic_record": ["B.E. Computer Science & Engineering — Expected May 2026, CGPA 7.0 / 10.0", "HSC — 60%", "SSLC — 64%"]
+  },
   "provenance": {
-    "master_profile_init": {
-      "value": "Canonical profile generated from repository context",
-      "source": "verified_doc",
-      "verified": true,
-      "confidence": 1.0,
-      "created_at": 1786856711.6040606,
-      "updated_at": 1786856711.6040606
-    }
+    "resume_import_2026_08_20": {"value": "User-provided Bharath_Raj_P_Resume.pdf", "source": "resume_import", "verified": true, "confidence": 1.0}
   },
   "created_at": 1786856711.6040606,
-  "updated_at": 1786856711.6040606
+  "updated_at": 1787225400.0
 }
+

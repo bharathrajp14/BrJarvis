@@ -7,6 +7,19 @@
 cooldown_seconds: 15
 
 backends:
+  - id: manus
+    provider: manus
+    model: manus-1.6-lite
+    base_url: https://api.manus.ai
+    api_key_env: MANUS_API_KEY
+    enabled: true
+    priority: 5
+    weight: 3
+    cost_per_1k_tokens: 0
+    latency_ms: 2500
+    capabilities: [chat, code, reasoning, vision, tools, agent]
+    max_context: 128000
+
   - id: local_ollama
     provider: ollama
     model: llama3.3
@@ -48,7 +61,7 @@ backends:
 routes:
   default:
     strategy: priority
-    backends: [local_ollama, proxy_brain]
+    backends: [manus, local_ollama, proxy_brain]
     max_fallbacks: 3
 
   local:
@@ -58,17 +71,17 @@ routes:
 
   fast:
     strategy: latency
-    backends: [local_ollama, proxy_brain]
+    backends: [manus, local_ollama, proxy_brain]
     required_capabilities: [chat]
     max_fallbacks: 2
 
   coding:
     strategy: weighted
-    backends: [proxy_brain, local_ollama]
+    backends: [manus, proxy_brain, local_ollama]
     required_capabilities: [code]
     max_fallbacks: 2
 
   budget:
     strategy: cost
-    backends: [local_ollama, proxy_brain]
+    backends: [manus, local_ollama, proxy_brain]
     max_fallbacks: 3

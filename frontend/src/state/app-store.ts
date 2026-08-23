@@ -1,4 +1,4 @@
-import { initialSnapshot } from '../platform/mock-data';
+import { emptySnapshot } from '../platform/empty-state';
 import type { AppSnapshot, Task, ViewId } from '../contracts/domain';
 
 export type AppAction =
@@ -10,7 +10,7 @@ export type AppAction =
   | { type: 'task-progress'; taskId: string; progress: number; detail?: string }
   | { type: 'approval-resolved'; approvalId: string; taskId: string; approved: boolean };
 
-let snapshot: AppSnapshot = structuredClone(initialSnapshot);
+let snapshot: AppSnapshot = structuredClone(emptySnapshot);
 const listeners = new Set<() => void>();
 
 function notify() {

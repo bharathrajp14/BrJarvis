@@ -14,6 +14,7 @@ if __name__ in sys.modules:
 
 from .base import BaseBackend
 from .gemini import GeminiBackend
+from .manus import ManusBackend
 
 # Optional backends — gracefully skip if SDK not installed
 try:
@@ -48,7 +49,9 @@ except ImportError:
 
 __all__ = [
     "BaseBackend",
-    "GeminiBackend",
+        "GeminiBackend",
+    "ManusBackend",
+
     "OpenAIBackend",
     "ClaudeBackend",
     "DeepSeekBackend",

@@ -7,11 +7,18 @@ and runtime logs must source version information exclusively from here.
 
 from __future__ import annotations
 
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as distribution_version
 from typing import Any, Dict
 
-__version__ = "41.0.0"
+try:
+    __version__ = distribution_version("brjarvis")
+except PackageNotFoundError:
+    # Source checkouts without installed metadata still use the release value
+    # declared in pyproject.toml and verified by the release checks.
+    __version__ = "41.0.3"
 VERSION = __version__
-BUILD = "2026-08-18"
+BUILD = "2026-08-23"
 CODENAME = "MARK XLI"
 DESCRIPTION = "BR JARVIS — Cognitive Multi-Modal AI Operating System & Autonomous Controller"
 

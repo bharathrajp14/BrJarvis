@@ -208,12 +208,12 @@ def launch_web_server(
 
     import uvicorn
 
-    try:
-        from brjarvis.web.api.server import create_app
+    from brjarvis.web.api.server import create_app
 
-        app = create_app()
-    except Exception:
-        from brjarvis.web.api.app import app
+    # Do not hide factory/configuration errors behind a second application.
+    # Compatibility imports belong at the module boundary, not in a broad
+    # runtime fallback that can start an unverified server.
+    app = create_app()
     uvicorn.run(app, host=bind_host, port=port, log_level="info")
 
 

@@ -99,5 +99,6 @@ export interface AppSnapshot {
   approvals: Approval[];
   artifacts: Artifact[];
   workspace: WorkspaceEntry[];
+  memoryCount: number;
   timeline: TimelineEvent[];
 }

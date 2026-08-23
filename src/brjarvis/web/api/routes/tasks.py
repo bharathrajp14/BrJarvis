@@ -29,7 +29,7 @@ class RunRequest(BaseModel):
     goals: List[str]
 
 
-@router.get("/api/tasks")
+@router.get("/tasks")
 async def get_tasks():
     """Retrieve queue tasks status."""
     try:
@@ -40,7 +40,7 @@ async def get_tasks():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/api/run")
+@router.post("/run")
 async def run_parallel(req: RunRequest):
     """Submit goals to the task queue."""
     if not req.goals:
@@ -53,7 +53,7 @@ async def run_parallel(req: RunRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/api/agent/tasks")
+@router.get("/agent/tasks")
 async def list_agent_tasks(status: Optional[str] = None, limit: int = 50):
     """List active and historical tasks from the persistent TaskStateManager."""
     mgr = get_task_state_manager()
@@ -61,7 +61,7 @@ async def list_agent_tasks(status: Optional[str] = None, limit: int = 50):
     return {"total": len(tasks), "tasks": [t.to_dict() for t in tasks]}
 
 
-@router.get("/api/agent/tasks/{task_id}")
+@router.get("/agent/tasks/{task_id}")
 async def get_agent_task(task_id: str):
     """Retrieve detailed task state, steps, and checkpoints by task_id."""
     mgr = get_task_state_manager()
@@ -71,7 +71,7 @@ async def get_agent_task(task_id: str):
     return task.to_dict()
 
 
-@router.post("/api/agent/tasks")
+@router.post("/agent/tasks")
 async def create_agent_task(req: CreateTaskRequest):
     """Create and trigger an autonomous task via AgentExecutor."""
     from brjarvis.agent.executor import AgentExecutor
@@ -90,7 +90,7 @@ async def create_agent_task(req: CreateTaskRequest):
     return {"status": "started", "task_id": task.task_id, "goal": req.goal}
 
 
-@router.post("/api/agent/tasks/{task_id}/approve")
+@router.post("/agent/tasks/{task_id}/approve")
 async def approve_agent_task(task_id: str, req: ResolveApprovalRequest):
     """Approve or reject a pending high-risk action approval gate."""
     mgr = get_task_state_manager()

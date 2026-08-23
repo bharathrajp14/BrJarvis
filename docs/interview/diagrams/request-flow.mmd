@@ -1,0 +1,35 @@
+sequenceDiagram
+    participant User
+    participant Surface as CLI/Web/Voice
+    participant Runtime as AssistantRuntime
+    participant Orch as Orchestrator
+    participant Mem as Memory
+    participant Router as AgentRouter
+    participant Model as LLM backend
+    participant Policy as Policy engine
+    participant Tool as Tool/connector
+    participant Verify as Verification
+
+    User->>Surface: "Open my project and summarize status"
+    Surface->>Runtime: Submit one request
+    Runtime->>Orch: Shared orchestrator instance
+    Orch->>Orch: Check mode, skill, and injection risk
+    Orch->>Mem: Load relevant context
+    Mem-->>Orch: Facts and recent history
+    Orch->>Router: Classify task and choose backend
+    Router-->>Orch: Available model profile
+    Orch->>Model: Prompt + context + allowed tools
+    Model-->>Orch: Text or structured tool proposal
+    Orch->>Policy: Is this action allowed?
+    alt Safe/read-only action
+        Policy-->>Orch: Allow
+    else Risky/destructive action
+        Policy-->>Orch: Confirm or deny
+    end
+    Orch->>Tool: Execute approved action
+    Tool-->>Orch: Result + evidence
+    Orch->>Verify: Check expected outcome
+    Verify-->>Orch: Verified / partial / failed
+    Orch->>Mem: Save turn, evidence, and lessons
+    Orch-->>Surface: Human-readable final response
+    Surface-->>User: Show result and status
