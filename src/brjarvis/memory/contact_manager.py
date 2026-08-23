@@ -446,6 +446,49 @@ class UnifiedContactStore:
             self.save()
         return contact_data
 
+    def update_contact(
+        self,
+        contact_id: str,
+        *,
+        phone_number: Optional[str] = None,
+        email: Optional[str] = None,
+        aliases: Optional[List[str]] = None,
+        org: Optional[str] = None,
+        title: Optional[str] = None,
+        notes: Optional[str] = None,
+        is_important: Optional[bool] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """Update mutable fields for an existing contact and persist atomically."""
+        with _lock:
+            existing = self._contacts.get(contact_id)
+            if existing is None:
+                return None
+            if phone_number is not None:
+                existing["phone_number"] = self.normalize_phone(phone_number)
+            if email is not None:
+                existing["email"] = email.strip()
+            if aliases is not None:
+                existing["aliases"] = list(dict.fromkeys(alias.strip() for alias in aliases if alias.strip()))
+            if org is not None:
+                existing["org"] = org.strip()
+            if title is not None:
+                existing["title"] = title.strip()
+            if notes is not None:
+                existing["notes"] = notes.strip()
+            if is_important is not None:
+                existing["is_important"] = is_important
+            self.save()
+            return dict(existing)
+
+    def delete_contact(self, contact_id: str) -> bool:
+        """Delete a contact from encrypted storage."""
+        with _lock:
+            if contact_id not in self._contacts:
+                return False
+            del self._contacts[contact_id]
+            self.save()
+            return True
+
     def import_primary_vcf(self) -> Dict[str, Any]:
         """Import contacts directly from system primary contacts file (C:\\Users\\bhara\\Documents\\contects\\contacts.vcf)."""
         if not PRIMARY_VCF_PATH.exists():

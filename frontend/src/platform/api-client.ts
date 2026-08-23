@@ -1,5 +1,5 @@
 import type { ApiEnvelope, ApiErrorShape, CommandRequest, CommandResponse } from '../contracts/api';
-import type { AppSnapshot, Artifact, Capability, Task, TaskStatus } from '../contracts/domain';
+import type { AppSnapshot, Artifact, Capability, CareerProfile, ConnectorSummary, MemoryEntry, Task, TaskStatus } from '../contracts/domain';
 import { emptySnapshot } from './empty-state';
 
 export class ApiError extends Error {
@@ -98,7 +98,7 @@ export class ApiClient {
 
   async snapshot(signal?: AbortSignal): Promise<AppSnapshot> {
     try {
-      const [taskResult, artifactResult, healthResult, connectorResult, projectResult, memoryResult, notificationResult] = await Promise.allSettled([
+      const [taskResult, artifactResult, healthResult, connectorResult, projectResult, memoryResult, notificationResult, careerResult] = await Promise.allSettled([
         this.request<{ tasks?: Record<string, unknown>[]; total?: number }>('/api/agent/tasks?limit=50', { signal }),
         this.request<{ artifacts?: Record<string, unknown>[]; total?: number }>('/api/artifacts', { signal }),
         this.request<Record<string, unknown>>('/health', { signal }),
@@ -106,6 +106,7 @@ export class ApiClient {
         this.request<{ projects?: Record<string, unknown>[] }>('/api/projects', { signal }),
         this.request<{ memories?: Record<string, unknown>[] }>('/api/memory', { signal }),
         this.request<{ notifications?: Record<string, unknown>[] }>('/api/notifications?limit=20', { signal }),
+        this.request<{ profile?: Record<string, unknown> }>('/api/career/profile', { signal }),
       ]);
       const rawTasks = taskResult.status === 'fulfilled' && Array.isArray(taskResult.value.tasks) ? taskResult.value.tasks : [];
       const tasks = rawTasks.map(normalizeTask);
@@ -130,10 +131,54 @@ export class ApiClient {
       const projects = projectResult.status === 'fulfilled' && Array.isArray(projectResult.value.projects) ? projectResult.value.projects : [];
       const memories = memoryResult.status === 'fulfilled' && Array.isArray(memoryResult.value.memories) ? memoryResult.value.memories : [];
       const notifications = notificationResult.status === 'fulfilled' && Array.isArray(notificationResult.value.notifications) ? notificationResult.value.notifications : [];
-      const connectorCount = Array.isArray(connectorPayload.connectors) ? connectorPayload.connectors.length : 0;
+      const rawProfile = careerResult.status === 'fulfilled' && careerResult.value.profile ? careerResult.value.profile : null;
+      const projectFileResults = await Promise.allSettled(projects.slice(0, 20).map((project) => {
+        const record = project as Record<string, unknown>;
+        const projectId = encodeURIComponent(String(record.project_id ?? record.id ?? ''));
+        return this.request<{ files?: Record<string, unknown>[] }>(`/api/projects/${projectId}`, { signal });
+      }));
+      const connectorRecords = Array.isArray(connectorPayload.connectors) ? connectorPayload.connectors : [];
+      const connectors: ConnectorSummary[] = connectorRecords.map((connector, index) => {
+        const record = connector as Record<string, unknown>;
+        return {
+          id: String(record.id ?? `connector-${index + 1}`),
+          name: String(record.name ?? record.id ?? 'Connector'),
+          description: String(record.description ?? record.desc ?? ''),
+          status: String(record.status ?? (record.configured ? 'CONNECTED' : 'NOT_CONFIGURED')),
+          configured: Boolean(record.configured),
+          requiresAuth: Boolean(record.requires_auth ?? record.requiresAuth),
+          tools: Array.isArray(record.tools) ? record.tools.map(String) : [],
+        };
+      });
+      const connectorCount = connectors.length;
+      const memoryEntries: MemoryEntry[] = memories.map((memory, index) => {
+        const record = memory as Record<string, unknown>;
+        return {
+          id: String(record.id ?? record.memory_id ?? record.name ?? `memory-${index + 1}`),
+          name: String(record.name ?? record.key ?? `Memory ${index + 1}`),
+          scope: String(record.scope ?? 'user'),
+          content: String(record.content ?? record.value ?? ''),
+          updatedAt: String(record.updated_at ?? record.updatedAt ?? '—'),
+        };
+      });
+      const career: CareerProfile | null = rawProfile ? {
+        name: String(rawProfile.name ?? rawProfile.full_name ?? ''),
+        headline: String(rawProfile.headline ?? rawProfile.title ?? ''),
+        location: String(rawProfile.location ?? ''),
+        skills: Array.isArray(rawProfile.skills) ? rawProfile.skills.map(String) : [],
+        completeness: Number(rawProfile.completeness ?? rawProfile.completion_percent ?? 0) || undefined,
+      } : null;
       const workspace = projects.flatMap((project, projectIndex) => {
         const record = project as Record<string, unknown>;
-        return [{ id: String(record.project_id ?? record.id ?? `project-${projectIndex + 1}`), name: String(record.name ?? 'Project'), kind: 'folder' as const, path: String(record.path ?? '/workspace'), detail: String(record.description ?? 'Live project') }];
+        const projectId = String(record.project_id ?? record.id ?? `project-${projectIndex + 1}`);
+        const projectEntry = { id: projectId, name: String(record.name ?? 'Project'), kind: 'folder' as const, path: String(record.path ?? '/workspace'), detail: String(record.description ?? 'Live project') };
+        const detailResult = projectFileResults[projectIndex];
+        const files = detailResult.status === 'fulfilled' && Array.isArray(detailResult.value.files) ? detailResult.value.files : [];
+        const fileEntries = files.map((file, fileIndex) => {
+          const fileRecord = file as Record<string, unknown>;
+          return { id: String(fileRecord.file_id ?? fileRecord.id ?? `${projectId}-file-${fileIndex + 1}`), name: String(fileRecord.filename ?? fileRecord.name ?? 'File'), kind: 'file' as const, path: String(fileRecord.file_path ?? fileRecord.path ?? projectEntry.path), detail: String(fileRecord.file_size ?? fileRecord.status ?? 'Live file') };
+        });
+        return [projectEntry, ...fileEntries];
       });
       const timeline = notifications.map((notification, index) => {
         const record = notification as Record<string, unknown>;
@@ -159,7 +204,10 @@ export class ApiClient {
         artifacts,
         capabilities,
         workspace,
-        memoryCount: memories.length,
+        memories: memoryEntries,
+        memoryCount: memoryEntries.length,
+        career,
+        connectors,
         timeline,
         activeTaskId: tasks[0]?.id ?? '',
         connection: taskResult.status === 'fulfilled' || healthResult.status === 'fulfilled' ? 'connected' : 'offline',
@@ -178,6 +226,18 @@ export class ApiClient {
       body: JSON.stringify({ request_id: approvalId, approved }),
       signal,
       headers: { 'Idempotency-Key': key() },
+    });
+  }
+
+  async previewArtifact(artifactId: string, signal?: AbortSignal): Promise<{ filename: string; is_text: boolean; content?: string; download_url?: string }> {
+    return this.request(`/api/artifacts/${encodeURIComponent(artifactId)}/preview`, { signal });
+  }
+
+  async createCareerResume(targetRole?: string, signal?: AbortSignal): Promise<Record<string, unknown>> {
+    return this.request('/api/career/resumes/create', {
+      method: 'POST',
+      body: JSON.stringify({ target_role: targetRole || null, template_id: 'ats_classic' }),
+      signal,
     });
   }
 

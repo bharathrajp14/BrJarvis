@@ -327,7 +327,7 @@ def create_app() -> FastAPI:
     app.include_router(chat_router)
     app.include_router(voice_router)
     app.include_router(ws_router)
-    app.include_router(career_router)
+    app.include_router(career_router, prefix="/api")
 
     # Versioned mounts are explicit for routers whose decorators are canonical
     # relative paths. Legacy routers retain their own tested `/api/v1` aliases
@@ -340,6 +340,7 @@ def create_app() -> FastAPI:
     app.include_router(auth_router, prefix="/api/v1")
     app.include_router(notifications_router, prefix="/api/v1")
     app.include_router(conversations_router, prefix="/api/v1")
+    app.include_router(career_router, prefix="/api/v1")
 
     # Mount Static Files & Web Client
     # Critical: HTML/JS/CSS served with no-cache so the Service Worker and browser

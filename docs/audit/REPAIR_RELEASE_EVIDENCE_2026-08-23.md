@@ -59,3 +59,11 @@ The legacy static dashboard remains in the repository for compatibility, while t
 [3]: ../../docs/forensic/21_TECHNICAL_DEBT.md "BRJARVIS technical debt inventory"
 [4]: ../../docs/audit/PRODUCTION_READINESS_2026-08-19.md "BRJARVIS production-readiness assessment"
 [5]: ../../pyproject.toml "BRJARVIS package metadata and dependency declarations"
+
+## Second full-update pass
+
+The post-publication re-audit found additional partial surfaces and corrected them without replacing the existing architecture. The rebuilt client now maps live connector summaries, persistent memory entries, Career profile data, project files, and notification-derived timeline data. Workspace search is functional, artifact previews call the protected preview endpoint, Career OS can invoke live ATS-ready resume generation, and task/approval/artifact views render explicit zero-record states. The legacy chat attachment control now submits files to the authenticated import endpoint and reports import failures visibly.
+
+The backend now exposes mutable contact update and delete operations through the normalized API, reports missing persistent-memory deletes as HTTP 404, and exposes Career OS under both `/api/career` and `/api/v1/career`. The new regressions cover contact CRUD, missing-memory behavior, Career profile access, and the versioned route contract.
+
+The focused regression checkpoint for this pass is **29 passed**. The frontend package build and static asset regeneration also pass after the new live views and actions were added.

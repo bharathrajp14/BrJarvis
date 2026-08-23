@@ -90,6 +90,32 @@ export interface TimelineEvent {
   tone: 'neutral' | 'accent' | 'success' | 'warning';
 }
 
+export interface MemoryEntry {
+  id: string;
+  name: string;
+  scope: string;
+  content: string;
+  updatedAt: string;
+}
+
+export interface CareerProfile {
+  name: string;
+  headline: string;
+  location: string;
+  skills: string[];
+  completeness?: number;
+}
+
+export interface ConnectorSummary {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  configured: boolean;
+  requiresAuth: boolean;
+  tools: string[];
+}
+
 export interface AppSnapshot {
   activeView: ViewId;
   activeTaskId: string;
@@ -99,6 +125,9 @@ export interface AppSnapshot {
   approvals: Approval[];
   artifacts: Artifact[];
   workspace: WorkspaceEntry[];
+  memories: MemoryEntry[];
   memoryCount: number;
+  career: CareerProfile | null;
+  connectors: ConnectorSummary[];
   timeline: TimelineEvent[];
 }

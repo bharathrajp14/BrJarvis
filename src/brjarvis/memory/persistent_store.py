@@ -280,13 +280,14 @@ def save_memory(entry: MemoryEntry, scope: str = "user", *, strict: bool = False
     _SEARCH_CACHE.clear()
 
 
-def delete_memory(name: str, scope: str = "user") -> None:
-    """Remove the memory file matching name, delete from SQLite/Vector, and rebuild the index."""
+def delete_memory(name: str, scope: str = "user") -> bool:
+    """Remove a memory and return whether a persisted file existed."""
     _SEARCH_CACHE.clear()
     mem_dir = get_memory_dir(scope)
     slug = _slugify(name)
     fp = mem_dir / f"{slug}.md"
-    if fp.exists():
+    existed = fp.exists()
+    if existed:
         _backup_version(fp)
         fp.unlink()
     _rewrite_index(scope)
@@ -313,6 +314,7 @@ def delete_memory(name: str, scope: str = "user") -> None:
             cdb.commit()
     except Exception as e:
         logger.debug("Suppressed exception in memory delete: %s", e)
+    return existed
 
 
 def load_entries(scope: str = "user") -> list[MemoryEntry]:

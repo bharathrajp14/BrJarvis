@@ -28,7 +28,7 @@ from .resume_engine.version_manager import ResumeVersionManager
 
 logger = logging.getLogger("JARVIS.CareerAPI")
 
-router = APIRouter(prefix="/api/career", tags=["Career OS"])
+router = APIRouter(prefix="/career", tags=["Career OS"])
 
 
 # ── Request / Response Schemas ───────────────────────────────────────────────

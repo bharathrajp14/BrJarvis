@@ -13,6 +13,9 @@ export const emptySnapshot: AppSnapshot = {
   approvals: [],
   artifacts: [],
   workspace: [],
+  memories: [],
   memoryCount: 0,
+  career: null,
+  connectors: [],
   timeline: [],
 };

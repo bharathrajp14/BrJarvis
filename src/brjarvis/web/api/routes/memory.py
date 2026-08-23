@@ -5,7 +5,7 @@ import logging
 import re
 import time
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, File, Form, HTTPException, Query, UploadFile
 from pydantic import BaseModel
@@ -35,6 +35,16 @@ class AddContactRequest(BaseModel):
     phone_number: str = ""
     email: str = ""
     aliases: List[str] = []
+
+
+class UpdateContactRequest(BaseModel):
+    phone_number: Optional[str] = None
+    email: Optional[str] = None
+    aliases: Optional[List[str]] = None
+    org: Optional[str] = None
+    title: Optional[str] = None
+    notes: Optional[str] = None
+    is_important: Optional[bool] = None
 
 
 @router.get("/memory")
@@ -80,7 +90,8 @@ async def delete_memory_entry(name: str, scope: str = "user"):
     """Delete a persistent memory entry."""
     from brjarvis.memory.persistent_store import delete_memory
 
-    delete_memory(name, scope=scope)
+    if not delete_memory(name, scope=scope):
+        raise HTTPException(status_code=404, detail="Memory not found")
     return {"message": f"Memory '{name}' deleted successfully."}
 
 
@@ -110,6 +121,28 @@ async def add_contact_endpoint(req: AddContactRequest):
         return {"status": "success", "message": f"Contact '{req.name}' added.", "contact": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to add contact: {e}")
+
+
+@router.patch("/contacts/{contact_id}")
+async def update_contact_endpoint(contact_id: str, req: UpdateContactRequest):
+    """Update mutable fields for an existing encrypted contact."""
+    from brjarvis.memory.contact_manager import get_contact_store
+
+    store = get_contact_store()
+    updated = store.update_contact(contact_id, **req.model_dump(exclude_unset=True))
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Contact not found")
+    return {"status": "success", "contact": updated}
+
+
+@router.delete("/contacts/{contact_id}")
+async def delete_contact_endpoint(contact_id: str):
+    """Delete an encrypted contact."""
+    from brjarvis.memory.contact_manager import get_contact_store
+
+    if not get_contact_store().delete_contact(contact_id):
+        raise HTTPException(status_code=404, detail="Contact not found")
+    return {"status": "success", "contact_id": contact_id}
 
 
 @router.post("/import/contacts")

@@ -89,6 +89,16 @@ def test_versioned_contacts_contract_and_path_containment(monkeypatch, tmp_path)
     assert listed.status_code == 200
     assert listed.json()["total"] == 1
 
+    contact_id = created.json()["contact"]["id"]
+    updated = client.patch(f"/api/v1/contacts/{contact_id}", json={"phone_number": "+1 (555) 123-4567", "is_important": True}, headers=headers)
+    assert updated.status_code == 200
+    assert updated.json()["contact"]["phone_number"] == "+15551234567"
+    assert updated.json()["contact"]["is_important"] is True
+
+    deleted = client.delete(f"/api/v1/contacts/{contact_id}", headers=headers)
+    assert deleted.status_code == 200
+    assert client.get("/api/v1/contacts?query=ada", headers=headers).json()["total"] == 0
+
     outside = client.post(
         "/api/v1/import/contacts",
         data={"file_path": str(tmp_path.parent / "outside.vcf")},
@@ -170,8 +180,30 @@ def test_project_upload_sanitizes_client_filename(monkeypatch, tmp_path):
 
 
 @pytest.mark.integration
+def test_memory_delete_reports_missing_records(monkeypatch):
+    from brjarvis.memory import persistent_store
+
+    monkeypatch.setattr(persistent_store, "delete_memory", lambda name, scope="user": False)
+    client = TestClient(create_app())
+    response = client.delete("/api/v1/memory/missing", headers={"X-API-Key": SERVER_API_KEY})
+    assert response.status_code == 404
+
+
+@pytest.mark.integration
+def test_career_profile_is_available_under_both_api_versions():
+    client = TestClient(create_app())
+    headers = {"X-API-Key": SERVER_API_KEY}
+    legacy = client.get("/api/career/profile", headers=headers)
+    versioned = client.get("/api/v1/career/profile", headers=headers)
+    assert legacy.status_code == 200
+    assert versioned.status_code == 200
+    assert "profile" in legacy.json()
+    assert "profile" in versioned.json()
+
+
+@pytest.mark.integration
 def test_normalized_routers_do_not_create_doubled_versioned_paths():
     paths = create_app().openapi()["paths"]
     assert not any(path.startswith("/api/v1/api/") for path in paths)
-    for path in ("/api/v1/auth/status", "/api/v1/notifications", "/api/v1/conversations", "/api/v1/tasks", "/api/v1/agent/tasks", "/api/v1/projects", "/api/v1/artifacts", "/api/v1/contacts", "/api/v1/connectors"):
+    for path in ("/api/v1/auth/status", "/api/v1/notifications", "/api/v1/conversations", "/api/v1/tasks", "/api/v1/agent/tasks", "/api/v1/projects", "/api/v1/artifacts", "/api/v1/contacts", "/api/v1/connectors", "/api/v1/career/profile"):
         assert path in paths
