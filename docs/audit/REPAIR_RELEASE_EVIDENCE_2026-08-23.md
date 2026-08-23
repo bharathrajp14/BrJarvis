@@ -82,3 +82,10 @@ Memory now supports live create and delete operations from the rebuilt UI and re
 Generic document import now rejects server paths outside the configured workspace root, bounds uploads to 25 MiB, and preserves uploaded source files inside the contained workspace import directory so vector metadata does not point to deleted temporary files. New route regressions cover contained workspace preview and generic import path rejection.
 
 The fresh final gates report **355 passed, 1 skipped, and 2 deselected**; frontend typecheck, packaged Vite build, both legacy JavaScript syntax checks, critical Ruff, and `pip-audit` all pass. The packaged rebuilt assets were regenerated into `src/brjarvis/web/static/dist`.
+
+
+## Fake-data cleanup pass
+
+A production-focused audit removed the unused `MockAndroidDevice` implementation and its package export, removed the fabricated `CarolynAddison` example workspace, and deleted the tracked generated `config/proxy_test_results.json` benchmark snapshot. The generated proxy-result path is now ignored so stale model probe output cannot be recommitted. Cross-device WhatsApp planning no longer injects the hard-coded recipient `Rahul`; it derives an explicit recipient query from the user goal and otherwise leaves recipient resolution to authorized contact state.
+
+Intentional test fixtures under `tests/fixtures` remain isolated test inputs and are not imported by production code. The committed Career profile is retained as user-provided profile data rather than treated as demo content. A second production-source scan found no remaining recognizable fabricated records such as the removed mock contacts, sample device, CarolynAddison workspace, or demo companies. The post-cleanup suite reports **355 passed, 1 skipped, and 2 deselected**; critical Ruff and legacy JavaScript syntax checks also pass.

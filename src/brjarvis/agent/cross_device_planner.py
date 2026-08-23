@@ -100,15 +100,17 @@ class CrossDevicePlanner:
                     verification_criteria="app_in_foreground",
                 )
             )
+            recipient_match = re.search(r"\bto\s+([a-z][a-z0-9 .'-]{1,60}?)(?:\s+(?:on|via|using)\s+whatsapp|$)", g, re.IGNORECASE)
+            recipient_query = recipient_match.group(1).strip() if recipient_match else None
             steps.append(
                 CrossDeviceStep(
                     step_num=3,
                     device_target=DeviceTarget.MOBILE_ANDROID,
                     capability_name="whatsapp",
                     action_name="send_message",
-                    description="Attach document and prepare WhatsApp message to contact",
+                    description="Attach document and resolve the WhatsApp recipient from authorized contacts",
                     parameters={
-                        "contact": "Rahul" if "rahul" in g else "contact",
+                        "contact_query": recipient_query,
                         "text": "Here is the requested document.",
                     },
                     requires_approval=True,  # Mandatory approval gate

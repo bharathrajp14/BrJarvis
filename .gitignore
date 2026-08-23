@@ -107,3 +107,6 @@ src/brjarvis/.jarvis/
 src/brjarvis/captures/
 src/brjarvis/notes/
 src/brjarvis/reports/
+
+# Generated model probe output
+config/proxy_test_results.json

@@ -5,7 +5,6 @@ if __name__ in sys.modules:
 
 from .device_controller import AndroidDeviceController
 from .gateway import DeviceGateway, PairedDevice, get_device_gateway
-from .mock_android import MockAndroidDevice
 from .protocol import AccessibilityNode, DeviceState, MobileMessage, MobileMessageType
 
 __all__ = [
@@ -17,5 +16,4 @@ __all__ = [
     "DeviceGateway",
     "PairedDevice",
     "AndroidDeviceController",
-    "MockAndroidDevice",
 ]
