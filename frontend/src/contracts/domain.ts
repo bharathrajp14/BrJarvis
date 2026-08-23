@@ -6,6 +6,7 @@ export type ViewId =
   | 'artifacts'
   | 'memory'
   | 'career'
+  | 'business'
   | 'integrations'
   | 'operations';
 

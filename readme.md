@@ -227,6 +227,16 @@ The application mounts authentication, health, tasks, conversations, projects, a
 | Startup recovery | Persisted interrupted tasks are inspected and recovered or failed according to checkpoint availability. |
 | Shutdown | WebSocket logging is deactivated; queue, event store, and orchestrator are stopped with bounded waits. |
 
+### Default startup and browser authentication
+
+`python start.py web` starts the FastAPI server and opens the canonical local entry point, normally `http://127.0.0.1:8000/`. With `JARVIS_REBUILT_UI_DEFAULT=true` (the default), the rebuilt control plane is available at `/`, `/web`, `/web/rebuild`, and `/web/control-plane`. The previous client remains available at `/web/legacy`; setting `JARVIS_REBUILT_UI_DEFAULT=false` rolls the default root and `/web` entry points back to that legacy client without removing the rebuilt routes.
+
+When `JARVIS_SERVER_API_KEY` is configured, the browser first checks `/api/v1/auth/status`. An unauthenticated browser is shown a secure sign-in gate; submitting the key calls `/api/v1/auth/login`, which exchanges it for a short-lived `HttpOnly` `jarvis_session` cookie. The key is not stored in browser or session storage, and protected APIs are not called until the session is established. Do not solve a `401 Authentication required` response by disabling server authentication; use the configured key through the browser gate or a valid bearer/API-key header for non-browser clients.
+
+### Business OS
+
+Business OS is a first-class control-plane surface for leads, clients, delivery, projects, and operating priorities. The current UI provides a connector-ready dashboard structure and clearly illustrative local metrics while the dedicated CRM, invoicing, and delivery contracts are integrated. Its cards and actions therefore provide navigation/toast affordances rather than claiming live financial or CRM data; connect authoritative providers before using the displayed examples for business decisions.
+
 ## Voice and floating-widget workflows
 
 The floating surface separates presentation, runtime, and voice responsibilities:

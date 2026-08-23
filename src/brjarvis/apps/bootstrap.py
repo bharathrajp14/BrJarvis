@@ -203,6 +203,7 @@ def launch_web_server(
     console.print("\n[bold cyan]▶ Starting BR Web Core Server[/]")
     console.print(f"  [green]Server Running on[/] {base_url}")
     console.print(f"  [green]Interface URL[/] Access [cyan]{target_url}[/]")
+    console.print(f"  [green]Control plane[/] Rebuilt UI at [cyan]{base_url}/web[/] (legacy rollback: [cyan]{base_url}/web/legacy[/])")
     console.print("[dim]Press Ctrl+C to shut down.[/]\n")
 
     import uvicorn

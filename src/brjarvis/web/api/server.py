@@ -358,16 +358,27 @@ def create_app() -> FastAPI:
         "Clear-Site-Data": '"cache"',  # Tells browsers to drop SW cache on each load
     }
 
+    def _use_rebuilt_ui() -> bool:
+        configured = os.environ.get("JARVIS_REBUILT_UI_DEFAULT", "true").strip().lower()
+        return configured not in {"0", "false", "no", "off"} and (WEB_DIR / "dist" / "index.html").exists()
+
     @app.get("/")
     @app.get("/index.html")
     @app.get("/web")
     @app.get("/web/")
     @app.get("/web/index.html")
     async def get_index():
-        index_file = WEB_DIR / "index.html"
+        index_file = WEB_DIR / "dist" / "index.html" if _use_rebuilt_ui() else WEB_DIR / "index.html"
         if index_file.exists():
             return FileResponse(index_file, headers=_NO_CACHE_HEADERS)
         return HTMLResponse("<h1>BR JARVIS Dashboard</h1><p>Web client loaded</p>")
+
+    @app.get("/web/legacy", include_in_schema=False)
+    async def get_legacy_web():
+        index_file = WEB_DIR / "index.html"
+        if index_file.exists():
+            return FileResponse(index_file, headers=_NO_CACHE_HEADERS)
+        raise HTTPException(status_code=404, detail="legacy UI not found")
 
     @app.get("/web/sw.js")
     async def get_sw():
@@ -424,7 +435,8 @@ def create_app() -> FastAPI:
             return FileResponse(target_file, headers=extra)
         accept = request.headers.get("accept", "")
         if "text/html" in accept or not Path(file_name).suffix:
-            index_file = WEB_DIR / "index.html"
+            configured = os.environ.get("JARVIS_REBUILT_UI_DEFAULT", "true").strip().lower()
+            index_file = WEB_DIR / "dist" / "index.html" if configured not in {"0", "false", "no", "off"} and (WEB_DIR / "dist" / "index.html").exists() else WEB_DIR / "index.html"
             if index_file.exists():
                 return FileResponse(index_file, headers=_NO_CACHE_HEADERS)
         raise HTTPException(status_code=404, detail=f"Requested URL '/{file_name}' not found.")

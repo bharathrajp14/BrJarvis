@@ -1,16 +1,16 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import type { ReactNode } from 'react';
 import {
-  Activity, ArrowUpRight, Bell, Bot, BriefcaseBusiness, Check, ChevronRight, CircleAlert, CircleCheck,
+  Activity, ArrowUpRight, Bell, Bot, BriefcaseBusiness, Building2, Check, ChevronRight, CircleAlert, CircleCheck,
   Clock3, Command, Database, Download, FileCode2, FileText, FolderTree, Gauge, GitBranch, Globe2,
   Inbox, Layers3, LayoutDashboard, ListTodo, LoaderCircle, LockKeyhole, Menu, MessageSquareText,
   Moon, MoreHorizontal, Network, Pause, Play, Plus, RefreshCw, Search, Send, Settings2, ShieldCheck,
-  Sparkles, Square, TerminalSquare, UserRound, Wifi, WifiOff, X, Zap,
+  Sparkles, Square, Target, TerminalSquare, TrendingUp, UserRound, Wifi, WifiOff, X, Zap,
 } from 'lucide-react';
 import type { NavigationItem } from '../contracts/api';
 import type { AppSnapshot, ExecutionMode, Task, ViewId } from '../contracts/domain';
 import { apiClient } from '../platform/api-client';
-import { loadAuthSnapshot } from '../platform/auth-client';
+import { loadAuthSnapshot, loginWithApiKey, type AuthSnapshot } from '../platform/auth-client';
 import { RealtimeClient } from '../platform/websocket-client';
 import { dispatch, getSnapshot, subscribe } from '../state/app-store';
 import '../styles/tokens.css';
@@ -24,8 +24,9 @@ const navigation: NavigationItem[] = [
   { id: 'artifacts', label: 'Artifacts', eyebrow: '05', description: 'Verified outputs and provenance.' },
   { id: 'memory', label: 'Memory', eyebrow: '06', description: 'Scoped knowledge and retrieval.' },
   { id: 'career', label: 'Career OS', eyebrow: '07', description: 'Profile, applications, and resumes.' },
-  { id: 'integrations', label: 'Integrations', eyebrow: '08', description: 'Providers, connectors, and capabilities.' },
-  { id: 'operations', label: 'Operations', eyebrow: '09', description: 'Runtime health, event lag, and audit.' },
+  { id: 'business', label: 'Business OS', eyebrow: '08', description: 'Leads, clients, projects, and business operations.' },
+  { id: 'integrations', label: 'Integrations', eyebrow: '09', description: 'Providers, connectors, and capabilities.' },
+  { id: 'operations', label: 'Operations', eyebrow: '10', description: 'Runtime health, event lag, and audit.' },
 ];
 
 const navIcons: Record<ViewId, typeof Command> = {
@@ -36,6 +37,7 @@ const navIcons: Record<ViewId, typeof Command> = {
   artifacts: Layers3,
   memory: Database,
   career: BriefcaseBusiness,
+  business: Building2,
   integrations: Network,
   operations: Gauge,
 };
@@ -58,12 +60,22 @@ export function App() {
   const [commandBusy, setCommandBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [operator, setOperator] = useState({ label: 'Operator', scope: 'Local session' });
+  const [auth, setAuth] = useState<AuthSnapshot | null>(null);
+  const [authBusy, setAuthBusy] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [realtime] = useState(() => new RealtimeClient((status) => dispatch({ type: 'connection', status })));
 
   useEffect(() => {
+    loadAuthSnapshot().then((currentAuth) => {
+      setAuth(currentAuth);
+      setOperator({ label: currentAuth.label, scope: currentAuth.scope });
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!auth || (auth.authRequired && !auth.authenticated)) return;
     apiClient.snapshot().then((data) => dispatch({ type: 'hydrate', snapshot: data }));
-    loadAuthSnapshot().then((auth) => setOperator({ label: auth.label, scope: auth.scope }));
-    realtime.connect();
+    void realtime.connect();
     const unsubscribe = realtime.subscribe((event) => {
       if (event.type === 'task.updated') dispatch({ type: 'task-upsert', task: event.task });
     });
@@ -73,7 +85,7 @@ export function App() {
     };
     window.addEventListener('keydown', keydown);
     return () => { unsubscribe(); realtime.disconnect(); window.removeEventListener('keydown', keydown); };
-  }, [realtime]);
+  }, [auth, realtime]);
 
   useEffect(() => {
     if (!toast) return;
@@ -84,6 +96,23 @@ export function App() {
   const activeTask = snapshot.tasks.find((task) => task.id === snapshot.activeTaskId) ?? snapshot.tasks[0];
   const activeNav = navigation.find((item) => item.id === snapshot.activeView) ?? navigation[0];
   const pendingApprovals = snapshot.approvals.length;
+
+  const submitLogin = async (apiKey: string) => {
+    setAuthBusy(true);
+    setAuthError(null);
+    try {
+      const currentAuth = await loginWithApiKey(apiKey);
+      setAuth(currentAuth);
+      setOperator({ label: currentAuth.label, scope: currentAuth.scope });
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : 'Authentication failed.');
+    } finally {
+      setAuthBusy(false);
+    }
+  };
+
+  if (!auth) return <BootScreen />;
+  if (auth.authRequired && !auth.authenticated) return <LoginScreen busy={authBusy} error={authError} onSubmit={submitLogin} />;
 
   const submitCommand = async () => {
     const goal = command.trim();
@@ -121,9 +150,9 @@ export function App() {
           <span className="nav-group-label">WORKSPACE</span>
           {navigation.slice(0, 5).map((item) => <NavItem key={item.id} item={item} active={snapshot.activeView === item.id} badge={item.id === 'approvals' ? pendingApprovals : undefined} onClick={() => selectView(item.id)} />)}
           <span className="nav-group-label nav-group-secondary">KNOWLEDGE</span>
-          {navigation.slice(5, 7).map((item) => <NavItem key={item.id} item={item} active={snapshot.activeView === item.id} onClick={() => selectView(item.id)} />)}
+          {navigation.slice(5, 8).map((item) => <NavItem key={item.id} item={item} active={snapshot.activeView === item.id} onClick={() => selectView(item.id)} />)}
           <span className="nav-group-label nav-group-secondary">SYSTEM</span>
-          {navigation.slice(7).map((item) => <NavItem key={item.id} item={item} active={snapshot.activeView === item.id} onClick={() => selectView(item.id)} />)}
+          {navigation.slice(8).map((item) => <NavItem key={item.id} item={item} active={snapshot.activeView === item.id} onClick={() => selectView(item.id)} />)}
         </nav>
         <div className="sidebar-bottom">
           <div className="sidebar-health"><div className={`status-dot ${snapshot.connection === 'connected' ? 'status-green' : 'status-amber'}`} /><div><span className="eyebrow">RUNTIME</span><strong>{snapshot.connection === 'connected' ? 'Connected' : 'Reconnecting'}</strong></div><Wifi size={14} /></div>
@@ -144,6 +173,7 @@ export function App() {
           {snapshot.activeView === 'artifacts' && <ArtifactsView snapshot={snapshot} />}
           {snapshot.activeView === 'memory' && <SimpleView icon={<Database size={20} />} title="Memory" eyebrow="SCOPED KNOWLEDGE" description="A permission-aware memory surface is ready for layered retrieval, freshness, and deletion controls." cards={['Recent conversation context', 'Project knowledge', 'User preferences']} />}
           {snapshot.activeView === 'career' && <SimpleView icon={<BriefcaseBusiness size={20} />} title="Career OS" eyebrow="FOCUSED WORKSPACE" description="Keep sensitive career workflows separate from operations while sharing the same typed platform foundation." cards={['Profile health', 'Active applications', 'Resume artifacts']} />}
+          {snapshot.activeView === 'business' && <BusinessView onToast={setToast} />}
           {snapshot.activeView === 'integrations' && <IntegrationsView snapshot={snapshot} />}
           {snapshot.activeView === 'operations' && <OperationsView snapshot={snapshot} />}
         </div></div>
@@ -211,5 +241,40 @@ function ProviderRow({ name, tag, state, latency }: { name: string; tag: string;
 function OperationsView({ snapshot }: { snapshot: AppSnapshot }) { return <><section className="ops-metrics"><Metric label="Queue depth" value="03" detail="1 waiting approval" tone="accent" /><Metric label="Event lag" value="42 ms" detail="Healthy delivery" tone="success" /><Metric label="Provider uptime" value="99.8%" detail="Rolling 24 hours" /><Metric label="Memory" value="38%" detail="12.4 GB available" /></section><section className="ops-grid"><article className="panel"><div className="panel-topline"><div><span className="eyebrow">RUNTIME SIGNALS</span><h3>System timeline</h3></div><button className="text-button">View audit <ArrowUpRight size={13} /></button></div><div className="event-list">{snapshot.timeline.concat([{ id: 'e5', time: formatTime(), label: 'Capability check', detail: 'Runtime, workspace, and gateway health sampled', tone: 'success' }]).map((event) => <div className="event-row" key={event.id}><span className={`event-line event-${event.tone}`} /><div className="event-content"><div><strong>{event.label}</strong><time>{event.time}</time></div><p>{event.detail}</p></div></div>)}</div></article><article className="panel ops-checks"><div className="panel-topline"><div><span className="eyebrow">READINESS</span><h3>Control gates</h3></div><CircleCheck className="healthy-icon" size={19} /></div>{['Authorization boundary', 'Task state persistence', 'Realtime replay cursor', 'Workspace index freshness'].map((label) => <div className="readiness-row" key={label}><span className="status-dot status-green" /><span>{label}</span><strong>Healthy</strong></div>)}</article></section></>; }
 
 function SimpleView({ icon, eyebrow, title, description, cards }: { icon: ReactNode; eyebrow: string; title: string; description: string; cards: string[] }) { return <section className="simple-view"><div className="simple-icon">{icon}</div><div className="eyebrow">{eyebrow}</div><h2>{title}</h2><p>{description}</p><div className="simple-cards">{cards.map((card, index) => <div className="panel simple-card" key={card}><span>0{index + 1}</span><strong>{card}</strong><ArrowUpRight size={15} /></div>)}</div></section>; }
+
+function BootScreen() {
+  return <div className="auth-screen"><div className="auth-card boot-card"><div className="brand-mark"><Sparkles size={18} /></div><div className="eyebrow accent-eyebrow">BRJARVIS / STARTING</div><h1>Preparing your control plane</h1><p>Loading secure session, capabilities, and the latest task state.</p><LoaderCircle size={20} className="spin boot-spinner" /></div></div>;
+}
+
+function LoginScreen({ busy, error, onSubmit }: { busy: boolean; error: string | null; onSubmit: (apiKey: string) => void }) {
+  const [apiKey, setApiKey] = useState('');
+  return <div className="auth-screen"><div className="auth-card"><div className="auth-brand"><div className="brand-mark"><Sparkles size={18} /></div><div><div className="brand-name">BRJARVIS</div><div className="brand-subtitle">CONTROL PLANE</div></div></div><div className="eyebrow accent-eyebrow">SECURE SESSION</div><h1>Sign in to continue</h1><p>Use the local server API key to create a short-lived browser session. The key is sent over the current connection and is not stored in browser storage.</p><form onSubmit={(event) => { event.preventDefault(); if (apiKey.trim()) onSubmit(apiKey); }}><label className="auth-label" htmlFor="server-api-key">Server API key</label><input id="server-api-key" className="auth-input" type="password" autoComplete="off" value={apiKey} onChange={(event) => setApiKey(event.target.value)} placeholder="Paste the configured server key" autoFocus /><button className="primary-button auth-submit" disabled={busy || !apiKey.trim()}>{busy ? <LoaderCircle size={16} className="spin" /> : <LockKeyhole size={16} />}{busy ? 'Creating session…' : 'Create secure session'}</button></form>{error && <div className="auth-error" role="alert"><CircleAlert size={15} />{error}</div>}<div className="auth-note"><ShieldCheck size={14} /><span>Session cookie is HttpOnly and expires according to server policy.</span></div></div></div>;
+}
+
+function BusinessView({ onToast }: { onToast: (message: string) => void }) {
+  const metrics: Array<{ label: string; value: string; detail: string; tone?: 'accent' | 'success' }> = [
+    { label: 'Open opportunities', value: '18', detail: '+4 this month', tone: 'accent' },
+    { label: 'Active clients', value: '07', detail: '2 need attention', tone: 'success' },
+    { label: 'Pipeline value', value: '$84.2k', detail: 'Weighted forecast' },
+    { label: 'Next deadline', value: '03d', detail: 'Quarterly review' },
+  ];
+  const pipeline = [
+    { name: 'Discovery', count: '06', value: '$18.4k', width: '72%', tone: 'accent' },
+    { name: 'Proposal', count: '04', value: '$31.8k', width: '54%', tone: 'purple' },
+    { name: 'Negotiation', count: '03', value: '$22.0k', width: '42%', tone: 'amber' },
+    { name: 'Won', count: '05', value: '$12.0k', width: '31%', tone: 'green' },
+  ];
+  const priorities = [
+    { title: 'Follow up with Northstar Labs', meta: 'Sales · Due today', state: 'Priority' },
+    { title: 'Prepare client renewal brief', meta: 'Account · Due tomorrow', state: 'Queued' },
+    { title: 'Review Q3 operating plan', meta: 'Strategy · Friday', state: 'Draft' },
+  ];
+  return <>
+    <section className="business-intro"><div><div className="hero-kicker"><span className="pulse-ring"><Building2 size={15} /></span> BUSINESS OPERATIONS ONLINE</div><h2>Turn activity into<br /><em>operating leverage.</em></h2><p>One focused surface for opportunities, clients, delivery, cash flow, and the decisions that keep the business moving.</p></div><button className="primary-button" onClick={() => onToast('Business command created. Start from the Command Center to automate the next step.')}><Plus size={16} />New business action</button></section>
+    <section className="business-metrics">{metrics.map((metric) => <Metric key={metric.label} {...metric} />)}</section>
+    <div className="business-grid"><section className="panel pipeline-panel"><div className="panel-topline"><div><span className="eyebrow">REVENUE PIPELINE</span><h3>Where work is moving</h3></div><button className="text-button" onClick={() => onToast('Pipeline view is ready for CRM connector data.')}>Open pipeline <ArrowUpRight size={13} /></button></div><div className="pipeline-list">{pipeline.map((stage) => <div className="pipeline-row" key={stage.name}><div className="pipeline-label"><strong>{stage.name}</strong><span>{stage.count} opportunities</span></div><div className="pipeline-bar"><span className={`pipeline-fill pipeline-${stage.tone}`} style={{ width: stage.width }} /></div><strong className="pipeline-value">{stage.value}</strong></div>)}</div><div className="pipeline-footer"><span><TrendingUp size={14} />12.8% conversion trend</span><span>Updated 4 min ago</span></div></section><section className="panel priority-panel"><div className="panel-topline"><div><span className="eyebrow">OPERATING PRIORITIES</span><h3>Next decisions</h3></div><Target size={18} className="accent-icon" /></div><div className="priority-list">{priorities.map((priority) => <button className="priority-row" key={priority.title} onClick={() => onToast(`${priority.title} added to the Command Center queue.`)}><span className="priority-icon"><ArrowUpRight size={14} /></span><span><strong>{priority.title}</strong><small>{priority.meta}</small></span><em>{priority.state}</em></button>)}</div></section></div>
+    <section className="business-quick"><div className="section-heading"><div><span className="eyebrow">BUSINESS OS MODULES</span><h3>Make the next move deliberate</h3></div></div><div className="quick-grid">{['Leads & opportunities', 'Client delivery', 'Invoices & cash flow', 'Projects & milestones'].map((label, index) => <button className="panel quick-card" key={label} onClick={() => onToast(`${label} will open through the connected Business OS workflow.`)}><span>0{index + 1}</span><strong>{label}</strong><ChevronRight size={15} /></button>)}</div></section>
+  </>;
+}
 
 function CommandPalette({ onClose, onNavigate }: { onClose: () => void; onNavigate: (view: ViewId) => void }) { const [query, setQuery] = useState(''); const items = navigation.filter((item) => `${item.label} ${item.description}`.toLowerCase().includes(query.toLowerCase())); return <div className="palette-backdrop" onClick={onClose}><div className="command-palette" onClick={(event) => event.stopPropagation()}><div className="palette-input"><Search size={18} /><input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Jump to a surface or action…" /></div><div className="palette-list">{items.map((item) => { const Icon = navIcons[item.id]; return <button key={item.id} onClick={() => onNavigate(item.id)}><span className="palette-icon"><Icon size={16} /></span><span><strong>{item.label}</strong><small>{item.description}</small></span><kbd>↵</kbd></button>; })}</div><div className="palette-footer"><span><kbd>↑↓</kbd> Navigate</span><span><kbd>↵</kbd> Open</span><span><kbd>esc</kbd> Close</span></div></div></div>; }
