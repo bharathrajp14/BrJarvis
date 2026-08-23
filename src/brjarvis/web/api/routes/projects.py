@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import uuid
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -13,6 +14,16 @@ from brjarvis.memory.workspace_store import get_workspace_store
 
 logger = logging.getLogger("JARVIS.API.Projects")
 router = APIRouter(tags=["Projects"])
+_MAX_PROJECT_FILE_BYTES = 25 * 1024 * 1024
+_MAX_PREVIEW_BYTES = 1 * 1024 * 1024
+_TEXT_EXTENSIONS = {".txt", ".md", ".markdown", ".csv", ".json", ".yaml", ".yml", ".log", ".py", ".js", ".ts", ".tsx", ".jsx", ".css", ".html", ".xml"}
+
+
+def _public_file_dict(record):
+    data = record.to_dict()
+    raw_path = data.pop("file_path", None)
+    data["path"] = Path(raw_path).name if raw_path else data.get("filename", "")
+    return data
 
 
 class CreateProjectRequest(BaseModel):
@@ -67,7 +78,7 @@ async def get_project_details(project_id: str):
 
     return {
         "project": proj.to_dict(),
-        "files": [f.to_dict() for f in files],
+        "files": [_public_file_dict(f) for f in files],
         "conversations": [c.to_dict() for c in convs],
         "artifacts": [a.to_dict() for a in artifacts],
     }
@@ -105,7 +116,7 @@ async def list_project_files(project_id: str):
     """List all files attached to a project."""
     store = get_workspace_store()
     files = store.list_project_files(project_id)
-    return {"total": len(files), "files": [f.to_dict() for f in files]}
+    return {"total": len(files), "files": [_public_file_dict(f) for f in files]}
 
 
 @router.post("/projects/{project_id}/files")
@@ -122,10 +133,19 @@ async def upload_project_file(
     target_dir = paths.ARTIFACT_ROOT / "projects" / project_id
     target_dir.mkdir(parents=True, exist_ok=True)
     filename = Path(file.filename or "upload.bin").name
+    if not filename or filename in {".", ".."}:
+        raise HTTPException(status_code=400, detail="A valid filename is required")
     target_path = target_dir / filename
 
-    content = await file.read()
-    target_path.write_bytes(content)
+    content = await file.read(_MAX_PROJECT_FILE_BYTES + 1)
+    if len(content) > _MAX_PROJECT_FILE_BYTES:
+        raise HTTPException(status_code=413, detail=f"Project files are limited to {_MAX_PROJECT_FILE_BYTES // (1024 * 1024)} MiB")
+    temp_path = target_dir / f".{filename}.{uuid.uuid4().hex}.upload"
+    try:
+        temp_path.write_bytes(content)
+        temp_path.replace(target_path)
+    finally:
+        temp_path.unlink(missing_ok=True)
 
     rec = store.add_project_file(
         project_id=project_id,
@@ -135,7 +155,32 @@ async def upload_project_file(
         mime_type=file.content_type or "application/octet-stream",
         status="READY",
     )
-    return {"status": "success", "file": rec.to_dict()}
+    return {"status": "success", "file": _public_file_dict(rec)}
+
+
+@router.get("/projects/{project_id}/files/{file_id}/preview")
+async def preview_project_file(project_id: str, file_id: str):
+    """Return safe metadata and a bounded preview for a project file."""
+    store = get_workspace_store()
+    record = store.get_project_file(project_id, file_id)
+    if not record:
+        raise HTTPException(status_code=404, detail="File not found")
+    expected_root = (paths.ARTIFACT_ROOT / "projects" / project_id).resolve()
+    file_path = Path(record.file_path).expanduser().resolve()
+    try:
+        file_path.relative_to(expected_root)
+    except ValueError as exc:
+        raise HTTPException(status_code=403, detail="Project file is outside the project workspace") from exc
+    if not file_path.exists() or not file_path.is_file():
+        raise HTTPException(status_code=404, detail="Project file is not available")
+    suffix = file_path.suffix.lower()
+    is_text = record.mime_type.startswith("text/") or suffix in _TEXT_EXTENSIONS
+    payload = {"file_id": record.file_id, "project_id": record.project_id, "filename": record.filename, "mime_type": record.mime_type, "size": file_path.stat().st_size, "is_text": is_text}
+    if is_text:
+        raw = file_path.read_bytes()[:_MAX_PREVIEW_BYTES]
+        payload["content"] = raw.decode("utf-8", errors="replace")
+        payload["truncated"] = file_path.stat().st_size > _MAX_PREVIEW_BYTES
+    return payload
 
 
 @router.delete("/projects/{project_id}/files/{file_id}")

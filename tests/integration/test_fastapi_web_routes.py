@@ -207,3 +207,56 @@ def test_normalized_routers_do_not_create_doubled_versioned_paths():
     assert not any(path.startswith("/api/v1/api/") for path in paths)
     for path in ("/api/v1/auth/status", "/api/v1/notifications", "/api/v1/conversations", "/api/v1/tasks", "/api/v1/agent/tasks", "/api/v1/projects", "/api/v1/artifacts", "/api/v1/contacts", "/api/v1/connectors", "/api/v1/career/profile"):
         assert path in paths
+
+
+@pytest.mark.integration
+def test_project_file_preview_is_contained_and_does_not_expose_host_path(monkeypatch, tmp_path):
+    from types import SimpleNamespace
+    from brjarvis.web.api.routes import projects as project_routes
+
+    project_root = tmp_path / "projects" / "project-1"
+    project_root.mkdir(parents=True)
+    preview_file = project_root / "notes.txt"
+    preview_file.write_text("safe preview\n", encoding="utf-8")
+    record = SimpleNamespace(
+        file_id="file-1",
+        project_id="project-1",
+        filename="notes.txt",
+        file_path=str(preview_file),
+        file_size=12,
+        mime_type="text/plain",
+        status="READY",
+    )
+
+    class Store:
+        def get_project_file(self, project_id, file_id):
+            return record if (project_id, file_id) == ("project-1", "file-1") else None
+
+    monkeypatch.setattr(project_routes, "get_workspace_store", lambda: Store())
+    monkeypatch.setattr(project_routes.paths, "ARTIFACT_ROOT", tmp_path)
+    client = TestClient(create_app())
+    response = client.get("/api/v1/projects/project-1/files/file-1/preview", headers={"X-API-Key": SERVER_API_KEY})
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["content"].strip() == "safe preview"
+    assert "file_path" not in payload
+    assert str(tmp_path) not in response.text
+
+
+@pytest.mark.integration
+def test_generic_import_file_path_must_be_inside_workspace(monkeypatch, tmp_path):
+    from brjarvis.web.api.routes import memory as memory_routes
+
+    monkeypatch.setattr(memory_routes.paths, "WORKSPACE_ROOT", tmp_path / "workspace")
+    outside = tmp_path / "outside.txt"
+    outside.write_text("not allowed", encoding="utf-8")
+    client = TestClient(create_app())
+    response = client.post(
+        "/api/v1/import/file",
+        data={"file_path": str(outside)},
+        headers={"X-API-Key": SERVER_API_KEY},
+    )
+
+    assert response.status_code == 400
+    assert "workspace root" in response.text

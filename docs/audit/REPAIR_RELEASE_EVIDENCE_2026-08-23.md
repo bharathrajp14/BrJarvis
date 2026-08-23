@@ -71,3 +71,14 @@ The focused regression checkpoint for this pass is **29 passed**. The frontend p
 ## Final regression repair
 
 The final full-suite run exposed a race in the desktop context card: asynchronous task-history refresh could overwrite an active approval context and duplicate its action buttons. The widget now suppresses history refresh while a task is running or awaiting approval. The targeted Qt regression passes, and the complete maintained suite now reports **353 passed, 1 skipped, and 2 deselected**.
+
+
+## Third full-project workability pass
+
+The third pass completed the remaining exposed rebuilt-surface interactions and closed additional backend defects. Command Center context attachments now use authenticated multipart upload into a contained persistent `.imports` workspace, with filename normalization and a 25 MiB limit. Workspace file rows are selectable and use a project/file-scoped preview endpoint with a 1 MiB text-preview bound, binary-file handling, and no absolute host-path disclosure. Project-file uploads are bounded and written atomically; project metadata responses no longer expose stored host paths.
+
+Memory now supports live create and delete operations from the rebuilt UI and refreshes from canonical state. The snapshot includes encrypted contact summaries, nested Career profile normalization, and project/file identities. Business OS is a live summary of stored projects, contacts, active work, and artifacts rather than fabricated CRM data; external CRM/invoicing data remains connector-dependent. Notifications open the live Operations timeline, theme switching is functional, and Career feedback no longer claims verification unless the backend status is `SUCCESS_VERIFIED`.
+
+Generic document import now rejects server paths outside the configured workspace root, bounds uploads to 25 MiB, and preserves uploaded source files inside the contained workspace import directory so vector metadata does not point to deleted temporary files. New route regressions cover contained workspace preview and generic import path rejection.
+
+The fresh final gates report **355 passed, 1 skipped, and 2 deselected**; frontend typecheck, packaged Vite build, both legacy JavaScript syntax checks, critical Ruff, and `pip-audit` all pass. The packaged rebuilt assets were regenerated into `src/brjarvis/web/static/dist`.

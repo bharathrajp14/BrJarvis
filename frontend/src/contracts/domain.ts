@@ -80,6 +80,8 @@ export interface WorkspaceEntry {
   kind: 'folder' | 'file';
   path: string;
   detail?: string;
+  projectId?: string;
+  fileId?: string;
 }
 
 export interface TimelineEvent {
@@ -96,6 +98,15 @@ export interface MemoryEntry {
   scope: string;
   content: string;
   updatedAt: string;
+}
+
+export interface ContactSummary {
+  id: string;
+  name: string;
+  organization: string;
+  email: string;
+  phone: string;
+  important: boolean;
 }
 
 export interface CareerProfile {
@@ -128,6 +139,7 @@ export interface AppSnapshot {
   memories: MemoryEntry[];
   memoryCount: number;
   career: CareerProfile | null;
+  contacts: ContactSummary[];
   connectors: ConnectorSummary[];
   timeline: TimelineEvent[];
 }

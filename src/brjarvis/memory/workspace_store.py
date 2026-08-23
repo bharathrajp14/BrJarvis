@@ -371,6 +371,27 @@ class WorkspaceStore:
                 for r in rows
             ]
 
+    def get_project_file(self, project_id: str, file_id: str) -> Optional[ProjectFileRecord]:
+        with self.db.get_connection() as conn:
+            row = conn.execute(
+                "SELECT * FROM project_files WHERE project_id = ? AND file_id = ?",
+                (project_id, file_id),
+            ).fetchone()
+            if not row:
+                return None
+            return ProjectFileRecord(
+                file_id=row["file_id"],
+                project_id=row["project_id"],
+                filename=row["filename"],
+                file_path=row["file_path"],
+                file_size=row["file_size"] or 0,
+                mime_type=row["mime_type"] or "application/octet-stream",
+                file_hash=row["file_hash"] or "",
+                status=row["status"] or "READY",
+                created_at=row["created_at"],
+                updated_at=row["updated_at"],
+            )
+
     def delete_project_file(self, file_id: str) -> bool:
         with self.db.get_connection() as conn:
             cur = conn.execute("DELETE FROM project_files WHERE file_id = ?", (file_id,))

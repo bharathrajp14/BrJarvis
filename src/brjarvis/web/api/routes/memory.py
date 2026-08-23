@@ -4,6 +4,7 @@ from __future__ import annotations
 import logging
 import re
 import time
+import uuid
 from pathlib import Path
 from typing import List, Optional
 
@@ -16,6 +17,7 @@ logger = logging.getLogger("JARVIS.API.Memory")
 router = APIRouter(tags=["Memory"])
 
 _BASE_DIR = paths.PROJECT_ROOT
+_MAX_IMPORT_BYTES = 25 * 1024 * 1024
 
 
 class SaveMemoryRequest(BaseModel):
@@ -199,18 +201,29 @@ async def import_file_endpoint(
     from brjarvis.actions.file_importer import import_file_to_knowledge
 
     if file:
-        temp_dir = paths.TEMP_ROOT / "uploads"
+        temp_dir = paths.WORKSPACE_ROOT / ".imports"
         temp_dir.mkdir(parents=True, exist_ok=True)
         filename = Path(file.filename or "upload.bin").name
-        save_path = temp_dir / filename
-        file_bytes = await file.read()
+        if not filename or filename in {".", ".."}:
+            raise HTTPException(status_code=400, detail="A valid filename is required")
+        file_bytes = await file.read(_MAX_IMPORT_BYTES + 1)
+        if len(file_bytes) > _MAX_IMPORT_BYTES:
+            raise HTTPException(status_code=413, detail=f"Imported files are limited to {_MAX_IMPORT_BYTES // (1024 * 1024)} MiB")
+        save_path = temp_dir / f"{uuid.uuid4().hex}_{filename}"
         save_path.write_bytes(file_bytes)
-        res = import_file_to_knowledge(save_path)
-        return res
+        return import_file_to_knowledge(save_path)
 
     if file_path:
-        res = import_file_to_knowledge(file_path)
-        return res
+        candidate = Path(file_path).expanduser().resolve()
+        try:
+            candidate.relative_to(paths.WORKSPACE_ROOT.resolve())
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail="file_path must be inside the configured workspace root.") from exc
+        if not candidate.exists() or not candidate.is_file():
+            raise HTTPException(status_code=404, detail="Import file was not found.")
+        if candidate.stat().st_size > _MAX_IMPORT_BYTES:
+            raise HTTPException(status_code=413, detail=f"Imported files are limited to {_MAX_IMPORT_BYTES // (1024 * 1024)} MiB")
+        return import_file_to_knowledge(candidate)
 
     raise HTTPException(status_code=400, detail="Provide a file upload or file_path to import.")
 

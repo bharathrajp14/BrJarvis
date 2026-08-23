@@ -16,6 +16,7 @@ export const emptySnapshot: AppSnapshot = {
   memories: [],
   memoryCount: 0,
   career: null,
+  contacts: [],
   connectors: [],
   timeline: [],
 };
