@@ -64,6 +64,28 @@ jobs:
       - name: Architecture contracts
         run: lint-imports
 
+  frontend:
+    name: Frontend UI build and type gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - name: Install frontend dependencies
+        run: pnpm --dir frontend install --frozen-lockfile
+      - name: Type-check frontend
+        run: pnpm --dir frontend typecheck
+      - name: Build frontend and copy static output
+        run: pnpm --dir frontend build:static
+      - name: Verify static build output
+        run: test -s frontend/dist/index.html && test -s frontend/dist/.vite/manifest.json && test -s src/brjarvis/web/static/dist/index.html
+
   tests:
     name: Tests (${{ matrix.os }}, Python ${{ matrix.python }})
     runs-on: ${{ matrix.os }}

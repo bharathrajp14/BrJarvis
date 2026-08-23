@@ -399,6 +399,14 @@ def create_app() -> FastAPI:
             return FileResponse(galaxy_file, headers=_NO_CACHE_HEADERS)
         return HTMLResponse("<h1>3D Knowledge Galaxy</h1>")
 
+    @app.get("/web/rebuild", include_in_schema=False)
+    @app.get("/web/control-plane", include_in_schema=False)
+    async def get_rebuilt_web():
+        rebuilt_index = WEB_DIR / "dist" / "index.html"
+        if rebuilt_index.exists():
+            return FileResponse(rebuilt_index, headers=_NO_CACHE_HEADERS)
+        raise HTTPException(status_code=404, detail="rebuilt UI not built")
+
     app.mount("/web", StaticFiles(directory=str(WEB_DIR), html=True), name="web")
 
     @app.get("/{file_name:path}")
