@@ -67,3 +67,7 @@ The post-publication re-audit found additional partial surfaces and corrected th
 The backend now exposes mutable contact update and delete operations through the normalized API, reports missing persistent-memory deletes as HTTP 404, and exposes Career OS under both `/api/career` and `/api/v1/career`. The new regressions cover contact CRUD, missing-memory behavior, Career profile access, and the versioned route contract.
 
 The focused regression checkpoint for this pass is **29 passed**. The frontend package build and static asset regeneration also pass after the new live views and actions were added.
+
+## Final regression repair
+
+The final full-suite run exposed a race in the desktop context card: asynchronous task-history refresh could overwrite an active approval context and duplicate its action buttons. The widget now suppresses history refresh while a task is running or awaiting approval. The targeted Qt regression passes, and the complete maintained suite now reports **353 passed, 1 skipped, and 2 deselected**.

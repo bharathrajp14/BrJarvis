@@ -612,7 +612,8 @@ if HAS_QT:
 
         def show_context(self) -> None:
             state = self._runtime.snapshot()
-            self._runtime.refresh_recent_tasks()
+            if state.task not in {"running", "waiting_for_approval", "approval"}:
+                self._runtime.refresh_recent_tasks()
             self._mode = "context"
             self._minimized = False
             if state.task in {"running", "waiting_for_approval", "approval"}:
