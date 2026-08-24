@@ -10,8 +10,10 @@ from __future__ import annotations
 import json
 import logging
 import sqlite3
+import threading
 import time
 import uuid
+
 from dataclasses import asdict, dataclass, field
 from enum import Enum
 from pathlib import Path
@@ -22,7 +24,12 @@ from brjarvis.memory.canonical_db import get_canonical_db
 logger = logging.getLogger("JARVIS.TaskState")
 
 
+class ConcurrentTaskUpdateError(RuntimeError):
+    """Raised when a stale task snapshot attempts to overwrite a newer one."""
+
+
 class TaskStatus(str, Enum):
+
     CREATED = "CREATED"
     UNDERSTANDING = "UNDERSTANDING"
     PLANNING = "PLANNING"
@@ -165,7 +172,11 @@ class TaskState:
     created_at: float = field(default_factory=time.time)
     updated_at: float = field(default_factory=time.time)
 
+    # Monotonic persistence revision used for optimistic concurrency control.
+    revision: int = 0
+
     def to_dict(self) -> Dict[str, Any]:
+
         d = asdict(self)
         d["status"] = self.status.value if isinstance(self.status, TaskStatus) else str(self.status)
         d["final_status"] = (
@@ -225,7 +236,12 @@ class TaskStateManager:
         else:
             self.db_manager = db_manager or get_canonical_db()
 
+        # Serialize read-modify-write operations within a manager; the SQL
+        # revision predicate also protects against races between processes.
+        self._mutation_lock = threading.RLock()
+
     def _get_conn(self) -> sqlite3.Connection:
+
         return self.db_manager.get_connection()
 
     def create_task(
@@ -274,8 +290,8 @@ class TaskStateManager:
         with self._get_conn() as conn:
             conn.execute(
                 """
-                INSERT OR REPLACE INTO tasks (task_id, goal, status, current_step, total_steps, active_agents, active_devices, data_json, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT OR REPLACE INTO tasks (task_id, goal, status, current_step, total_steps, active_agents, active_devices, data_json, created_at, updated_at, revision)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     state.task_id,
@@ -288,6 +304,7 @@ class TaskStateManager:
                     json.dumps(state.to_dict()),
                     state.created_at,
                     state.updated_at,
+                    state.revision,
                 ),
             )
             conn.commit()
@@ -327,38 +344,52 @@ class TaskStateManager:
         return state
 
     def save_task(self, state: TaskState) -> None:
-        """Persist full TaskState snapshot to SQLite."""
-        state.updated_at = time.time()
-        with self._get_conn() as conn:
-            conn.execute(
-                """
-                INSERT OR REPLACE INTO tasks (task_id, goal, status, current_step, total_steps, active_agents, active_devices, data_json, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    state.task_id,
-                    state.goal,
-                    state.status.value if isinstance(state.status, TaskStatus) else str(state.status),
-                    state.current_step,
-                    state.total_steps,
-                    json.dumps(state.active_agents),
-                    json.dumps(state.active_devices),
-                    json.dumps(state.to_dict()),
-                    state.created_at,
-                    state.updated_at,
-                ),
-            )
-            conn.commit()
+        """Persist a task snapshot only if its revision is still current."""
+        with self._mutation_lock:
+            state.updated_at = time.time()
+            next_revision = int(state.revision) + 1
+            state_json = state.to_dict()
+            state_json["revision"] = next_revision
+            with self._get_conn() as conn:
+                cursor = conn.execute(
+                    """
+                    UPDATE tasks
+                    SET goal = ?, status = ?, current_step = ?, total_steps = ?,
+                        active_agents = ?, active_devices = ?, data_json = ?,
+                        updated_at = ?, revision = ?
+                    WHERE task_id = ? AND revision = ?
+                    """,
+                    (
+                        state.goal,
+                        state.status.value if isinstance(state.status, TaskStatus) else str(state.status),
+                        state.current_step,
+                        state.total_steps,
+                        json.dumps(state.active_agents),
+                        json.dumps(state.active_devices),
+                        json.dumps(state_json),
+                        state.updated_at,
+                        next_revision,
+                        state.task_id,
+                        state.revision,
+                    ),
+                )
+                if cursor.rowcount != 1:
+                    raise ConcurrentTaskUpdateError(
+                        f"Task '{state.task_id}' changed since it was loaded; reload before saving."
+                    )
+                conn.commit()
+            state.revision = next_revision
 
     def get_task(self, task_id: str) -> Optional[TaskState]:
         """Retrieve task by ID."""
         with self._get_conn() as conn:
-            cursor = conn.execute("SELECT data_json FROM tasks WHERE task_id = ?", (task_id,))
+            cursor = conn.execute("SELECT data_json, revision FROM tasks WHERE task_id = ?", (task_id,))
             row = cursor.fetchone()
             if not row:
                 return None
             try:
                 data = json.loads(row["data_json"])
+                data.setdefault("revision", int(row["revision"] or 0))
                 return TaskState.from_dict(data)
             except Exception as e:
                 logger.error("Error deserializing task [%s]: %s", task_id, e)
@@ -369,15 +400,17 @@ class TaskStateManager:
         with self._get_conn() as conn:
             if status:
                 cursor = conn.execute(
-                    "SELECT data_json FROM tasks WHERE status = ? ORDER BY updated_at DESC LIMIT ?", (status, limit)
+                    "SELECT data_json, revision FROM tasks WHERE status = ? ORDER BY updated_at DESC LIMIT ?", (status, limit)
                 )
             else:
-                cursor = conn.execute("SELECT data_json FROM tasks ORDER BY updated_at DESC LIMIT ?", (limit,))
+                cursor = conn.execute("SELECT data_json, revision FROM tasks ORDER BY updated_at DESC LIMIT ?", (limit,))
             rows = cursor.fetchall()
             tasks = []
             for r in rows:
                 try:
-                    tasks.append(TaskState.from_dict(json.loads(r["data_json"])))
+                    data = json.loads(r["data_json"])
+                    data.setdefault("revision", int(r["revision"] or 0))
+                    tasks.append(TaskState.from_dict(data))
                 except Exception:
                     pass
             return tasks

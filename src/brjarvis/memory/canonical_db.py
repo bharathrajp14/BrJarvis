@@ -151,9 +151,14 @@ class CanonicalDatabaseManager:
                         active_devices TEXT,
                         data_json TEXT NOT NULL,
                         created_at REAL NOT NULL,
-                        updated_at REAL NOT NULL
+                        updated_at REAL NOT NULL,
+                        revision INTEGER NOT NULL DEFAULT 0
                     )
                 """)
+                task_columns = self._get_columns(conn, "tasks")
+                if "revision" not in task_columns:
+                    conn.execute("ALTER TABLE tasks ADD COLUMN revision INTEGER NOT NULL DEFAULT 0")
+                    conn.commit()
                 conn.execute("""
                     CREATE TABLE IF NOT EXISTS task_steps (
                         step_id TEXT PRIMARY KEY,

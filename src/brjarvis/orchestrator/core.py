@@ -17,8 +17,10 @@ import json
 import logging
 import os
 import re
+import threading
 import time
 import uuid
+
 from typing import Any, Iterator, Optional
 
 from brjarvis.agent.step_planner import StepPlanner
@@ -188,8 +190,11 @@ class JarvisOrchestrator:
         self.current_mode = "general"
         self.conversation_store = None
         self._subagent_mgr = None
+        self._shutdown_lock = threading.Lock()
+        self._shutdown_complete = False
 
         # History subsystem
+
         self._session_store = None
         self._session_id = ""
         self._history_linker = None
@@ -919,7 +924,9 @@ class JarvisOrchestrator:
                             break
                         except Exception as exc:
                             if attempt == 2:
-                                yield f"\n[Backend error: {exc}]"
+                                logger.error("Backend stream failed after retries: %s", exc, exc_info=True)
+                                yield "\n[Backend error: the provider failed after retries. Please try again.]"
+
                                 return
                             time.sleep(retry_delay)
                             retry_delay *= 2
@@ -928,7 +935,9 @@ class JarvisOrchestrator:
                     response = self.router.run(profile, self.working_memory.get(), system)
 
             except Exception as exc:
-                final_response = f"Backend error: {exc}"
+                logger.error("Backend execution failed: %s", exc, exc_info=True)
+                final_response = "Backend error: the provider failed while processing the request. Please try again."
+
                 success = False
                 event_bus.publish(
                     TaskEvent(
@@ -1029,7 +1038,8 @@ class JarvisOrchestrator:
                     try:
                         tool_result = execute_tool(tool_name, tool_args or {})
                     except Exception as tool_err:
-                        tool_result = f"[Tool Error: {tool_name} failed — {tool_err}. Try an alternative approach.]"
+                        logger.error("Tool '%s' failed in orchestrator: %s", tool_name, tool_err, exc_info=True)
+                        tool_result = f"[Tool Error: {tool_name} failed. Try an alternative approach.]"
 
                 tool_ms = int((time.monotonic() - t_tool) * 1000)
 
@@ -1258,7 +1268,8 @@ class JarvisOrchestrator:
                 pass
         except Exception as exc:
             logger.error(f"[Orchestrator] React loop raised unexpected exception: {exc}", exc_info=True)
-            return f"[Error] {exc}"
+            return "[Error] The request could not be completed because the execution loop failed."
+
         return result or "I have completed your request."
 
     def chat_stream(self, user_input: str) -> Iterator[str]:
@@ -1342,7 +1353,14 @@ class JarvisOrchestrator:
         return summary
 
     def shutdown(self) -> None:
+        """Close session resources once, even if multiple owners call shutdown."""
+        with self._shutdown_lock:
+            if self._shutdown_complete:
+                return
+            self._shutdown_complete = True
+
         summary = self.consolidate_on_exit()
+
         if self._session_store and self._session_id:
             try:
                 self._session_store.close_session(self._session_id, summary=summary)

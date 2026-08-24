@@ -1,0 +1,31 @@
+{
+  "repository": "Br-Jarvis",
+  "branch": "main",
+  "audit_date": "2026-08-24",
+  "findings": [
+    {"id":"DATA-001","severity":"HIGH","category":"concurrency","files":["src/brjarvis/agent/task_state.py","src/brjarvis/memory/canonical_db.py"],"status":"partial_fixed","summary":"Whole-snapshot read-modify-write can lose concurrent task updates.","recommendation":"Revisioned optimistic concurrency and explicit stale-write rejection are implemented; add reload-and-reconcile behavior and append-only transition records next."},
+    {"id":"SEC-001","severity":"HIGH","category":"authentication","files":["src/brjarvis/web/api/routes/auth.py"],"status":"partial","summary":"Session, ticket, and handoff stores are process-local.","recommendation":"Use a shared repository for multi-worker deployment or enforce documented single-process mode."},
+    {"id":"PERF-001","severity":"HIGH","category":"frontend-performance","files":["frontend/src/platform/api-client.ts","src/brjarvis/web/api/routes/projects.py"],"status":"partial_fixed","summary":"Initial hydration made nine requests plus up to 20 project-detail requests.","recommendation":"Project file metadata is now included in the project-list response; the remaining nine-panel fan-out should be consolidated or lazily loaded next."},
+    {"id":"SEC-002","severity":"MEDIUM","category":"authentication","files":["src/brjarvis/web/api/routes/auth.py"],"status":"fixed","summary":"No logout/revocation or failed-login throttling.","recommendation":"Implemented process-local revocation, logout, serialized stores, and five-failure window throttle."},
+    {"id":"SEC-003","severity":"MEDIUM","category":"cookies","files":["src/brjarvis/web/api/routes/auth.py"],"status":"fixed","summary":"Cookie secure behavior was implicit and path was not explicit.","recommendation":"Implemented environment-aware secure default, Path=/, and logout deletion."},
+    {"id":"SEC-004","severity":"MEDIUM","category":"information-disclosure","files":["src/brjarvis/tools/runtime.py"],"status":"fixed","summary":"Raw synchronous-handler exception text was agent-visible.","recommendation":"Implemented generic agent-visible failure with detailed server-side logging."},
+    {"id":"SEC-005","severity":"MEDIUM","category":"browser-security","files":["src/brjarvis/web/api/server.py"],"status":"open","summary":"CSP and credentialed CORS are broader than necessary.","recommendation":"Derive policy from actual assets and restrict directives, methods, headers, and origins."},
+    {"id":"REL-001","severity":"MEDIUM","category":"lifecycle","files":["src/brjarvis/core/bootstrap.py","src/brjarvis/web/api/server.py","src/brjarvis/orchestrator/core.py"],"status":"partial_fixed","summary":"Orchestrator shutdown is registered in bootstrap and called directly in web lifespan.","recommendation":"Orchestrator shutdown is now idempotent; designate one lifecycle owner and add repeated start/stop tests."},
+    {"id":"REL-002","severity":"MEDIUM","category":"test-isolation","files":["src/brjarvis/core/bootstrap.py"],"status":"open","summary":"Runtime reset clears only the assistant singleton.","recommendation":"Add coordinated reset hooks for global runtime, event, queue, and tool state."},
+    {"id":"PERF-002","severity":"MEDIUM","category":"websocket","files":["src/brjarvis/web/api/server.py","src/brjarvis/web/api/routes/websocket.py"],"status":"partial_fixed","summary":"Per-log-line task fan-out had no bounded per-client queue.","recommendation":"Broadcasts now await bounded 0.5-second per-client sends; a per-client queue remains the next improvement for sustained high-volume logs."},
+    {"id":"ARCH-001","severity":"MEDIUM","category":"architecture","files":["src/brjarvis/tools/registry.py","src/brjarvis/tools/runtime.py"],"status":"open","summary":"Legacy and canonical tool registries coexist.","recommendation":"Make ToolRuntime authoritative and retain a checked compatibility adapter during migration."},
+    {"id":"ARCH-002","severity":"MEDIUM","category":"architecture","files":["src/brjarvis/orchestrator/core.py"],"status":"open","summary":"Orchestrator owns too many concerns.","recommendation":"Extract context, command routing, conversation persistence, and execution-loop services."},
+    {"id":"UX-001","severity":"MEDIUM","category":"frontend-correctness","files":["frontend/src/platform/api-client.ts"],"status":"fixed","summary":"Boolean(\"false\") incorrectly displayed approval/configuration flags as true.","recommendation":"Implemented strict boolean normalization and covered through build verification."},
+    {"id":"UX-002","severity":"MEDIUM","category":"frontend-ux","files":["frontend/src/platform/api-client.ts","frontend/src/state/app-store.ts","frontend/src/contracts/domain.ts"],"status":"partial_fixed","summary":"Rejected panels were represented as empty arrays and could look healthy.","recommendation":"The snapshot now carries optional panelHealth states; screens still need to render panel-specific error and retry affordances."},
+    {"id":"DATA-002","severity":"MEDIUM","category":"database","files":["src/brjarvis/agent/task_state.py","src/brjarvis/memory/canonical_db.py"],"status":"open","summary":"Whole-row INSERT OR REPLACE and many JSON blobs complicate queryability and consistency.","recommendation":"Use explicit upserts, schema versions, append-only evidence, and normalized operational fields."},
+    {"id":"ARCH-003","severity":"LOW","category":"developer-experience","files":[".gitignore","audit/inventory_src.txt"],"status":"open","summary":"Generated pycache/pyc files obscure source inventory.","recommendation":"Use source-only inventory scripts and keep generated artifacts excluded."},
+    {"id":"DX-001","severity":"LOW","category":"ci","files":["pyproject.toml",".github/workflows"],"status":"open","summary":"Static-analysis wrapper did not yield reliable result artifacts.","recommendation":"Add bounded CI commands with explicit exit-code capture and uploaded reports."}
+  ],
+  "verification": {
+    "compileall": "passed",
+    "pytest_before": "357 passed, 1 skipped in 54.08s",
+    "pytest_after": "361 passed, 1 skipped in 41.24s",
+    "frontend_build": "passed after project-file hydration and panel-health changes",
+    "ruff_pyright_bandit": "inconclusive; wrapper did not produce reliable artifacts"
+  }
+}

@@ -123,10 +123,15 @@ async def _send_ws_log(ws: WebSocket, line: str):
 
 
 async def broadcast_log(line: str):
+    """Broadcast a log line with bounded, awaited fan-out."""
     async with get_ws_lock():
         targets = list(ACTIVE_WEBSOCKETS)
-    for ws in targets:
-        asyncio.create_task(_send_ws_log(ws, line))
+    if not targets:
+        return
+    await asyncio.gather(
+        *(asyncio.wait_for(_send_ws_log(ws, line), timeout=0.5) for ws in targets),
+        return_exceptions=True,
+    )
 
 
 @asynccontextmanager

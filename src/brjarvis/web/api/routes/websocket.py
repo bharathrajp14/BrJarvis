@@ -61,8 +61,12 @@ async def broadcast_ws_event(
     }
     async with get_ws_lock():
         targets = list(ACTIVE_WEBSOCKETS)
-    for ws in targets:
-        asyncio.create_task(safe_ws_send(ws, data))
+    if not targets:
+        return
+    await asyncio.gather(
+        *(asyncio.wait_for(safe_ws_send(ws, data), timeout=0.5) for ws in targets),
+        return_exceptions=True,
+    )
 
 
 def _forward_eventbus_to_ws(event: Any) -> None:
@@ -446,7 +450,7 @@ async def websocket_endpoint(websocket: WebSocket):
                                 "conversation_id": cid,
                                 "task_id": tid,
                                 "request_id": rid,
-                                "payload": {"error": str(e)},
+                                "payload": {"error": "Task execution failed. Please retry or inspect server logs."},
                             },
                         )
 

@@ -1,0 +1,253 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brjarvis"
+version = "41.0.3"
+description = "BRJARVIS — Cognitive Multi-Modal AI Operating System & Autonomous Controller"
+readme = "readme.md"
+license = {text = "MIT"}
+requires-python = ">=3.11, <=3.14"
+authors = [
+    {name = "Bharath Raj", email = "bharathraj14120@gmail.com"},
+]
+keywords = [
+    "ai-assistant",
+    "voice-assistant",
+    "python",
+    "gemini",
+    "local-first",
+    "autonomous-agent",
+    "desktop-automation"
+]
+
+dependencies = [
+    "google-genai>=1.0.0,<2.0.0",
+    "python-dotenv>=1.0.0,<2.0.0",
+    "fastapi>=0.111.0,<1.0.0",
+    "uvicorn[standard]>=0.30.0,<1.0.0",
+    "python-multipart>=0.0.9,<1.0.0",
+    "rich>=13.7.0,<15.0.0",
+    "psutil>=5.9.0,<7.5.0",
+    "pyyaml>=6.0,<7.0",
+    "requests>=2.31.0,<3.0.0",
+    "httpx>=0.27.0,<1.0.0",
+    "pydantic>=2.0.0,<3.0.0",
+
+    "keyring>=25.0.0,<26.0.0",
+    "cryptography>=50.0.0,<51.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/bharthraj1412/BrJarvis"
+Repository = "https://github.com/bharthraj1412/BrJarvis.git"
+
+[project.optional-dependencies]
+voice = [
+    "sounddevice>=0.5.0",
+    "SpeechRecognition>=3.10.0",
+    "edge-tts>=7.0.0",
+    "numpy>=1.26.0",
+    "faster-whisper>=1.0.0",
+    "onnxruntime>=1.17.0",
+]
+automation = [
+    "pyperclip>=1.8.2",
+    "pyautogui>=0.9.54",
+    "pillow>=10.0.0",
+    "mss>=10.0.0",
+    "opencv-python>=4.9.0",
+    "PySide6>=6.6.0",
+]
+web = [
+    "ddgs>=6.0.0",
+    "beautifulsoup4>=4.12.0",
+    "playwright>=1.44.0",
+    "selenium>=4.20.0",
+    "youtube-transcript-api>=0.6.0",
+    "websockets>=14.0",
+]
+documents = [
+    "python-docx>=1.1.0",
+    "python-pptx>=1.0.0",
+    "fpdf2>=2.7.0",
+    "openpyxl>=3.1.0",
+    "pypdf>=4.0.0",
+]
+pdf-rendering = [
+    "PyMuPDF>=1.24.0",
+]
+memory = []
+llm-backends = [
+    "openai>=1.30.0",
+    "anthropic>=0.30.0",
+    "mistralai>=2.4.0",
+]
+windows = [
+    "pygetwindow; sys_platform == 'win32'",
+    "comtypes; sys_platform == 'win32'",
+    "pycaw; sys_platform == 'win32'",
+    "win10toast; sys_platform == 'win32'",
+    "pywinauto; sys_platform == 'win32'",
+    "send2trash; sys_platform == 'win32'",
+    "keyboard>=0.13.5; sys_platform == 'win32'",
+]
+all = [
+    "brjarvis[voice,automation,web,documents,llm-backends,windows]",
+]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+    "pytest-timeout>=2.0.0",
+    "pytest-cov>=5.0.0",
+    "pytest-mock>=3.14.0",
+    "ruff>=0.6.0",
+    "pyright>=1.1.390",
+    "build>=1.2.0",
+    "pip-audit>=2.7.0",
+    "bandit[toml]>=1.7.0",
+    "detect-secrets>=1.5.0",
+    "pip-licenses>=5.0.0",
+    "import-linter>=2.1.0",
+]
+
+[project.scripts]
+brjarvis = "brjarvis.apps.cli:main"
+jarvis = "brjarvis.apps.bootstrap:main"
+jarvis-cli = "brjarvis.apps.cli:main"
+jarvis-server = "brjarvis.apps.web:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["brjarvis*"]
+namespaces = false
+
+[tool.setuptools.package-data]
+"brjarvis.skills" = ["**/*.md", "**/*.json", "**/*.yaml", "**/*.yml"]
+"brjarvis.web" = ["static/*", "static/**/*"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+timeout = 30
+pythonpath = ["src", "src/brjarvis", ".", "apps/web"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+norecursedirs = [".archive", "scratch", "workspace", "BR_WORKSPACE", "runtime", ".git", "__pycache__"]
+markers = [
+    "unit: Fast isolated unit tests",
+    "smoke: Quick sanity and runtime health smoke tests",
+    "integration: Cross-subsystem integration tests",
+    "e2e: End-to-end full scenario workflows",
+    "adversarial: Security, injection and fuzzing resilience tests",
+    "benchmark: Performance, latency and throughput benchmark tests",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+    "ignore:.*You have both PyFPDF & fpdf2 installed.*:UserWarning",
+]
+# BR JARVIS v41.0 — Python Requirements
+# Tested against: Python 3.11–3.14, PySide6 6.11.1
+
+# Install: pip install -r requirements.txt
+
+# ── AI / LLM Backends ────────────────────────────────────────────────────────
+google-genai>=1.0.0,<2.0.0
+openai>=1.30.0,<3.0.0
+anthropic>=0.30.0,<1.0.0
+mistralai>=2.4.0,<3.0.0
+
+# ── Voice Engine ─────────────────────────────────────────────────────────────
+sounddevice>=0.5.0,<1.0.0
+SpeechRecognition>=3.10.0,<4.0.0
+edge-tts>=7.0.0,<8.0.0
+faster-whisper>=1.0.0,<2.0.0
+onnxruntime>=1.17.0,<2.0.0
+
+# ── Web Server ───────────────────────────────────────────────────────────────
+fastapi>=0.111.0,<1.0.0
+uvicorn>=0.30.0,<1.0.0
+websockets>=14.0,<20.0
+httpx>=0.27.0,<1.0.0
+pydantic>=2.0.0,<3.0.0
+python-multipart>=0.0.9,<1.0.0
+
+# ── GUI ──────────────────────────────────────────────────────────────────────
+PySide6>=6.6.0,<7.0.0
+
+# ── Data / ML ────────────────────────────────────────────────────────────────
+numpy>=1.26.0,<3.0.0
+pillow>=10.0.0,<13.0.0
+opencv-python>=4.9.0,<5.0.0
+
+# ── Storage / DB ─────────────────────────────────────────────────────────────
+
+# ── Document Processing ──────────────────────────────────────────────────────
+python-docx>=1.1.0,<2.0.0
+python-pptx>=1.0.0,<2.0.0
+fpdf2>=2.7.0,<3.0.0
+openpyxl>=3.1.0,<4.0.0
+pypdf>=4.0.0,<7.0.0
+
+# ── Web Scraping / Automation ────────────────────────────────────────────────
+requests>=2.31.0,<3.0.0
+beautifulsoup4>=4.12.0,<5.0.0
+playwright>=1.44.0,<2.0.0
+selenium>=4.20.0,<5.0.0
+youtube-transcript-api>=0.6.0,<1.0.0
+ddgs>=6.0.0,<10.0.0
+
+# ── Utilities ────────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0,<2.0.0
+pyyaml>=6.0,<7.0
+rich>=13.7.0,<15.0.0
+prompt_toolkit>=3.0.0,<4.0.0
+psutil>=5.9.0,<7.5.0
+pyperclip>=1.8.2,<2.0.0
+pyautogui>=0.9.54,<1.0.0
+cryptography>=50.0.0,<51.0.0
+keyring>=25.0.0,<26.0.0
+
+# ── Windows Only ─────────────────────────────────────────────────────────────
+pygetwindow; sys_platform == 'win32'
+comtypes; sys_platform == 'win32'
+pycaw; sys_platform == 'win32'
+win10toast; sys_platform == 'win32'
+pywinauto; sys_platform == 'win32'
+send2trash; sys_platform == 'win32'
+keyboard>=0.13.5; sys_platform == 'win32'
+mss>=10.0.0; sys_platform == 'win32'
+# BR JARVIS v41.0 — Development Requirements
+# Install: pip install -r requirements-dev.txt
+
+-r requirements.txt
+
+# Testing
+pytest>=8.0.0
+pytest-asyncio>=0.24.0
+pytest-mock>=3.14.0
+pytest-cov>=5.0.0
+pytest-timeout>=2.0.0
+
+# Formatting, linting, and typing
+ruff>=0.6.0
+pyright>=1.1.390
+
+# Packaging and architecture validation
+build>=1.2.0
+import-linter>=2.1.0
+
+# Security, dependency, secret, and license auditing
+pip-audit>=2.7.0
+bandit[toml]>=1.7.0
+detect-secrets>=1.5.0
+pip-licenses>=5.0.0

@@ -11,6 +11,7 @@ import hmac
 import logging
 import os
 import secrets
+import threading
 import time
 from typing import Dict, Optional
 
@@ -35,27 +36,73 @@ _SESSION_TTL_SECONDS = 86400.0  # 24 hours
 _HANDOFF_STORE: Dict[str, float] = {}
 _HANDOFF_TTL_SECONDS = 45.0
 
+# These stores are intentionally process-local for the local-first deployment model,
+# but mutations must still be serialized because FastAPI may serve requests on
+# multiple worker threads.  Multi-worker deployments should use a shared session
+# store before relying on browser sessions for cross-process authentication.
+_AUTH_STORE_LOCK = threading.RLock()
+_LOGIN_WINDOW_SECONDS = 60.0
+_LOGIN_MAX_FAILURES = 5
+_LOGIN_FAILURES: Dict[str, list[float]] = {}
+
+
+def _cookie_secure() -> bool:
+    """Resolve cookie transport policy without making local HTTP unusable."""
+    configured = os.environ.get("JARVIS_COOKIE_SECURE")
+    if configured is not None:
+        return configured.strip().lower() in {"1", "true", "yes", "on"}
+    environment = os.environ.get("JARVIS_ENV", "development").strip().lower()
+    return environment in {"production", "prod", "staging"}
+
+
+def _client_key(request: Request) -> str:
+    """Return a low-sensitivity login-throttling key."""
+    return request.client.host if request.client else "unknown"
+
+
+def _login_allowed(request: Request) -> bool:
+    now = time.time()
+    key = _client_key(request)
+    with _AUTH_STORE_LOCK:
+        attempts = [timestamp for timestamp in _LOGIN_FAILURES.get(key, []) if now - timestamp < _LOGIN_WINDOW_SECONDS]
+        _LOGIN_FAILURES[key] = attempts
+        return len(attempts) < _LOGIN_MAX_FAILURES
+
+
+def _record_login_failure(request: Request) -> None:
+    now = time.time()
+    key = _client_key(request)
+    with _AUTH_STORE_LOCK:
+        attempts = [timestamp for timestamp in _LOGIN_FAILURES.get(key, []) if now - timestamp < _LOGIN_WINDOW_SECONDS]
+        attempts.append(now)
+        _LOGIN_FAILURES[key] = attempts
+
+
+
+
 
 def _prune_expired() -> None:
     now = time.time()
-    expired_tickets = [t for t, exp in _TICKET_STORE.items() if exp < now]
-    for t in expired_tickets:
-        _TICKET_STORE.pop(t, None)
+    with _AUTH_STORE_LOCK:
+        expired_tickets = [t for t, exp in _TICKET_STORE.items() if exp < now]
+        for t in expired_tickets:
+            _TICKET_STORE.pop(t, None)
 
-    expired_sessions = [s for s, exp in _SESSION_STORE.items() if exp < now]
-    for s in expired_sessions:
-        _SESSION_STORE.pop(s, None)
+        expired_sessions = [s for s, exp in _SESSION_STORE.items() if exp < now]
+        for s in expired_sessions:
+            _SESSION_STORE.pop(s, None)
 
-    expired_handoffs = [h for h, exp in _HANDOFF_STORE.items() if exp < now]
-    for h in expired_handoffs:
-        _HANDOFF_STORE.pop(h, None)
+        expired_handoffs = [h for h, exp in _HANDOFF_STORE.items() if exp < now]
+        for h in expired_handoffs:
+            _HANDOFF_STORE.pop(h, None)
 
 
 def issue_ws_ticket() -> str:
     """Issue a secure, single-use, short-lived WebSocket connection ticket."""
     _prune_expired()
     ticket = secrets.token_urlsafe(32)
-    _TICKET_STORE[ticket] = time.time() + _TICKET_TTL_SECONDS
+    with _AUTH_STORE_LOCK:
+        _TICKET_STORE[ticket] = time.time() + _TICKET_TTL_SECONDS
     return ticket
 
 
@@ -64,7 +111,8 @@ def verify_and_consume_ws_ticket(ticket: str) -> bool:
     _prune_expired()
     if not ticket:
         return False
-    expiry = _TICKET_STORE.pop(ticket, None)
+    with _AUTH_STORE_LOCK:
+        expiry = _TICKET_STORE.pop(ticket, None)
     if expiry is None:
         return False
     return expiry >= time.time()
@@ -74,8 +122,16 @@ def create_session() -> str:
     """Create a persistent authenticated session."""
     _prune_expired()
     token = secrets.token_urlsafe(48)
-    _SESSION_STORE[token] = time.time() + _SESSION_TTL_SECONDS
+    with _AUTH_STORE_LOCK:
+        _SESSION_STORE[token] = time.time() + _SESSION_TTL_SECONDS
     return token
+
+
+def revoke_session(token: str | None) -> None:
+    """Revoke a session token immediately when a browser logs out."""
+    if token:
+        with _AUTH_STORE_LOCK:
+            _SESSION_STORE.pop(token, None)
 
 
 def verify_session(token: str) -> bool:
@@ -83,7 +139,9 @@ def verify_session(token: str) -> bool:
     _prune_expired()
     if not token:
         return False
-    expiry = _SESSION_STORE.get(token)
+    with _AUTH_STORE_LOCK:
+        expiry = _SESSION_STORE.get(token)
+
     if expiry is None:
         return False
     return expiry >= time.time()
@@ -163,9 +221,12 @@ async def get_auth_status(
 
 
 @router.post("/auth/login", response_model=LoginResponse)
-async def login(login_req: LoginRequest, response: Response):
+async def login(login_req: LoginRequest, request: Request, response: Response):
     """Authenticate with API key and establish a session."""
+    if not _login_allowed(request):
+        raise HTTPException(status_code=429, detail="Too many failed login attempts; try again later")
     if not SERVER_API_KEY or not hmac.compare_digest(login_req.api_key.strip(), SERVER_API_KEY):
+        _record_login_failure(request)
         raise HTTPException(status_code=401, detail="Unauthorized: Invalid API Key")
 
     session_token = create_session()
@@ -175,13 +236,23 @@ async def login(login_req: LoginRequest, response: Response):
         max_age=int(_SESSION_TTL_SECONDS),
         httponly=True,
         samesite="strict",
-        secure=os.environ.get("JARVIS_COOKIE_SECURE", "false").strip().lower() in {"1", "true", "yes", "on"},
+        secure=_cookie_secure(),
+        path="/",
     )
+
     return LoginResponse(
         success=True,
         expires_in=int(_SESSION_TTL_SECONDS),
         auth_required=bool(SERVER_API_KEY),
     )
+
+
+@router.post("/auth/logout")
+async def logout(request: Request, response: Response):
+    """Revoke the current browser session and clear its cookie."""
+    revoke_session(request.cookies.get("jarvis_session"))
+    response.delete_cookie(key="jarvis_session", path="/")
+    return {"success": True}
 
 
 @router.post("/auth/desktop-handoff", response_model=DesktopHandoffResponse)
@@ -218,7 +289,8 @@ async def redeem_desktop_handoff(req: DesktopHandoffRedeemRequest, response: Res
         max_age=int(_SESSION_TTL_SECONDS),
         httponly=True,
         samesite="strict",
-        secure=os.environ.get("JARVIS_COOKIE_SECURE", "false").strip().lower() in {"1", "true", "yes", "on"},
+        secure=_cookie_secure(),
+        path="/",
     )
     return {"success": True, "expires_in": int(_SESSION_TTL_SECONDS)}
 

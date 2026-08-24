@@ -1,0 +1,28 @@
+{
+  "pythonVersion": "3.12",
+  "pythonPlatform": "Windows",
+  "venvPath": ".",
+  "venv": ".venv",
+  "extraPaths": ["src", "src/brjarvis", "."],
+  "include": ["src", "apps", "scripts", "tests"],
+  "exclude": [".venv", "runtime", "__pycache__", "node_modules", "*.egg-info", ".git"],
+  "typeCheckingMode": "basic",
+  "reportMissingModuleSource": "warning",
+  "reportMissingImports": "warning",
+  "reportMissingTypeStubs": "none",
+  "reportUnusedImport": "none",
+  "reportUnusedVariable": "none"
+}
+[importlinter]
+root_package = brjarvis
+include_external_packages = False
+
+[importlinter:contract:security-layer-independence]
+name = Security layer must not depend on presentation adapters
+type = forbidden
+source_modules =
+    brjarvis.security
+forbidden_modules =
+    brjarvis.desktop
+    brjarvis.ui
+    brjarvis.web

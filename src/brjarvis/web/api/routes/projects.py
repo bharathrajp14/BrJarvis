@@ -43,10 +43,15 @@ class UpdateProjectRequest(BaseModel):
 
 @router.get("/projects")
 async def list_projects():
-    """List all workspace projects."""
+    """List workspace projects with bounded file metadata for one-call hydration."""
     store = get_workspace_store()
     projects = store.list_projects()
-    return {"total": len(projects), "projects": [p.to_dict() for p in projects]}
+    payload = []
+    for project in projects:
+        record = project.to_dict()
+        record["files"] = [_public_file_dict(file) for file in store.list_project_files(project.project_id)]
+        payload.append(record)
+    return {"total": len(payload), "projects": payload}
 
 
 @router.post("/projects")

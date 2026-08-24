@@ -127,6 +127,13 @@ export interface ConnectorSummary {
   tools: string[];
 }
 
+export type PanelState = 'ready' | 'empty' | 'error';
+
+export interface PanelHealth {
+  state: PanelState;
+  message?: string;
+}
+
 export interface AppSnapshot {
   activeView: ViewId;
   activeTaskId: string;
@@ -142,4 +149,5 @@ export interface AppSnapshot {
   contacts: ContactSummary[];
   connectors: ConnectorSummary[];
   timeline: TimelineEvent[];
+  panelHealth?: Record<string, PanelHealth>;
 }

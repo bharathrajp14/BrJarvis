@@ -29,7 +29,7 @@ export function subscribe(listener: () => void) {
 export function dispatch(action: AppAction) {
   switch (action.type) {
     case 'hydrate':
-      snapshot = action.snapshot;
+      snapshot = structuredClone(action.snapshot);
       break;
     case 'view':
       snapshot = { ...snapshot, activeView: action.view };

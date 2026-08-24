@@ -1,5 +1,5 @@
 import type { ApiEnvelope, ApiErrorShape, CommandRequest, CommandResponse } from '../contracts/api';
-import type { AppSnapshot, Artifact, Capability, CareerProfile, ConnectorSummary, ContactSummary, MemoryEntry, Task, TaskStatus } from '../contracts/domain';
+import type { AppSnapshot, Artifact, Capability, CareerProfile, ConnectorSummary, ContactSummary, MemoryEntry, PanelHealth, Task, TaskStatus } from '../contracts/domain';
 import { emptySnapshot } from './empty-state';
 
 export class ApiError extends Error {
@@ -20,6 +20,17 @@ const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ''
 
 function key() {
   return globalThis.crypto?.randomUUID?.() ?? `ui-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function asBoolean(value: unknown): boolean {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value !== 0;
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (['true', '1', 'yes', 'on'].includes(normalized)) return true;
+    if (['false', '0', 'no', 'off', ''].includes(normalized)) return false;
+  }
+  return Boolean(value);
 }
 
 function taskStatus(value: unknown): TaskStatus {
@@ -64,7 +75,7 @@ function normalizeTask(raw: Record<string, unknown>, index: number): Task {
     provider: String(raw.provider ?? raw.backend ?? 'BRJARVIS runtime'),
     summary: String(raw.summary ?? raw.description ?? raw.result ?? 'Task state received from the BRJARVIS runtime.'),
     artifactCount: Number(raw.artifact_count ?? raw.artifactCount ?? 0),
-    requiresApproval: Boolean(raw.requires_approval ?? raw.requiresApproval),
+    requiresApproval: asBoolean(raw.requires_approval ?? raw.requiresApproval),
     steps: Array.isArray(raw.steps)
       ? raw.steps.map((step, stepIndex) => {
         const record = (step ?? {}) as Record<string, unknown>;
@@ -128,6 +139,10 @@ export class ApiClient {
         }))
         : [];
       const health = healthResult.status === 'fulfilled' ? healthResult.value : {};
+      const panelHealth = (result: PromiseSettledResult<unknown>, hasItems: boolean): PanelHealth => {
+        if (result.status === 'rejected') return { state: 'error', message: 'Live data could not be loaded.' };
+        return { state: hasItems ? 'ready' : 'empty' };
+      };
       const connectorPayload = connectorResult.status === 'fulfilled' ? connectorResult.value : {};
       const projects = projectResult.status === 'fulfilled' && Array.isArray(projectResult.value.projects) ? projectResult.value.projects : [];
       const memories = memoryResult.status === 'fulfilled' && Array.isArray(memoryResult.value.memories) ? memoryResult.value.memories : [];
@@ -142,14 +157,9 @@ export class ApiClient {
           organization: String(record.org ?? record.organization ?? record.company ?? ''),
           email: String(record.email ?? ''),
           phone: String(record.phone_number ?? record.phone ?? ''),
-          important: Boolean(record.is_important ?? record.important),
+          important: asBoolean(record.is_important ?? record.important),
         };
       });
-      const projectFileResults = await Promise.allSettled(projects.slice(0, 20).map((project) => {
-        const record = project as Record<string, unknown>;
-        const projectId = encodeURIComponent(String(record.project_id ?? record.id ?? ''));
-        return this.request<{ files?: Record<string, unknown>[] }>(`/api/projects/${projectId}`, { signal });
-      }));
       const connectorRecords = Array.isArray(connectorPayload.connectors) ? connectorPayload.connectors : [];
       const connectors: ConnectorSummary[] = connectorRecords.map((connector, index) => {
         const record = connector as Record<string, unknown>;
@@ -158,8 +168,8 @@ export class ApiClient {
           name: String(record.name ?? record.id ?? 'Connector'),
           description: String(record.description ?? record.desc ?? ''),
           status: String(record.status ?? (record.configured ? 'CONNECTED' : 'NOT_CONFIGURED')),
-          configured: Boolean(record.configured),
-          requiresAuth: Boolean(record.requires_auth ?? record.requiresAuth),
+          configured: asBoolean(record.configured),
+          requiresAuth: asBoolean(record.requires_auth ?? record.requiresAuth),
           tools: Array.isArray(record.tools) ? record.tools.map(String) : [],
         };
       });
@@ -190,8 +200,7 @@ export class ApiClient {
         const record = project as Record<string, unknown>;
         const projectId = String(record.project_id ?? record.id ?? `project-${projectIndex + 1}`);
         const projectEntry = { id: projectId, name: String(record.name ?? 'Project'), kind: 'folder' as const, path: String(record.path ?? '/workspace'), detail: String(record.description ?? 'Live project'), projectId, fileId: undefined };
-        const detailResult = projectFileResults[projectIndex];
-        const files = detailResult.status === 'fulfilled' && Array.isArray(detailResult.value.files) ? detailResult.value.files : [];
+        const files = Array.isArray(record.files) ? record.files as Record<string, unknown>[] : [];
         const fileEntries = files.map((file, fileIndex) => {
           const fileRecord = file as Record<string, unknown>;
           const fileId = String(fileRecord.file_id ?? fileRecord.id ?? `${projectId}-file-${fileIndex + 1}`);
@@ -229,6 +238,17 @@ export class ApiClient {
         contacts,
         connectors,
         timeline,
+        panelHealth: {
+          tasks: panelHealth(taskResult, tasks.length > 0),
+          artifacts: panelHealth(artifactResult, artifacts.length > 0),
+          health: panelHealth(healthResult, Object.keys(health).length > 0),
+          connectors: panelHealth(connectorResult, connectors.length > 0),
+          projects: panelHealth(projectResult, projects.length > 0),
+          memories: panelHealth(memoryResult, memoryEntries.length > 0),
+          notifications: panelHealth(notificationResult, notifications.length > 0),
+          career: panelHealth(careerResult, Boolean(rawProfile)),
+          contacts: panelHealth(contactResult, contacts.length > 0),
+        },
         activeTaskId: tasks[0]?.id ?? '',
         connection: taskResult.status === 'fulfilled' || healthResult.status === 'fulfilled' ? 'connected' : 'offline',
       };

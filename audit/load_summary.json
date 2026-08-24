@@ -1,0 +1,111 @@
+{
+  "websocket": {
+    "broadcast_log": {
+      "cases": 9,
+      "max_clients": 100,
+      "max_peak_global_send_overlap": 100,
+      "max_event_p50_ms": 64.48643500043545,
+      "max_event_rate_per_second": 29215.846795966536,
+      "failure_case": {
+        "clients": 100,
+        "events": 20,
+        "delay_ms": 50.0,
+        "fail_ratio": 0.1,
+        "elapsed_ms": 1289.728700008709,
+        "event_p50_ms": 64.48643500043545,
+        "event_rate": 15.507137276130203,
+        "sent": 1800,
+        "expected_successful_sends": 1800,
+        "peak_client_send_overlap": 1,
+        "peak_global_send_overlap": 100
+      },
+      "delivery_integrity": true
+    },
+    "broadcast_ws_event": {
+      "cases": 9,
+      "max_clients": 100,
+      "max_peak_global_send_overlap": 100,
+      "max_event_p50_ms": 62.34200500039151,
+      "max_event_rate_per_second": 28253.37627374895,
+      "failure_case": {
+        "clients": 100,
+        "events": 20,
+        "delay_ms": 50.0,
+        "fail_ratio": 0.1,
+        "elapsed_ms": 1246.8401000078302,
+        "event_p50_ms": 62.34200500039151,
+        "event_rate": 16.040549225096626,
+        "sent": 1800,
+        "expected_successful_sends": 1800,
+        "peak_client_send_overlap": 1,
+        "peak_global_send_overlap": 100
+      },
+      "delivery_integrity": true
+    }
+  },
+  "hydration": {
+    "cases": 12,
+    "request_count_values": [
+      9
+    ],
+    "peak_concurrency_values": [
+      9
+    ],
+    "max_p95_ms": 42.21350000000001,
+    "max_p95_case": {
+      "projectCount": 0,
+      "delayMs": 0,
+      "samples": 20,
+      "requests": 9,
+      "peakConcurrency": 9,
+      "p50Ms": 15.043700000000001,
+      "p95Ms": 42.21350000000001,
+      "maxMs": 42.21350000000001
+    },
+    "request_count_independent_of_project_count": true,
+    "failure_case": {
+      "projectCount": 100,
+      "delayMs": 5,
+      "requests": 9,
+      "peakConcurrency": 9,
+      "elapsedMs": 12.579600000000028,
+      "connection": "connected",
+      "panelHealth": {
+        "tasks": {
+          "state": "empty"
+        },
+        "artifacts": {
+          "state": "error",
+          "message": "Live data could not be loaded."
+        },
+        "health": {
+          "state": "ready"
+        },
+        "connectors": {
+          "state": "empty"
+        },
+        "projects": {
+          "state": "ready"
+        },
+        "memories": {
+          "state": "empty"
+        },
+        "notifications": {
+          "state": "empty"
+        },
+        "career": {
+          "state": "empty"
+        },
+        "contacts": {
+          "state": "empty"
+        }
+      }
+    },
+    "concurrent_case": {
+      "concurrentSnapshots": 20,
+      "concurrentElapsedMs": 38.93339999999989,
+      "requestsPerSnapshot": 9,
+      "peakFetchConcurrencyPerSnapshot": 9
+    }
+  }
+}

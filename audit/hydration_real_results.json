@@ -1,0 +1,170 @@
+{
+  "hydration": [
+    {
+      "projectCount": 0,
+      "delayMs": 0,
+      "samples": 20,
+      "requests": 9,
+      "peakConcurrency": 9,
+      "p50Ms": 15.043700000000001,
+      "p95Ms": 42.21350000000001,
+      "maxMs": 42.21350000000001
+    },
+    {
+      "projectCount": 0,
+      "delayMs": 5,
+      "samples": 20,
+      "requests": 9,
+      "peakConcurrency": 9,
+      "p50Ms": 15.462100000000078,
+      "p95Ms": 17.958499999999958,
+      "maxMs": 17.958499999999958
+    },
+    {
+      "projectCount": 0,
+      "delayMs": 20,
+      "samples": 20,
+      "requests": 9,
+      "peakConcurrency": 9,
+      "p50Ms": 31.017200000000003,
+      "p95Ms": 34.4050000000002,
+      "maxMs": 34.4050000000002
+    },
+    {
+      "projectCount": 10,
+      "delayMs": 0,
+      "samples": 20,
+      "requests": 9,
+      "peakConcurrency": 9,
+      "p50Ms": 15.479600000000119,
+      "p95Ms": 16.60310000000004,
+      "maxMs": 16.60310000000004
+    },
+    {
+      "projectCount": 10,
+      "delayMs": 5,
+      "samples": 20,
+      "requests": 9,
+      "peakConcurrency": 9,
+      "p50Ms": 15.507499999999936,
+      "p95Ms": 16.109300000000076,
+      "maxMs": 16.109300000000076
+    },
+    {
+      "projectCount": 10,
+      "delayMs": 20,
+      "samples": 20,
+      "requests": 9,
+      "peakConcurrency": 9,
+      "p50Ms": 31.211099999999988,
+      "p95Ms": 31.638800000000174,
+      "maxMs": 31.638800000000174
+    },
+    {
+      "projectCount": 100,
+      "delayMs": 0,
+      "samples": 20,
+      "requests": 9,
+      "peakConcurrency": 9,
+      "p50Ms": 15.464800000000196,
+      "p95Ms": 17.579999999999927,
+      "maxMs": 17.579999999999927
+    },
+    {
+      "projectCount": 100,
+      "delayMs": 5,
+      "samples": 20,
+      "requests": 9,
+      "peakConcurrency": 9,
+      "p50Ms": 15.728000000000065,
+      "p95Ms": 16.47530000000006,
+      "maxMs": 16.47530000000006
+    },
+    {
+      "projectCount": 100,
+      "delayMs": 20,
+      "samples": 20,
+      "requests": 9,
+      "peakConcurrency": 9,
+      "p50Ms": 31.30060000000003,
+      "p95Ms": 32.714100000000144,
+      "maxMs": 32.714100000000144
+    },
+    {
+      "projectCount": 500,
+      "delayMs": 0,
+      "samples": 20,
+      "requests": 9,
+      "peakConcurrency": 9,
+      "p50Ms": 13.861999999999625,
+      "p95Ms": 18.45139999999992,
+      "maxMs": 18.45139999999992
+    },
+    {
+      "projectCount": 500,
+      "delayMs": 5,
+      "samples": 20,
+      "requests": 9,
+      "peakConcurrency": 9,
+      "p50Ms": 15.534599999999955,
+      "p95Ms": 17.489700000000084,
+      "maxMs": 17.489700000000084
+    },
+    {
+      "projectCount": 500,
+      "delayMs": 20,
+      "samples": 20,
+      "requests": 9,
+      "peakConcurrency": 9,
+      "p50Ms": 31.064000000000306,
+      "p95Ms": 33.886899999999514,
+      "maxMs": 33.886899999999514
+    },
+    {
+      "failureCase": {
+        "projectCount": 100,
+        "delayMs": 5,
+        "requests": 9,
+        "peakConcurrency": 9,
+        "elapsedMs": 12.579600000000028,
+        "connection": "connected",
+        "panelHealth": {
+          "tasks": {
+            "state": "empty"
+          },
+          "artifacts": {
+            "state": "error",
+            "message": "Live data could not be loaded."
+          },
+          "health": {
+            "state": "ready"
+          },
+          "connectors": {
+            "state": "empty"
+          },
+          "projects": {
+            "state": "ready"
+          },
+          "memories": {
+            "state": "empty"
+          },
+          "notifications": {
+            "state": "empty"
+          },
+          "career": {
+            "state": "empty"
+          },
+          "contacts": {
+            "state": "empty"
+          }
+        }
+      }
+    },
+    {
+      "concurrentSnapshots": 20,
+      "concurrentElapsedMs": 38.93339999999989,
+      "requestsPerSnapshot": 9,
+      "peakFetchConcurrencyPerSnapshot": 9
+    }
+  ]
+}

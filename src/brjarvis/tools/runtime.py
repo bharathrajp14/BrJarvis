@@ -205,10 +205,19 @@ class ToolRuntime:
                             reason=f"Security Alert: Blocked by prompt injection defense in argument '{arg_k}'.",
                             error_code=ToolErrorCode.POLICY_DENIED,
                         )
-        except Exception:
-            pass
+        except Exception as guard_err:
+            # A missing or broken guard must not silently remove a defense layer
+            # for tools that can change state or access protected resources.
+            logger.warning("Prompt-injection guard unavailable for '%s': %s", canonical_name, guard_err)
+            if not tool_def.is_read_only:
+                return ToolResult.blocked(
+                    tool_name=canonical_name,
+                    reason="Security preflight unavailable; state-changing execution was blocked.",
+                    error_code=ToolErrorCode.POLICY_DENIED,
+                )
 
         # ── Stage 5: Security & Policy Evaluation ──
+
         risk_map = {
             RiskLevel.LOW: SecRiskLevel.LOW,
             RiskLevel.MEDIUM: SecRiskLevel.MEDIUM,
@@ -331,11 +340,14 @@ class ToolRuntime:
             duration_ms = (time.perf_counter() - t0) * 1000.0
             logger.error(f"❌ Tool '{canonical_name}' raised exception: {exc}", exc_info=True)
             self._record_metrics(canonical_name, success=False, duration_ms=duration_ms)
+            # Keep exception details in logs only.  Returning raw provider,
+            # filesystem, or subprocess errors can disclose internal paths,
+            # credentials, or implementation details to the model and UI.
             return ToolResult.failed(
                 tool_name=canonical_name,
                 error_code=ToolErrorCode.EXECUTION_EXCEPTION,
-                message=str(exc),
-                stderr=str(exc),
+                message="Tool execution failed; see the execution log for details.",
+                stderr="",
                 execution_ms=duration_ms,
             )
 
