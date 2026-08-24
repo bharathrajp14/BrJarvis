@@ -302,7 +302,7 @@ export class ApiClient {
   async createTask(command: CommandRequest, signal?: AbortSignal): Promise<CommandResponse> {
     const response = await this.request<Record<string, unknown>>('/api/agent/tasks', {
       method: 'POST',
-      body: JSON.stringify({ goal: command.goal, active_devices: [] }),
+      body: JSON.stringify({ goal: command.goal, active_devices: [], mode: command.mode, privacy: command.privacy }),
       signal,
       headers: { 'Idempotency-Key': command.idempotencyKey },
     });

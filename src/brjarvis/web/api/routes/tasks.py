@@ -18,6 +18,8 @@ router = APIRouter(tags=["Tasks"])
 class CreateTaskRequest(BaseModel):
     goal: str
     active_devices: Optional[List[str]] = None
+    mode: str = "smart"
+    privacy: str = "balanced"
 
 
 class ResolveApprovalRequest(BaseModel):
@@ -77,7 +79,13 @@ async def create_agent_task(req: CreateTaskRequest):
     from brjarvis.agent.executor import AgentExecutor
 
     mgr = get_task_state_manager()
-    task = mgr.create_task(req.goal, active_devices=req.active_devices)
+    mode = req.mode if req.mode in {"fast", "smart", "deep"} else "smart"
+    privacy = req.privacy if req.privacy in {"balanced", "local_only"} else "balanced"
+    task = mgr.create_task(
+        req.goal,
+        active_devices=req.active_devices,
+        goal_spec={"execution_mode": mode, "privacy": privacy},
+    )
 
     def _run_job():
         try:

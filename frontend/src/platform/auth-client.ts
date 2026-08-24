@@ -5,12 +5,23 @@ export interface AuthSnapshot {
   scope: string;
 }
 
+function asBoolean(value: unknown): boolean {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value !== 0;
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (['true', '1', 'yes', 'on', 'authenticated'].includes(normalized)) return true;
+    if (['false', '0', 'no', 'off', ''].includes(normalized)) return false;
+  }
+  return Boolean(value);
+}
+
 function normalizeAuth(body: Record<string, unknown>): AuthSnapshot {
   const data = (body.data ?? body) as Record<string, unknown>;
   const identity = (data.user ?? data.session_user ?? data.identity ?? {}) as Record<string, unknown>;
   return {
-    authRequired: Boolean(data.auth_required ?? data.authRequired),
-    authenticated: Boolean(data.authenticated ?? data.logged_in ?? data.status === 'authenticated'),
+    authRequired: asBoolean(data.auth_required ?? data.authRequired),
+    authenticated: asBoolean(data.authenticated ?? data.logged_in ?? data.status === 'authenticated'),
     label: String(identity.name ?? identity.email ?? data.username ?? data.user_id ?? 'Operator'),
     scope: String(data.scope ?? data.role ?? 'Local session'),
   };
