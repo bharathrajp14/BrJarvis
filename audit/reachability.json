@@ -1,0 +1,845 @@
+{
+  "entrypoints": [
+    "brjarvis.apps.bootstrap",
+    "brjarvis.apps.cli",
+    "brjarvis.apps.web",
+    "brjarvis.core.bootstrap",
+    "brjarvis.web.api.app",
+    "cli.main",
+    "desktop.main",
+    "float_widget",
+    "main",
+    "permissions",
+    "server",
+    "start",
+    "ui",
+    "ui_mark",
+    "voice.main",
+    "web.main"
+  ],
+  "total_modules": 542,
+  "reachable_count": 379,
+  "test_only_count": 44,
+  "dead_count": 119,
+  "dead_loc": 19404,
+  "test_only_loc": 17635,
+  "test_only": [
+    {
+      "module": "brjarvis.actions.process_optimizer",
+      "path": "src\\brjarvis\\actions\\process_optimizer.py",
+      "loc": 70
+    },
+    {
+      "module": "brjarvis.agent.agent_loop",
+      "path": "src\\brjarvis\\agent\\agent_loop.py",
+      "loc": 638
+    },
+    {
+      "module": "brjarvis.agent.cross_device_planner",
+      "path": "src\\brjarvis\\agent\\cross_device_planner.py",
+      "loc": 282
+    },
+    {
+      "module": "brjarvis.agent.session",
+      "path": "src\\brjarvis\\agent\\session.py",
+      "loc": 563
+    },
+    {
+      "module": "brjarvis.agent.stage_decomposer",
+      "path": "src\\brjarvis\\agent\\stage_decomposer.py",
+      "loc": 961
+    },
+    {
+      "module": "brjarvis.agent.step_planner",
+      "path": "src\\brjarvis\\agent\\step_planner.py",
+      "loc": 152
+    },
+    {
+      "module": "brjarvis.career.ats_engine",
+      "path": "src\\brjarvis\\career\\ats_engine\\__init__.py",
+      "loc": 9
+    },
+    {
+      "module": "brjarvis.context.builder",
+      "path": "src\\brjarvis\\context\\builder.py",
+      "loc": 137
+    },
+    {
+      "module": "brjarvis.context.compressor",
+      "path": "src\\brjarvis\\context\\compressor.py",
+      "loc": 86
+    },
+    {
+      "module": "brjarvis.context.token_counter",
+      "path": "src\\brjarvis\\context\\token_counter.py",
+      "loc": 58
+    },
+    {
+      "module": "brjarvis.context.types",
+      "path": "src\\brjarvis\\context\\types.py",
+      "loc": 89
+    },
+    {
+      "module": "brjarvis.contracts.session",
+      "path": "src\\brjarvis\\contracts\\session.py",
+      "loc": 105
+    },
+    {
+      "module": "brjarvis.core.intent_engine",
+      "path": "src\\brjarvis\\core\\intent_engine.py",
+      "loc": 2394
+    },
+    {
+      "module": "brjarvis.core.terminal.actions",
+      "path": "src\\brjarvis\\core\\terminal\\actions.py",
+      "loc": 149
+    },
+    {
+      "module": "brjarvis.core.terminal.autocomplete",
+      "path": "src\\brjarvis\\core\\terminal\\autocomplete.py",
+      "loc": 276
+    },
+    {
+      "module": "brjarvis.core.terminal.commands",
+      "path": "src\\brjarvis\\core\\terminal\\commands.py",
+      "loc": 2068
+    },
+    {
+      "module": "brjarvis.core.terminal.components",
+      "path": "src\\brjarvis\\core\\terminal\\components.py",
+      "loc": 451
+    },
+    {
+      "module": "brjarvis.core.terminal.events",
+      "path": "src\\brjarvis\\core\\terminal\\events.py",
+      "loc": 245
+    },
+    {
+      "module": "brjarvis.core.terminal.guard",
+      "path": "src\\brjarvis\\core\\terminal\\guard.py",
+      "loc": 289
+    },
+    {
+      "module": "brjarvis.core.terminal.hit_test",
+      "path": "src\\brjarvis\\core\\terminal\\hit_test.py",
+      "loc": 128
+    },
+    {
+      "module": "brjarvis.core.terminal.interactive_tui",
+      "path": "src\\brjarvis\\core\\terminal\\interactive_tui.py",
+      "loc": 281
+    },
+    {
+      "module": "brjarvis.core.terminal.renderer",
+      "path": "src\\brjarvis\\core\\terminal\\renderer.py",
+      "loc": 1048
+    },
+    {
+      "module": "brjarvis.core.terminal.selection",
+      "path": "src\\brjarvis\\core\\terminal\\selection.py",
+      "loc": 277
+    },
+    {
+      "module": "brjarvis.core.terminal.session",
+      "path": "src\\brjarvis\\core\\terminal\\session.py",
+      "loc": 690
+    },
+    {
+      "module": "brjarvis.core.terminal.theme",
+      "path": "src\\brjarvis\\core\\terminal\\theme.py",
+      "loc": 139
+    },
+    {
+      "module": "brjarvis.core.terminal.viewport",
+      "path": "src\\brjarvis\\core\\terminal\\viewport.py",
+      "loc": 133
+    },
+    {
+      "module": "brjarvis.gateway.routing",
+      "path": "src\\brjarvis\\gateway\\routing.py",
+      "loc": 357
+    },
+    {
+      "module": "brjarvis.history.audit_writer",
+      "path": "src\\brjarvis\\history\\audit_writer.py",
+      "loc": 150
+    },
+    {
+      "module": "brjarvis.history.linker",
+      "path": "src\\brjarvis\\history\\linker.py",
+      "loc": 205
+    },
+    {
+      "module": "brjarvis.history.session_store",
+      "path": "src\\brjarvis\\history\\session_store.py",
+      "loc": 411
+    },
+    {
+      "module": "brjarvis.integrations.mobile.device_controller",
+      "path": "src\\brjarvis\\integrations\\mobile\\device_controller.py",
+      "loc": 153
+    },
+    {
+      "module": "brjarvis.integrations.mobile.screen_understanding",
+      "path": "src\\brjarvis\\integrations\\mobile\\screen_understanding.py",
+      "loc": 135
+    },
+    {
+      "module": "brjarvis.memory.consolidator",
+      "path": "src\\brjarvis\\memory\\consolidator.py",
+      "loc": 158
+    },
+    {
+      "module": "brjarvis.memory.conversation_store",
+      "path": "src\\brjarvis\\memory\\conversation_store.py",
+      "loc": 254
+    },
+    {
+      "module": "brjarvis.memory.memory_context",
+      "path": "src\\brjarvis\\memory\\memory_context.py",
+      "loc": 140
+    },
+    {
+      "module": "brjarvis.memory.memory_scan",
+      "path": "src\\brjarvis\\memory\\memory_scan.py",
+      "loc": 116
+    },
+    {
+      "module": "brjarvis.memory.session_lifecycle",
+      "path": "src\\brjarvis\\memory\\session_lifecycle.py",
+      "loc": 182
+    },
+    {
+      "module": "brjarvis.memory.task_memory_router",
+      "path": "src\\brjarvis\\memory\\task_memory_router.py",
+      "loc": 193
+    },
+    {
+      "module": "brjarvis.orchestrator.core",
+      "path": "src\\brjarvis\\orchestrator\\core.py",
+      "loc": 1384
+    },
+    {
+      "module": "brjarvis.router.core",
+      "path": "src\\brjarvis\\router\\core.py",
+      "loc": 539
+    },
+    {
+      "module": "brjarvis.router.diagnostics",
+      "path": "src\\brjarvis\\router\\diagnostics.py",
+      "loc": 267
+    },
+    {
+      "module": "brjarvis.tools.diagnostics",
+      "path": "src\\brjarvis\\tools\\diagnostics.py",
+      "loc": 136
+    },
+    {
+      "module": "brjarvis.web.api.routes",
+      "path": "src\\brjarvis\\web\\api\\routes\\__init__.py",
+      "loc": 3
+    },
+    {
+      "module": "brjarvis.workflow.tool_orchestration",
+      "path": "src\\brjarvis\\workflow\\tool_orchestration.py",
+      "loc": 1134
+    }
+  ],
+  "dead": [
+    {
+      "module": "apps",
+      "path": "apps\\__init__.py",
+      "loc": 9
+    },
+    {
+      "module": "brjarvis.actions.browser_control",
+      "path": "src\\brjarvis\\actions\\browser_control.py",
+      "loc": 1103
+    },
+    {
+      "module": "brjarvis.actions.code_helper",
+      "path": "src\\brjarvis\\actions\\code_helper.py",
+      "loc": 605
+    },
+    {
+      "module": "brjarvis.actions.dev_agent",
+      "path": "src\\brjarvis\\actions\\dev_agent.py",
+      "loc": 638
+    },
+    {
+      "module": "brjarvis.actions.file_controller",
+      "path": "src\\brjarvis\\actions\\file_controller.py",
+      "loc": 557
+    },
+    {
+      "module": "brjarvis.actions.flight_finder",
+      "path": "src\\brjarvis\\actions\\flight_finder.py",
+      "loc": 372
+    },
+    {
+      "module": "brjarvis.actions.game_updater",
+      "path": "src\\brjarvis\\actions\\game_updater.py",
+      "loc": 1079
+    },
+    {
+      "module": "brjarvis.actions.proactive",
+      "path": "src\\brjarvis\\actions\\proactive.py",
+      "loc": 127
+    },
+    {
+      "module": "brjarvis.actions.repo_controller",
+      "path": "src\\brjarvis\\actions\\repo_controller.py",
+      "loc": 61
+    },
+    {
+      "module": "brjarvis.actions.sqlite_manager",
+      "path": "src\\brjarvis\\actions\\sqlite_manager.py",
+      "loc": 74
+    },
+    {
+      "module": "brjarvis.agent.critic_agent",
+      "path": "src\\brjarvis\\agent\\critic_agent.py",
+      "loc": 93
+    },
+    {
+      "module": "brjarvis.agent.executor_engine",
+      "path": "src\\brjarvis\\agent\\executor_engine.py",
+      "loc": 289
+    },
+    {
+      "module": "brjarvis.agent.planner_engine",
+      "path": "src\\brjarvis\\agent\\planner_engine.py",
+      "loc": 190
+    },
+    {
+      "module": "brjarvis.agent.planning_mode",
+      "path": "src\\brjarvis\\agent\\planning_mode.py",
+      "loc": 180
+    },
+    {
+      "module": "brjarvis.agent.task_lifecycle",
+      "path": "src\\brjarvis\\agent\\task_lifecycle.py",
+      "loc": 139
+    },
+    {
+      "module": "brjarvis.agent.task_scheduler",
+      "path": "src\\brjarvis\\agent\\task_scheduler.py",
+      "loc": 71
+    },
+    {
+      "module": "brjarvis.agent.transcript_logger",
+      "path": "src\\brjarvis\\agent\\transcript_logger.py",
+      "loc": 84
+    },
+    {
+      "module": "brjarvis.agent.types",
+      "path": "src\\brjarvis\\agent\\types.py",
+      "loc": 62
+    },
+    {
+      "module": "brjarvis.apps",
+      "path": "src\\brjarvis\\apps\\__init__.py",
+      "loc": 16
+    },
+    {
+      "module": "brjarvis.career.application_engine",
+      "path": "src\\brjarvis\\career\\application_engine\\__init__.py",
+      "loc": 23
+    },
+    {
+      "module": "brjarvis.career.calendar_engine",
+      "path": "src\\brjarvis\\career\\calendar_engine\\__init__.py",
+      "loc": 9
+    },
+    {
+      "module": "brjarvis.career.canva",
+      "path": "src\\brjarvis\\career\\canva\\__init__.py",
+      "loc": 13
+    },
+    {
+      "module": "brjarvis.career.cover_letter",
+      "path": "src\\brjarvis\\career\\cover_letter\\__init__.py",
+      "loc": 8
+    },
+    {
+      "module": "brjarvis.career.crm",
+      "path": "src\\brjarvis\\career\\crm\\__init__.py",
+      "loc": 17
+    },
+    {
+      "module": "brjarvis.career.crm.event_pipeline",
+      "path": "src\\brjarvis\\career\\crm\\event_pipeline.py",
+      "loc": 180
+    },
+    {
+      "module": "brjarvis.career.email_intelligence",
+      "path": "src\\brjarvis\\career\\email_intelligence\\__init__.py",
+      "loc": 21
+    },
+    {
+      "module": "brjarvis.career.job_engine.adapters.ashby",
+      "path": "src\\brjarvis\\career\\job_engine\\adapters\\ashby.py",
+      "loc": 169
+    },
+    {
+      "module": "brjarvis.career.job_engine.adapters.base",
+      "path": "src\\brjarvis\\career\\job_engine\\adapters\\base.py",
+      "loc": 77
+    },
+    {
+      "module": "brjarvis.career.job_engine.adapters.company_site",
+      "path": "src\\brjarvis\\career\\job_engine\\adapters\\company_site.py",
+      "loc": 59
+    },
+    {
+      "module": "brjarvis.career.job_engine.adapters.generic_browser",
+      "path": "src\\brjarvis\\career\\job_engine\\adapters\\generic_browser.py",
+      "loc": 108
+    },
+    {
+      "module": "brjarvis.career.job_engine.adapters.greenhouse",
+      "path": "src\\brjarvis\\career\\job_engine\\adapters\\greenhouse.py",
+      "loc": 250
+    },
+    {
+      "module": "brjarvis.career.job_engine.adapters.lever",
+      "path": "src\\brjarvis\\career\\job_engine\\adapters\\lever.py",
+      "loc": 178
+    },
+    {
+      "module": "brjarvis.career.resume_engine",
+      "path": "src\\brjarvis\\career\\resume_engine\\__init__.py",
+      "loc": 39
+    },
+    {
+      "module": "brjarvis.career.spreadsheet",
+      "path": "src\\brjarvis\\career\\spreadsheet\\__init__.py",
+      "loc": 11
+    },
+    {
+      "module": "brjarvis.computer.operator",
+      "path": "src\\brjarvis\\computer\\operator.py",
+      "loc": 300
+    },
+    {
+      "module": "brjarvis.computer.recovery",
+      "path": "src\\brjarvis\\computer\\recovery.py",
+      "loc": 116
+    },
+    {
+      "module": "brjarvis.computer.semantic_operator",
+      "path": "src\\brjarvis\\computer\\semantic_operator.py",
+      "loc": 116
+    },
+    {
+      "module": "brjarvis.computer.types",
+      "path": "src\\brjarvis\\computer\\types.py",
+      "loc": 48
+    },
+    {
+      "module": "brjarvis.config.model_loader",
+      "path": "src\\brjarvis\\config\\model_loader.py",
+      "loc": 75
+    },
+    {
+      "module": "brjarvis.context.engine",
+      "path": "src\\brjarvis\\context\\engine.py",
+      "loc": 124
+    },
+    {
+      "module": "brjarvis.context.token_manager",
+      "path": "src\\brjarvis\\context\\token_manager.py",
+      "loc": 99
+    },
+    {
+      "module": "brjarvis.contracts.agent",
+      "path": "src\\brjarvis\\contracts\\agent.py",
+      "loc": 88
+    },
+    {
+      "module": "brjarvis.contracts.events",
+      "path": "src\\brjarvis\\contracts\\events.py",
+      "loc": 43
+    },
+    {
+      "module": "brjarvis.contracts.memory",
+      "path": "src\\brjarvis\\contracts\\memory.py",
+      "loc": 81
+    },
+    {
+      "module": "brjarvis.contracts.model",
+      "path": "src\\brjarvis\\contracts\\model.py",
+      "loc": 94
+    },
+    {
+      "module": "brjarvis.contracts.security",
+      "path": "src\\brjarvis\\contracts\\security.py",
+      "loc": 78
+    },
+    {
+      "module": "brjarvis.contracts.task",
+      "path": "src\\brjarvis\\contracts\\task.py",
+      "loc": 128
+    },
+    {
+      "module": "brjarvis.contracts.tool",
+      "path": "src\\brjarvis\\contracts\\tool.py",
+      "loc": 126
+    },
+    {
+      "module": "brjarvis.contracts.verification",
+      "path": "src\\brjarvis\\contracts\\verification.py",
+      "loc": 54
+    },
+    {
+      "module": "brjarvis.contracts.workflow",
+      "path": "src\\brjarvis\\contracts\\workflow.py",
+      "loc": 58
+    },
+    {
+      "module": "brjarvis.core.bootstrapper",
+      "path": "src\\brjarvis\\core\\bootstrapper.py",
+      "loc": 15
+    },
+    {
+      "module": "brjarvis.core.code_graph",
+      "path": "src\\brjarvis\\core\\code_graph.py",
+      "loc": 231
+    },
+    {
+      "module": "brjarvis.core.compat",
+      "path": "src\\brjarvis\\core\\compat.py",
+      "loc": 302
+    },
+    {
+      "module": "brjarvis.core.error_middleware",
+      "path": "src\\brjarvis\\core\\error_middleware.py",
+      "loc": 53
+    },
+    {
+      "module": "brjarvis.core.errors",
+      "path": "src\\brjarvis\\core\\errors.py",
+      "loc": 138
+    },
+    {
+      "module": "brjarvis.core.installer",
+      "path": "src\\brjarvis\\core\\installer.py",
+      "loc": 146
+    },
+    {
+      "module": "brjarvis.core.integration",
+      "path": "src\\brjarvis\\core\\integration.py",
+      "loc": 53
+    },
+    {
+      "module": "brjarvis.core.personality",
+      "path": "src\\brjarvis\\core\\personality.py",
+      "loc": 38
+    },
+    {
+      "module": "brjarvis.core.retry",
+      "path": "src\\brjarvis\\core\\retry.py",
+      "loc": 108
+    },
+    {
+      "module": "brjarvis.core.sanitizer",
+      "path": "src\\brjarvis\\core\\sanitizer.py",
+      "loc": 3
+    },
+    {
+      "module": "brjarvis.core.timeouts",
+      "path": "src\\brjarvis\\core\\timeouts.py",
+      "loc": 24
+    },
+    {
+      "module": "brjarvis.diagnostics",
+      "path": "src\\brjarvis\\diagnostics\\__init__.py",
+      "loc": 16
+    },
+    {
+      "module": "brjarvis.events.handlers",
+      "path": "src\\brjarvis\\events\\handlers.py",
+      "loc": 21
+    },
+    {
+      "module": "brjarvis.gateway.probe",
+      "path": "src\\brjarvis\\gateway\\probe.py",
+      "loc": 141
+    },
+    {
+      "module": "brjarvis.guardian.redteam.recon",
+      "path": "src\\brjarvis\\guardian\\redteam\\recon.py",
+      "loc": 85
+    },
+    {
+      "module": "brjarvis.guardian.redteam.report",
+      "path": "src\\brjarvis\\guardian\\redteam\\report.py",
+      "loc": 109
+    },
+    {
+      "module": "brjarvis.guardian.redteam.vuln_scanner",
+      "path": "src\\brjarvis\\guardian\\redteam\\vuln_scanner.py",
+      "loc": 54
+    },
+    {
+      "module": "brjarvis.guardian.rollback",
+      "path": "src\\brjarvis\\guardian\\rollback.py",
+      "loc": 65
+    },
+    {
+      "module": "brjarvis.guardian.snapshot",
+      "path": "src\\brjarvis\\guardian\\snapshot.py",
+      "loc": 157
+    },
+    {
+      "module": "brjarvis.history.audit_engine",
+      "path": "src\\brjarvis\\history\\audit_engine.py",
+      "loc": 174
+    },
+    {
+      "module": "brjarvis.history.replay",
+      "path": "src\\brjarvis\\history\\replay.py",
+      "loc": 261
+    },
+    {
+      "module": "brjarvis.integrations.backends.adapter",
+      "path": "src\\brjarvis\\integrations\\backends\\adapter.py",
+      "loc": 330
+    },
+    {
+      "module": "brjarvis.integrations.backends.anthropic",
+      "path": "src\\brjarvis\\integrations\\backends\\anthropic.py",
+      "loc": 154
+    },
+    {
+      "module": "brjarvis.integrations.backends.deepseek",
+      "path": "src\\brjarvis\\integrations\\backends\\deepseek.py",
+      "loc": 123
+    },
+    {
+      "module": "brjarvis.integrations.backends.manus",
+      "path": "src\\brjarvis\\integrations\\backends\\manus.py",
+      "loc": 230
+    },
+    {
+      "module": "brjarvis.integrations.backends.mistral",
+      "path": "src\\brjarvis\\integrations\\backends\\mistral.py",
+      "loc": 97
+    },
+    {
+      "module": "brjarvis.integrations.backends.nvidia",
+      "path": "src\\brjarvis\\integrations\\backends\\nvidia.py",
+      "loc": 119
+    },
+    {
+      "module": "brjarvis.integrations.backends.ollama",
+      "path": "src\\brjarvis\\integrations\\backends\\ollama.py",
+      "loc": 142
+    },
+    {
+      "module": "brjarvis.integrations.backends.openai_compat",
+      "path": "src\\brjarvis\\integrations\\backends\\openai_compat.py",
+      "loc": 73
+    },
+    {
+      "module": "brjarvis.memory.decay",
+      "path": "src\\brjarvis\\memory\\decay.py",
+      "loc": 69
+    },
+    {
+      "module": "brjarvis.memory.diagnostics",
+      "path": "src\\brjarvis\\memory\\diagnostics.py",
+      "loc": 184
+    },
+    {
+      "module": "brjarvis.memory.handoff",
+      "path": "src\\brjarvis\\memory\\handoff.py",
+      "loc": 297
+    },
+    {
+      "module": "brjarvis.memory.knowledge_graph",
+      "path": "src\\brjarvis\\memory\\knowledge_graph.py",
+      "loc": 157
+    },
+    {
+      "module": "brjarvis.memory.migrate_legacy_memory",
+      "path": "src\\brjarvis\\memory\\migrate_legacy_memory.py",
+      "loc": 185
+    },
+    {
+      "module": "brjarvis.memory.temporal_kg",
+      "path": "src\\brjarvis\\memory\\temporal_kg.py",
+      "loc": 139
+    },
+    {
+      "module": "brjarvis.orchestrator.speculative",
+      "path": "src\\brjarvis\\orchestrator\\speculative.py",
+      "loc": 19
+    },
+    {
+      "module": "brjarvis.plugins.plugin_manager",
+      "path": "src\\brjarvis\\plugins\\plugin_manager.py",
+      "loc": 139
+    },
+    {
+      "module": "brjarvis.reasoning.cognitive_loop",
+      "path": "src\\brjarvis\\reasoning\\cognitive_loop.py",
+      "loc": 97
+    },
+    {
+      "module": "brjarvis.reasoning.engine",
+      "path": "src\\brjarvis\\reasoning\\engine.py",
+      "loc": 184
+    },
+    {
+      "module": "brjarvis.reasoning.meta_cognition",
+      "path": "src\\brjarvis\\reasoning\\meta_cognition.py",
+      "loc": 125
+    },
+    {
+      "module": "brjarvis.reasoning.prompt_cache",
+      "path": "src\\brjarvis\\reasoning\\prompt_cache.py",
+      "loc": 64
+    },
+    {
+      "module": "brjarvis.reasoning.speculative",
+      "path": "src\\brjarvis\\reasoning\\speculative.py",
+      "loc": 213
+    },
+    {
+      "module": "brjarvis.reasoning.speculative_engine",
+      "path": "src\\brjarvis\\reasoning\\speculative_engine.py",
+      "loc": 24
+    },
+    {
+      "module": "brjarvis.reasoning.speculative_selector",
+      "path": "src\\brjarvis\\reasoning\\speculative_selector.py",
+      "loc": 53
+    },
+    {
+      "module": "brjarvis.reasoning.types",
+      "path": "src\\brjarvis\\reasoning\\types.py",
+      "loc": 92
+    },
+    {
+      "module": "brjarvis.screen_server.ws_server",
+      "path": "src\\brjarvis\\screen_server\\ws_server.py",
+      "loc": 142
+    },
+    {
+      "module": "brjarvis.security.sanitizer",
+      "path": "src\\brjarvis\\security\\sanitizer.py",
+      "loc": 87
+    },
+    {
+      "module": "brjarvis.skills.builtin",
+      "path": "src\\brjarvis\\skills\\builtin.py",
+      "loc": 424
+    },
+    {
+      "module": "brjarvis.skills.builtin_connectors",
+      "path": "src\\brjarvis\\skills\\builtin_connectors.py",
+      "loc": 216
+    },
+    {
+      "module": "brjarvis.skills.builtin_editor",
+      "path": "src\\brjarvis\\skills\\builtin_editor.py",
+      "loc": 126
+    },
+    {
+      "module": "brjarvis.skills.builtin_extras",
+      "path": "src\\brjarvis\\skills\\builtin_extras.py",
+      "loc": 159
+    },
+    {
+      "module": "brjarvis.skills.builtin_pro",
+      "path": "src\\brjarvis\\skills\\builtin_pro.py",
+      "loc": 1242
+    },
+    {
+      "module": "brjarvis.skills.builtin_rag",
+      "path": "src\\brjarvis\\skills\\builtin_rag.py",
+      "loc": 125
+    },
+    {
+      "module": "brjarvis.skills.builtin_writer",
+      "path": "src\\brjarvis\\skills\\builtin_writer.py",
+      "loc": 198
+    },
+    {
+      "module": "brjarvis.skills.executor",
+      "path": "src\\brjarvis\\skills\\executor.py",
+      "loc": 82
+    },
+    {
+      "module": "brjarvis.skills.hot_reload",
+      "path": "src\\brjarvis\\skills\\hot_reload.py",
+      "loc": 68
+    },
+    {
+      "module": "brjarvis.skills.installer",
+      "path": "src\\brjarvis\\skills\\installer.py",
+      "loc": 357
+    },
+    {
+      "module": "brjarvis.skills.loader",
+      "path": "src\\brjarvis\\skills\\loader.py",
+      "loc": 269
+    },
+    {
+      "module": "brjarvis.skills.registry",
+      "path": "src\\brjarvis\\skills\\registry.py",
+      "loc": 83
+    },
+    {
+      "module": "brjarvis.tools.tool_ranker",
+      "path": "src\\brjarvis\\tools\\tool_ranker.py",
+      "loc": 251
+    },
+    {
+      "module": "brjarvis.voice.tts_queue",
+      "path": "src\\brjarvis\\voice\\tts_queue.py",
+      "loc": 116
+    },
+    {
+      "module": "brjarvis.web",
+      "path": "src\\brjarvis\\web\\__init__.py",
+      "loc": 5
+    },
+    {
+      "module": "brjarvis.web.api",
+      "path": "src\\brjarvis\\web\\api\\__init__.py",
+      "loc": 13
+    },
+    {
+      "module": "brjarvis.workflow.task_dag",
+      "path": "src\\brjarvis\\workflow\\task_dag.py",
+      "loc": 413
+    },
+    {
+      "module": "setup",
+      "path": "setup.py",
+      "loc": 13
+    },
+    {
+      "module": "setup_native",
+      "path": "setup_native.py",
+      "loc": 10
+    },
+    {
+      "module": "web.api",
+      "path": "apps\\web\\api\\__init__.py",
+      "loc": 20
+    },
+    {
+      "module": "web.dashboard",
+      "path": "apps\\web\\dashboard\\__init__.py",
+      "loc": 2
+    },
+    {
+      "module": "web.dashboard.server",
+      "path": "apps\\web\\dashboard\\server.py",
+      "loc": 941
+    }
+  ]
+}

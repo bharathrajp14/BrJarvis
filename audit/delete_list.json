@@ -1,0 +1,491 @@
+{
+  "clear_to_delete": [
+    {
+      "module": "brjarvis.actions.browser_control",
+      "path": "src\\brjarvis\\actions\\browser_control.py",
+      "loc": 1103,
+      "rel": "src/brjarvis/actions/browser_control.py",
+      "referenced_by": [
+        "src/brjarvis/actions/flight_finder.py"
+      ]
+    },
+    {
+      "module": "brjarvis.actions.game_updater",
+      "path": "src\\brjarvis\\actions\\game_updater.py",
+      "loc": 1079,
+      "rel": "src/brjarvis/actions/game_updater.py",
+      "referenced_by": []
+    },
+    {
+      "module": "web.dashboard.server",
+      "path": "apps\\web\\dashboard\\server.py",
+      "loc": 941,
+      "rel": "apps/web/dashboard/server.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.actions.dev_agent",
+      "path": "src\\brjarvis\\actions\\dev_agent.py",
+      "loc": 638,
+      "rel": "src/brjarvis/actions/dev_agent.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.actions.code_helper",
+      "path": "src\\brjarvis\\actions\\code_helper.py",
+      "loc": 605,
+      "rel": "src/brjarvis/actions/code_helper.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.actions.file_controller",
+      "path": "src\\brjarvis\\actions\\file_controller.py",
+      "loc": 557,
+      "rel": "src/brjarvis/actions/file_controller.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.actions.flight_finder",
+      "path": "src\\brjarvis\\actions\\flight_finder.py",
+      "loc": 372,
+      "rel": "src/brjarvis/actions/flight_finder.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.integrations.backends.adapter",
+      "path": "src\\brjarvis\\integrations\\backends\\adapter.py",
+      "loc": 330,
+      "rel": "src/brjarvis/integrations/backends/adapter.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.core.compat",
+      "path": "src\\brjarvis\\core\\compat.py",
+      "loc": 302,
+      "rel": "src/brjarvis/core/compat.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.tools.tool_ranker",
+      "path": "src\\brjarvis\\tools\\tool_ranker.py",
+      "loc": 251,
+      "rel": "src/brjarvis/tools/tool_ranker.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.core.code_graph",
+      "path": "src\\brjarvis\\core\\code_graph.py",
+      "loc": 231,
+      "rel": "src/brjarvis/core/code_graph.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.reasoning.speculative",
+      "path": "src\\brjarvis\\reasoning\\speculative.py",
+      "loc": 213,
+      "rel": "src/brjarvis/reasoning/speculative.py",
+      "referenced_by": [
+        "src/brjarvis/orchestrator/speculative.py",
+        "src/brjarvis/reasoning/speculative_engine.py"
+      ]
+    },
+    {
+      "module": "brjarvis.memory.migrate_legacy_memory",
+      "path": "src\\brjarvis\\memory\\migrate_legacy_memory.py",
+      "loc": 185,
+      "rel": "src/brjarvis/memory/migrate_legacy_memory.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.memory.diagnostics",
+      "path": "src\\brjarvis\\memory\\diagnostics.py",
+      "loc": 184,
+      "rel": "src/brjarvis/memory/diagnostics.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.agent.planning_mode",
+      "path": "src\\brjarvis\\agent\\planning_mode.py",
+      "loc": 180,
+      "rel": "src/brjarvis/agent/planning_mode.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.history.audit_engine",
+      "path": "src\\brjarvis\\history\\audit_engine.py",
+      "loc": 174,
+      "rel": "src/brjarvis/history/audit_engine.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.memory.knowledge_graph",
+      "path": "src\\brjarvis\\memory\\knowledge_graph.py",
+      "loc": 157,
+      "rel": "src/brjarvis/memory/knowledge_graph.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.core.installer",
+      "path": "src\\brjarvis\\core\\installer.py",
+      "loc": 146,
+      "rel": "src/brjarvis/core/installer.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.screen_server.ws_server",
+      "path": "src\\brjarvis\\screen_server\\ws_server.py",
+      "loc": 142,
+      "rel": "src/brjarvis/screen_server/ws_server.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.gateway.probe",
+      "path": "src\\brjarvis\\gateway\\probe.py",
+      "loc": 141,
+      "rel": "src/brjarvis/gateway/probe.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.agent.task_lifecycle",
+      "path": "src\\brjarvis\\agent\\task_lifecycle.py",
+      "loc": 139,
+      "rel": "src/brjarvis/agent/task_lifecycle.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.memory.temporal_kg",
+      "path": "src\\brjarvis\\memory\\temporal_kg.py",
+      "loc": 139,
+      "rel": "src/brjarvis/memory/temporal_kg.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.core.errors",
+      "path": "src\\brjarvis\\core\\errors.py",
+      "loc": 138,
+      "rel": "src/brjarvis/core/errors.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.reasoning.meta_cognition",
+      "path": "src\\brjarvis\\reasoning\\meta_cognition.py",
+      "loc": 125,
+      "rel": "src/brjarvis/reasoning/meta_cognition.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.computer.recovery",
+      "path": "src\\brjarvis\\computer\\recovery.py",
+      "loc": 116,
+      "rel": "src/brjarvis/computer/recovery.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.computer.semantic_operator",
+      "path": "src\\brjarvis\\computer\\semantic_operator.py",
+      "loc": 116,
+      "rel": "src/brjarvis/computer/semantic_operator.py",
+      "referenced_by": [
+        "src/brjarvis/computer/recovery.py"
+      ]
+    },
+    {
+      "module": "brjarvis.voice.tts_queue",
+      "path": "src\\brjarvis\\voice\\tts_queue.py",
+      "loc": 116,
+      "rel": "src/brjarvis/voice/tts_queue.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.core.retry",
+      "path": "src\\brjarvis\\core\\retry.py",
+      "loc": 108,
+      "rel": "src/brjarvis/core/retry.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.context.token_manager",
+      "path": "src\\brjarvis\\context\\token_manager.py",
+      "loc": 99,
+      "rel": "src/brjarvis/context/token_manager.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.reasoning.cognitive_loop",
+      "path": "src\\brjarvis\\reasoning\\cognitive_loop.py",
+      "loc": 97,
+      "rel": "src/brjarvis/reasoning/cognitive_loop.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.agent.critic_agent",
+      "path": "src\\brjarvis\\agent\\critic_agent.py",
+      "loc": 93,
+      "rel": "src/brjarvis/agent/critic_agent.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.security.sanitizer",
+      "path": "src\\brjarvis\\security\\sanitizer.py",
+      "loc": 87,
+      "rel": "src/brjarvis/security/sanitizer.py",
+      "referenced_by": [
+        "src/brjarvis/core/sanitizer.py"
+      ]
+    },
+    {
+      "module": "brjarvis.agent.transcript_logger",
+      "path": "src\\brjarvis\\agent\\transcript_logger.py",
+      "loc": 84,
+      "rel": "src/brjarvis/agent/transcript_logger.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.actions.sqlite_manager",
+      "path": "src\\brjarvis\\actions\\sqlite_manager.py",
+      "loc": 74,
+      "rel": "src/brjarvis/actions/sqlite_manager.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.agent.task_scheduler",
+      "path": "src\\brjarvis\\agent\\task_scheduler.py",
+      "loc": 71,
+      "rel": "src/brjarvis/agent/task_scheduler.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.memory.decay",
+      "path": "src\\brjarvis\\memory\\decay.py",
+      "loc": 69,
+      "rel": "src/brjarvis/memory/decay.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.skills.hot_reload",
+      "path": "src\\brjarvis\\skills\\hot_reload.py",
+      "loc": 68,
+      "rel": "src/brjarvis/skills/hot_reload.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.reasoning.prompt_cache",
+      "path": "src\\brjarvis\\reasoning\\prompt_cache.py",
+      "loc": 64,
+      "rel": "src/brjarvis/reasoning/prompt_cache.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.actions.repo_controller",
+      "path": "src\\brjarvis\\actions\\repo_controller.py",
+      "loc": 61,
+      "rel": "src/brjarvis/actions/repo_controller.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.core.error_middleware",
+      "path": "src\\brjarvis\\core\\error_middleware.py",
+      "loc": 53,
+      "rel": "src/brjarvis/core/error_middleware.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.core.integration",
+      "path": "src\\brjarvis\\core\\integration.py",
+      "loc": 53,
+      "rel": "src/brjarvis/core/integration.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.reasoning.speculative_selector",
+      "path": "src\\brjarvis\\reasoning\\speculative_selector.py",
+      "loc": 53,
+      "rel": "src/brjarvis/reasoning/speculative_selector.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.core.personality",
+      "path": "src\\brjarvis\\core\\personality.py",
+      "loc": 38,
+      "rel": "src/brjarvis/core/personality.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.core.timeouts",
+      "path": "src\\brjarvis\\core\\timeouts.py",
+      "loc": 24,
+      "rel": "src/brjarvis/core/timeouts.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.reasoning.speculative_engine",
+      "path": "src\\brjarvis\\reasoning\\speculative_engine.py",
+      "loc": 24,
+      "rel": "src/brjarvis/reasoning/speculative_engine.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.orchestrator.speculative",
+      "path": "src\\brjarvis\\orchestrator\\speculative.py",
+      "loc": 19,
+      "rel": "src/brjarvis/orchestrator/speculative.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.core.bootstrapper",
+      "path": "src\\brjarvis\\core\\bootstrapper.py",
+      "loc": 15,
+      "rel": "src/brjarvis/core/bootstrapper.py",
+      "referenced_by": []
+    },
+    {
+      "module": "brjarvis.core.sanitizer",
+      "path": "src\\brjarvis\\core\\sanitizer.py",
+      "loc": 3,
+      "rel": "src/brjarvis/core/sanitizer.py",
+      "referenced_by": []
+    },
+    {
+      "module": "web.dashboard",
+      "path": "apps\\web\\dashboard\\__init__.py",
+      "loc": 2,
+      "rel": "apps/web/dashboard/__init__.py",
+      "referenced_by": []
+    }
+  ],
+  "clear_count": 49,
+  "clear_loc": 10079,
+  "held_back": [
+    {
+      "module": "brjarvis.workflow.task_dag",
+      "path": "src\\brjarvis\\workflow\\task_dag.py",
+      "loc": 413,
+      "rel": "src/brjarvis/workflow/task_dag.py",
+      "referenced_by": [
+        "src/brjarvis/agent/task_scheduler.py",
+        "src/brjarvis/workflow/__init__.py"
+      ]
+    },
+    {
+      "module": "brjarvis.skills.installer",
+      "path": "src\\brjarvis\\skills\\installer.py",
+      "loc": 357,
+      "rel": "src/brjarvis/skills/installer.py",
+      "referenced_by": [
+        "src/brjarvis/skills/__init__.py"
+      ]
+    },
+    {
+      "module": "brjarvis.computer.operator",
+      "path": "src\\brjarvis\\computer\\operator.py",
+      "loc": 300,
+      "rel": "src/brjarvis/computer/operator.py",
+      "referenced_by": [
+        "src/brjarvis/computer/__init__.py",
+        "src/brjarvis/computer/recovery.py",
+        "src/brjarvis/computer/semantic_operator.py"
+      ]
+    },
+    {
+      "module": "brjarvis.history.replay",
+      "path": "src\\brjarvis\\history\\replay.py",
+      "loc": 261,
+      "rel": "src/brjarvis/history/replay.py",
+      "referenced_by": [
+        "src/brjarvis/history/__init__.py"
+      ]
+    },
+    {
+      "module": "brjarvis.reasoning.engine",
+      "path": "src\\brjarvis\\reasoning\\engine.py",
+      "loc": 184,
+      "rel": "src/brjarvis/reasoning/engine.py",
+      "referenced_by": [
+        "src/brjarvis/reasoning/__init__.py"
+      ]
+    },
+    {
+      "module": "brjarvis.actions.proactive",
+      "path": "src\\brjarvis\\actions\\proactive.py",
+      "loc": 127,
+      "rel": "src/brjarvis/actions/proactive.py",
+      "referenced_by": [
+        "apps/web/dashboard/server.py",
+        "src/brjarvis/actions/channel_action_dispatcher.py",
+        "src/brjarvis/tools/proactive_listener_tools.py"
+      ]
+    },
+    {
+      "module": "brjarvis.reasoning.types",
+      "path": "src\\brjarvis\\reasoning\\types.py",
+      "loc": 92,
+      "rel": "src/brjarvis/reasoning/types.py",
+      "referenced_by": [
+        "src/brjarvis/reasoning/__init__.py",
+        "src/brjarvis/reasoning/engine.py"
+      ]
+    },
+    {
+      "module": "brjarvis.skills.registry",
+      "path": "src\\brjarvis\\skills\\registry.py",
+      "loc": 83,
+      "rel": "src/brjarvis/skills/registry.py",
+      "referenced_by": [
+        "src/brjarvis/skills/skill_engine.py"
+      ]
+    },
+    {
+      "module": "brjarvis.config.model_loader",
+      "path": "src\\brjarvis\\config\\model_loader.py",
+      "loc": 75,
+      "rel": "src/brjarvis/config/model_loader.py",
+      "referenced_by": [
+        "config/model_loader.py"
+      ]
+    },
+    {
+      "module": "brjarvis.computer.types",
+      "path": "src\\brjarvis\\computer\\types.py",
+      "loc": 48,
+      "rel": "src/brjarvis/computer/types.py",
+      "referenced_by": [
+        "src/brjarvis/computer/__init__.py",
+        "src/brjarvis/computer/operator.py",
+        "src/brjarvis/computer/recovery.py",
+        "src/brjarvis/computer/semantic_operator.py"
+      ]
+    },
+    {
+      "module": "brjarvis.career.calendar_engine",
+      "path": "src\\brjarvis\\career\\calendar_engine\\__init__.py",
+      "loc": 9,
+      "rel": "src/brjarvis/career/calendar_engine/__init__.py",
+      "referenced_by": [
+        "src/brjarvis/career/api_routes.py",
+        "src/brjarvis/career/calendar_engine/manager.py"
+      ]
+    }
+  ],
+  "kept_by_policy": [
+    {
+      "module": "apps",
+      "path": "apps\\__init__.py",
+      "loc": 9
+    },
+    {
+      "module": "setup",
+      "path": "setup.py",
+      "loc": 13
+    },
+    {
+      "module": "setup_native",
+      "path": "setup_native.py",
+      "loc": 10
+    },
+    {
+      "module": "web.api",
+      "path": "apps\\web\\api\\__init__.py",
+      "loc": 20
+    }
+  ]
+}
