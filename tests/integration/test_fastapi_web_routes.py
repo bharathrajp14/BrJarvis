@@ -212,6 +212,7 @@ def test_normalized_routers_do_not_create_doubled_versioned_paths():
 @pytest.mark.integration
 def test_project_file_preview_is_contained_and_does_not_expose_host_path(monkeypatch, tmp_path):
     from types import SimpleNamespace
+
     from brjarvis.web.api.routes import projects as project_routes
 
     project_root = tmp_path / "projects" / "project-1"

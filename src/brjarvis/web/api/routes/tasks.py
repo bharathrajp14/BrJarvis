@@ -38,8 +38,9 @@ async def get_tasks():
         q = get_queue()
         statuses = q.get_all_statuses()
         return {"active": q.active_count(), "pending": q.pending_count(), "tasks": statuses[-10:]}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        logger.exception("Failed to list queue tasks")
+        raise HTTPException(status_code=500, detail="Unable to list tasks")
 
 
 @router.post("/run")
@@ -51,8 +52,9 @@ async def run_parallel(req: RunRequest):
         q = get_queue()
         task_ids = q.submit_many(req.goals, priority=TaskPriority.NORMAL)
         return {"status": "started", "task_ids": task_ids}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        logger.exception("Failed to submit parallel tasks")
+        raise HTTPException(status_code=500, detail="Unable to start tasks")
 
 
 @router.get("/agent/tasks")

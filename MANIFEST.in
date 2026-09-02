@@ -1,0 +1,3 @@
+recursive-include src/brjarvis/web/static *
+recursive-include src/brjarvis/skills *
+include LICENSE readme.md

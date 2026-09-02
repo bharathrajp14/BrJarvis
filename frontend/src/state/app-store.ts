@@ -28,9 +28,19 @@ export function subscribe(listener: () => void) {
 
 export function dispatch(action: AppAction) {
   switch (action.type) {
-    case 'hydrate':
-      snapshot = structuredClone(action.snapshot);
+    case 'hydrate': {
+      const incoming = structuredClone(action.snapshot);
+      const preservedTaskId =
+        snapshot.activeTaskId && incoming.tasks.some((task) => task.id === snapshot.activeTaskId)
+          ? snapshot.activeTaskId
+          : incoming.activeTaskId;
+      snapshot = {
+        ...incoming,
+        activeView: snapshot.activeView || incoming.activeView,
+        activeTaskId: preservedTaskId,
+      };
       break;
+    }
     case 'view':
       snapshot = { ...snapshot, activeView: action.view };
       break;

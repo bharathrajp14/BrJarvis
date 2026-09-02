@@ -148,3 +148,26 @@ class HealthMonitor:
             overall = "DEGRADED"
 
         return HealthReport(overall_status=overall, hardware=hardware, components=components)
+
+
+_MONITOR: Optional[HealthMonitor] = None
+
+
+def get_health_monitor() -> HealthMonitor:
+    """Return the process-wide health monitor."""
+    global _MONITOR
+    if _MONITOR is None:
+        _MONITOR = HealthMonitor()
+    return _MONITOR
+
+
+def get_health_report() -> Dict[str, float | str | bool]:
+    """Return a JSON-serializable hardware snapshot for HTTP health routes."""
+    report = get_health_monitor().generate_report()
+    return {
+        "cpu_percent": report.hardware.cpu_percent,
+        "memory_percent": report.hardware.memory_used_percent,
+        "disk_percent": report.hardware.disk_used_percent,
+        "overall_status": report.overall_status,
+        "native_c_bridge_active": report.hardware.native_c_bridge_active,
+    }
