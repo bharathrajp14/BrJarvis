@@ -24,10 +24,22 @@ def find_project_root() -> Path:
 
     curr = Path(__file__).resolve().parent
     for parent in [curr] + list(curr.parents):
-        if (parent / "pyproject.toml").exists() or (parent / ".git").exists() or (parent / "start.py").exists():
+        # Installed wheels live under site-packages; never treat that tree as
+        # the project root or runtime data will be written into the venv.
+        if "site-packages" in parent.parts:
+            continue
+        has_pyproject = (parent / "pyproject.toml").exists()
+        has_start = (parent / "start.py").exists()
+        has_src = (parent / "src" / "brjarvis").is_dir()
+        if has_src and (has_pyproject or has_start or (parent / ".git").exists()):
+            return parent
+        if has_pyproject and has_start:
             return parent
 
-    return Path(__file__).resolve().parent.parent.parent.parent
+    data_home = os.environ.get("JARVIS_DATA_DIR")
+    if data_home:
+        return Path(data_home).expanduser().resolve()
+    return Path.home() / ".brjarvis"
 
 
 def find_python_executable(root: Optional[Path] = None) -> Path:

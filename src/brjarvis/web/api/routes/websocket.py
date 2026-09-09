@@ -8,6 +8,7 @@ import os
 import time
 import uuid
 from typing import Any, Optional
+from urllib.parse import urlparse
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from starlette.websockets import WebSocketState
@@ -98,21 +99,42 @@ except Exception as _sub_err:
     logger.debug("EventBus WS forwarder subscription notice: %s", _sub_err)
 
 
-def _check_ws_auth(websocket: WebSocket) -> bool:
-    """Validate WebSocket handshake credentials against server security policy."""
-    if not SERVER_API_KEY:
-        return False
+def websocket_origin_allowed(origin: str | None, host: str | None, extra_origins: set[str] | None = None) -> bool:
+    """Allow same-origin sockets plus the configured CORS/localhost allow-list.
 
-    allowed_origins = {
+    Hard-coding ports 8000/3000 rejected legitimate local servers that rebound
+    to a nearby free port, and blocked preview/reverse-proxy hosts.
+    """
+    if not origin:
+        return True
+    allowed = {
         "http://localhost:8000",
         "http://127.0.0.1:8000",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
     }
-    configured_origins = os.environ.get("JARVIS_CORS_ORIGINS", "")
-    allowed_origins.update(origin.strip() for origin in configured_origins.split(",") if origin.strip())
+    if extra_origins:
+        allowed.update(origin_value for origin_value in extra_origins if origin_value)
+    if origin in allowed:
+        return True
+    if not host:
+        return False
+    try:
+        origin_host = urlparse(origin).netloc
+    except Exception:
+        return False
+    return bool(origin_host) and origin_host.lower() == host.lower()
+
+
+def _check_ws_auth(websocket: WebSocket) -> bool:
+    """Validate WebSocket handshake credentials against server security policy."""
+    if not SERVER_API_KEY:
+        return False
+
+    configured_origins = {origin.strip() for origin in os.environ.get("JARVIS_CORS_ORIGINS", "").split(",") if origin.strip()}
     origin = websocket.headers.get("origin")
-    if origin and origin not in allowed_origins:
+    host = websocket.headers.get("host")
+    if not websocket_origin_allowed(origin, host, configured_origins):
         return False
 
     ticket = websocket.query_params.get("ticket")

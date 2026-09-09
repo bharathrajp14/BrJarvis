@@ -1,15 +1,13 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import {
   Activity, ArrowUpRight, Bell, Bot, BriefcaseBusiness, Building2, Check, ChevronRight, CircleAlert, CircleCheck,
-  Clock3, Command, Database, Download, FileCode2, FileText, FolderTree, Gauge, GitBranch, Globe2,
-  Inbox, Layers3, LayoutDashboard, ListTodo, LoaderCircle, LockKeyhole, Menu, MessageSquareText,
-  Moon, MoreHorizontal, Network, Pause, Play, Plus, RefreshCw, Search, Send, Settings2, ShieldCheck,
-  Sparkles, Square, Target, TerminalSquare, TrendingUp, UserRound, Wifi, WifiOff, X, Zap,
+  Clock3, Command, Database, FileCode2, FileText, FolderTree, Gauge, Layers3, ListTodo, LoaderCircle, LockKeyhole,
+  LogOut, Menu, Moon, Network, Plus, RefreshCw, Search, Send, Settings2, ShieldCheck, Sparkles, UserRound, Wifi, X, Zap,
 } from 'lucide-react';
 import type { NavigationItem } from '../contracts/api';
 import type { AppSnapshot, Artifact, ExecutionMode, MemoryEntry, Task, ViewId } from '../contracts/domain';
 import { apiClient } from '../platform/api-client';
-import { loadAuthSnapshot, loginWithApiKey, type AuthSnapshot } from '../platform/auth-client';
+import { loadAuthSnapshot, loginWithApiKey, logoutSession, type AuthSnapshot } from '../platform/auth-client';
 import { RealtimeClient } from '../platform/websocket-client';
 import { dispatch, getSnapshot, subscribe } from '../state/app-store';
 import '../styles/tokens.css';
@@ -129,6 +127,23 @@ export function App() {
     }
   };
 
+  const submitLogout = async () => {
+    try {
+      await logoutSession();
+    } catch {
+      // Local session state is still cleared so the operator is signed out of this browser.
+    }
+    realtime.disconnect();
+    setAuth((current) => ({
+      authRequired: current?.authRequired ?? true,
+      authenticated: false,
+      label: 'Operator',
+      scope: 'Signed out',
+    }));
+    setOperator({ label: 'Operator', scope: 'Signed out' });
+    setToast('Session ended.');
+  };
+
   if (!auth) return <BootScreen />;
   if (auth.authRequired && !auth.authenticated) return <LoginScreen busy={authBusy} error={authError} onSubmit={submitLogin} />;
 
@@ -174,7 +189,7 @@ export function App() {
         </nav>
         <div className="sidebar-bottom">
           <div className="sidebar-health"><div className={`status-dot ${snapshot.connection === 'connected' ? 'status-green' : 'status-amber'}`} /><div><span className="eyebrow">RUNTIME</span><strong>{snapshot.connection === 'connected' ? 'Connected' : 'Reconnecting'}</strong></div><Wifi size={14} /></div>
-          <div className="user-card"><div className="avatar"><UserRound size={16} /></div><div className="user-meta"><strong>{operator.label}</strong><span>{operator.scope}</span></div><button className="icon-button" onClick={() => setToast('Settings are managed through the local server configuration.')} aria-label="Settings" title="Open local settings"><Settings2 size={16} /></button></div>
+          <div className="user-card"><div className="avatar"><UserRound size={16} /></div><div className="user-meta"><strong>{operator.label}</strong><span>{operator.scope}</span></div><button className="icon-button" onClick={() => setToast('Settings are managed through the local server configuration.')} aria-label="Settings" title="Open local settings"><Settings2 size={16} /></button><button className="icon-button" onClick={() => void submitLogout()} aria-label="Sign out" title="Sign out"><LogOut size={16} /></button></div>
         </div>
       </aside>
       {mobileOpen && <button className="sidebar-scrim" onClick={() => setMobileOpen(false)} aria-label="Close navigation" />}
@@ -292,7 +307,7 @@ function MemoryView({ memories, onToast }: { memories: MemoryEntry[]; onToast: (
   return <section className="simple-view memory-view"><div className="simple-icon"><Database size={20} /></div><div className="eyebrow">SCOPED KNOWLEDGE</div><h2>Memory</h2><p>Live memory records from the persistent memory store.</p><form className="memory-compose panel" onSubmit={save}><input value={name} onChange={(event) => setName(event.target.value)} placeholder="Memory name" aria-label="Memory name" /><textarea value={content} onChange={(event) => setContent(event.target.value)} placeholder="What should BRJARVIS remember?" aria-label="Memory content" /><button className="primary-button" disabled={busy || !name.trim() || !content.trim()}>{busy ? <LoaderCircle size={15} className="spin" /> : <Plus size={15} />}Save memory</button></form><div className="workspace-search"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search live memory" aria-label="Search live memory" /></div><div className="simple-cards">{filtered.length ? filtered.map((memory) => <div className="panel simple-card" key={memory.id}><span>{memory.scope}</span><strong>{memory.name}<small>{memory.content}</small></strong><time>{memory.updatedAt}</time><button className="icon-button" onClick={() => void remove(memory)} disabled={busy} aria-label={`Delete ${memory.name}`} title="Delete memory"><X size={15} /></button></div>) : <div className="empty-state">No live memory records match this query.</div>}</div></section>;
 }
 
-function CareerView({ profile, onToast }: { profile: AppSnapshot['career']; onToast: (message: string) => void }) { const [busy, setBusy] = useState(false); const [resume, setResume] = useState<Record<string, unknown> | null>(null); const generateResume = async () => { setBusy(true); try { const result = await apiClient.createCareerResume(); setResume(result); onToast(String(result.status ?? '').toUpperCase() === 'SUCCESS_VERIFIED' ? 'Resume generated and verified by Career OS.' : 'Resume generation completed; review the returned Career OS status.'); } catch (error) { onToast(error instanceof Error ? error.message : 'Resume generation failed.'); } finally { setBusy(false); } }; if (!profile) return <section className="simple-view"><div className="simple-icon"><BriefcaseBusiness size={20} /></div><div className="eyebrow">FOCUSED WORKSPACE</div><h2>Career profile unavailable</h2><p>The Career OS API did not return a profile for this session.</p></section>; return <section className="simple-view"><div className="simple-icon"><BriefcaseBusiness size={20} /></div><div className="eyebrow">FOCUSED WORKSPACE</div><h2>{profile.name || 'Career profile'}</h2><p>{profile.headline || 'No headline returned'}{profile.location ? ` · ${profile.location}` : ''}</p><div className="simple-cards"><div className="panel simple-card"><span>Skills</span><strong>{profile.skills.length ? profile.skills.join(', ') : 'No skills returned'}</strong></div>{profile.completeness !== undefined && <div className="panel simple-card"><span>Completeness</span><strong>{profile.completeness}%</strong></div>}<div className="panel simple-card"><span>Resume</span><strong>{resume ? `Version ${String(resume.version_id ?? 'created')}` : 'Generate a current ATS-ready resume'}</strong><button className="primary-button" onClick={generateResume} disabled={busy}>{busy ? <LoaderCircle size={15} className="spin" /> : <FileText size={15} />} {busy ? 'Generating…' : 'Generate resume'}</button></div></div></section>; }
+function CareerView({ profile, onToast }: { profile: AppSnapshot['career']; onToast: (message: string) => void }) { const [busy, setBusy] = useState(false); const [resume, setResume] = useState<Record<string, unknown> | null>(null); const generateResume = async () => { setBusy(true); try { const result = await apiClient.createCareerResume(); setResume(result); onToast(String(result.status ?? '').toUpperCase() === 'SUCCESS_VERIFIED' ? 'Resume generated and verified by Career OS.' : 'Resume generation completed; review the returned Career OS status.'); } catch (error) { onToast(error instanceof Error ? error.message : 'Resume generation failed.'); } finally { setBusy(false); } }; if (!profile) return <section className="simple-view"><div className="simple-icon"><BriefcaseBusiness size={20} /></div><div className="eyebrow">FOCUSED WORKSPACE</div><h2>Career profile unavailable</h2><p>The Career OS API did not return a profile for this session.</p></section>; return <section className="simple-view"><div className="simple-icon"><BriefcaseBusiness size={20} /></div><div className="eyebrow">FOCUSED WORKSPACE</div><h2>{profile.name || 'Career profile'}</h2><p>{profile.headline || 'No headline returned'}{profile.location ? ` · ${profile.location}` : ''}</p><div className="simple-cards"><div className="panel simple-card"><span>Skills</span><strong>{profile.skills.length ? profile.skills.join(', ') : 'No skills returned'}</strong></div>{profile.completeness !== undefined && <div className="panel simple-card"><span>Completeness</span><strong>{profile.completeness}%</strong></div>}<div className="panel simple-card"><span>Resume</span><strong>{resume ? `Version ${String(resume.version_id ?? 'created')}` : 'Generate a current ATS-ready resume'}</strong><button type="button" className="primary-button" onClick={() => void generateResume()} disabled={busy}>{busy ? <LoaderCircle size={15} className="spin" /> : <FileText size={15} />} {busy ? 'Generating…' : 'Generate resume'}</button></div></div></section>; }
 
 function BootScreen() {
   return <div className="auth-screen"><div className="auth-card boot-card"><div className="brand-mark"><Sparkles size={18} /></div><div className="eyebrow accent-eyebrow">BRJARVIS / STARTING</div><h1>Preparing your control plane</h1><p>Loading secure session, capabilities, and the latest task state.</p><LoaderCircle size={20} className="spin boot-spinner" /></div></div>;

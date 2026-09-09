@@ -48,3 +48,7 @@ export async function loginWithApiKey(apiKey: string): Promise<AuthSnapshot> {
   if (!response.ok) throw new Error(body.detail ?? body.error?.message ?? 'Authentication failed. Check the server API key.');
   return loadAuthSnapshot();
 }
+
+export async function logoutSession(): Promise<void> {
+  await fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'include', headers: { Accept: 'application/json' } });
+}

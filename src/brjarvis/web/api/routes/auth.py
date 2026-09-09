@@ -78,7 +78,15 @@ def _record_login_failure(request: Request) -> None:
         _LOGIN_FAILURES[key] = attempts
 
 
+def _clear_login_failures(request: Request) -> None:
+    with _AUTH_STORE_LOCK:
+        _LOGIN_FAILURES.pop(_client_key(request), None)
 
+
+def _constant_time_equals(left: str, right: str) -> bool:
+    if not left or not right:
+        return False
+    return hmac.compare_digest(left, right)
 
 
 def _prune_expired() -> None:
@@ -199,7 +207,7 @@ def _is_authorized(request: Request, authorization: Optional[str], x_api_key: Op
     token = _extract_token(request, authorization, x_api_key)
     if not token:
         return False
-    if hmac.compare_digest(token, SERVER_API_KEY):
+    if _constant_time_equals(token, SERVER_API_KEY):
         return True
     if verify_session(token):
         return True
@@ -225,10 +233,11 @@ async def login(login_req: LoginRequest, request: Request, response: Response):
     """Authenticate with API key and establish a session."""
     if not _login_allowed(request):
         raise HTTPException(status_code=429, detail="Too many failed login attempts; try again later")
-    if not SERVER_API_KEY or not hmac.compare_digest(login_req.api_key.strip(), SERVER_API_KEY):
+    if not SERVER_API_KEY or not _constant_time_equals(login_req.api_key.strip(), SERVER_API_KEY):
         _record_login_failure(request)
         raise HTTPException(status_code=401, detail="Unauthorized: Invalid API Key")
 
+    _clear_login_failures(request)
     session_token = create_session()
     response.set_cookie(
         key="jarvis_session",
@@ -270,7 +279,8 @@ async def create_desktop_handoff(
         raise HTTPException(status_code=400, detail="Workspace redirect must be same-origin under /web")
     _prune_expired()
     handoff = secrets.token_urlsafe(32)
-    _HANDOFF_STORE[handoff] = time.time() + _HANDOFF_TTL_SECONDS
+    with _AUTH_STORE_LOCK:
+        _HANDOFF_STORE[handoff] = time.time() + _HANDOFF_TTL_SECONDS
     separator = "&" if "?" in redirect else "?"
     return DesktopHandoffResponse(url=f"{redirect}{separator}handoff={handoff}", expires_in=int(_HANDOFF_TTL_SECONDS))
 

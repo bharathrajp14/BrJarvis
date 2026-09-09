@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "brjarvis"
-version = "41.0.3"
+version = "41.0.4"
 description = "BRJARVIS — Cognitive Multi-Modal AI Operating System & Autonomous Controller"
 readme = "readme.md"
 license = {text = "MIT"}
@@ -40,8 +40,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/bharthraj1412/BrJarvis"
-Repository = "https://github.com/bharthraj1412/BrJarvis.git"
+Homepage = "https://github.com/bharathrajp14/BrJarvis"
+Repository = "https://github.com/bharathrajp14/BrJarvis.git"
 
 [project.optional-dependencies]
 voice = [

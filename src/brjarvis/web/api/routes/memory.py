@@ -121,8 +121,9 @@ async def add_contact_endpoint(req: AddContactRequest):
             aliases=req.aliases,
         )
         return {"status": "success", "message": f"Contact '{req.name}' added.", "contact": result}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to add contact: {e}")
+    except Exception:
+        logger.exception("Failed to add contact")
+        raise HTTPException(status_code=500, detail="Failed to add contact")
 
 
 @router.patch("/contacts/{contact_id}")
@@ -265,8 +266,9 @@ async def remember_note(req: RememberRequest):
             "graph": graph_data,
             "confirmation": confirmation,
         }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        logger.exception("Failed to record remembered note")
+        raise HTTPException(status_code=500, detail="Unable to record note")
 
 
 @router.get("/galaxy/data")

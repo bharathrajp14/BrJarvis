@@ -2,6 +2,25 @@
 
 All notable BR-JARVIS changes are documented here.
 
+## [41.0.4-runtime-and-control-plane-fixes] - 2026-09-02
+
+### Correctness
+
+- Stopped the voice package from importing the Qt desktop HUD at import time, so transcript refinement and CI collection no longer crash without PySide6.
+- Made headless Qt stubs real classes so UI widgets can be imported without `TypeError: __mro_entries__ must return a tuple`.
+- Skipped Qt widget tests when PySide6 is not installed.
+- Preserved the active control-plane view and selected task across snapshot hydration so live events no longer kick the operator back to Command Center.
+- Allowed same-origin WebSocket connections on non-default ports and preview hosts instead of hard-coding ports 8000/3000.
+- Stopped the browser WebSocket client from reconnecting after an intentional disconnect, and bounded the event-id cache.
+- Cleared login throttling after a successful sign-in and serialized desktop handoff token storage.
+- Stopped health endpoints from returning fabricated CPU/memory/disk percentages when live metrics are unavailable.
+- Kept installed-wheel runtime data out of `site-packages` by resolving a writable data root when the checkout is not present.
+
+### Control plane
+
+- Added session logout from the control-plane user card.
+- Gave Memory save and Career resume actions explicit submit/click handlers.
+
 ## [41.0.3-doctor-and-requirements] - 2026-08-19
 
 ### Diagnostics and dependency safety

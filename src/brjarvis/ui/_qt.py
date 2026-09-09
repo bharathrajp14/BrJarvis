@@ -136,23 +136,40 @@ elif _HAS_QT:
         QWidget,
     )
 else:
-    # Minimal dummy stubs for headless mode without Qt installed
-    class _DummyQt:
+    # Headless stubs must be real classes.  Using a shared instance as a base
+    # raises TypeError: __mro_entries__ must return a tuple when UI widgets
+    # subclass QWidget / QObject without Qt installed.
+    class _DummyQtMeta(type):
+        def __getattr__(cls, name: str):
+            return cls
+
+    class _DummyQt(metaclass=_DummyQtMeta):
+        def __init__(self, *args, **kwargs):
+            pass
+
         def __getattr__(self, name: str):
             return self
 
         def __call__(self, *args, **kwargs):
             return self
 
-    _dummy = _DummyQt()
-    QEasingCurve = QMimeData = QObject = QPointF = QRectF = QSize = Qt = _dummy
-    QTimer = QUrl = pyqtSignal = _dummy
-    QBrush = QColor = QConicalGradient = QDragEnterEvent = QDropEvent = QFont = _dummy
-    QFontDatabase = QKeySequence = QLinearGradient = QPainter = QPainterPath = _dummy
-    QPen = QPixmap = QRadialGradient = QShortcut = _dummy
-    QApplication = QFileDialog = QFrame = QHBoxLayout = QLabel = QLineEdit = _dummy
-    QMainWindow = QPushButton = QScrollArea = QSizePolicy = QSplitter = _dummy
-    QStackedWidget = QTextEdit = QVBoxLayout = QWidget = QProgressBar = _dummy
+        def __iter__(self):
+            return iter(())
+
+        def __bool__(self):
+            return False
+
+        def __mro_entries__(self, bases):
+            return (type(self),)
+
+    QEasingCurve = QMimeData = QObject = QPointF = QRectF = QSize = Qt = _DummyQt
+    QTimer = QUrl = pyqtSignal = _DummyQt
+    QBrush = QColor = QConicalGradient = QDragEnterEvent = QDropEvent = QFont = _DummyQt
+    QFontDatabase = QKeySequence = QLinearGradient = QPainter = QPainterPath = _DummyQt
+    QPen = QPixmap = QRadialGradient = QShortcut = _DummyQt
+    QApplication = QFileDialog = QFrame = QHBoxLayout = QLabel = QLineEdit = _DummyQt
+    QMainWindow = QPushButton = QScrollArea = QSizePolicy = QSplitter = _DummyQt
+    QStackedWidget = QTextEdit = QVBoxLayout = QWidget = QProgressBar = _DummyQt
 
 __all__ = [
     "_USE_PYSIDE6",
