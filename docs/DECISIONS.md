@@ -96,3 +96,21 @@ documentation. Actual documentation was 266 files in `docs/` plus 25 in `notes/`
 
 Conventions stated in prose have already failed here once — `docs/archive/` asserts
 several of these as done. They become `.importlinter` contracts and CI checks instead.
+
+---
+
+## D7 — Two-layer canonical memory and cross-surface recall
+
+**Date:** 2026-09-27 · **Status:** accepted
+
+Fold fragmented memory implementations into canonical `src/jarvis/memory/` structured
+as two distinct layers:
+1. Explicit/structured facts: discrete, user-visible, editable, taggable items (identity,
+   preferences, ongoing projects, direct user instructions) persisted in SQLite via
+   `memory/db.py`. Includes full consent controls (view, edit, toggle, delete).
+2. Asynchronous session summarizer: post-session synthesis extracting durable facts from
+   turn transcripts into the structured store rather than unbounded transcript replay.
+3. Gated retrieval: keyword and semantic query matching to select only turn-relevant
+   facts bounded by strict token budgets, mitigating context rot.
+4. Single runtime resolution: CLI, web, voice, floating widget, and Career OS resolve
+   the exact same memory instance through `AssistantRuntime.memory`.

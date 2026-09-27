@@ -28,7 +28,8 @@ class AssistantRuntime:
     container: Container
     lifecycle: Lifecycle
     gateway: Any | None
-    started_at: str
+    memory: Any | None = None
+    started_at: str = ""
     _closed: bool = False
 
     @property
@@ -45,6 +46,11 @@ class AssistantRuntime:
     async def shutdown(self) -> None:
         if self._closed:
             return
+        if self.memory is not None and hasattr(self.memory, "close"):
+            try:
+                self.memory.close()
+            except Exception:
+                pass
         await self.lifecycle.shutdown()
         self._closed = True
 
@@ -92,12 +98,23 @@ def build_assistant_runtime(
             from ..gateway.model_gateway import ModelGateway
 
             resolved_container.register_instance(ModelGateway, resolved_gateway)
+
+        resolved_memory = None
+        try:
+            from ..memory.unified import UnifiedMemory
+
+            resolved_memory = UnifiedMemory(resolved_layout.data_root / "jarvis.db")
+            resolved_container.register_instance(UnifiedMemory, resolved_memory)
+        except Exception as exc:
+            logger.warning("UnifiedMemory construction deferred: %s", exc)
+
         runtime = AssistantRuntime(
             config=resolved_config,
             paths=resolved_layout,
             container=resolved_container,
             lifecycle=Lifecycle(),
             gateway=resolved_gateway,
+            memory=resolved_memory,
             started_at=datetime.now(UTC).isoformat(),
         )
         _runtime = runtime

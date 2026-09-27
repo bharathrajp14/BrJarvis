@@ -2,6 +2,30 @@
 
 All notable BR-JARVIS changes are documented here.
 
+## [42.0.0-canonical-two-layer-memory] - 2026-09-27
+
+### Architecture & Memory (Decision D7)
+
+- **Two-Layer Canonical Memory Architecture**:
+  - Implemented `ExplicitFactStore` (`src/jarvis/memory/facts.py`) providing discrete, user-visible, editable, and taggable facts categorized into `identity`, `preference`, `project`, `constraint`, `workflow`, and `custom`.
+  - Implemented `SessionSummarizer` (`src/jarvis/memory/summarizer.py`) performing asynchronous post-session synthesis over transcripts to extract durable facts and generate structured recaps.
+  - Implemented `MemoryRetriever` (`src/jarvis/memory/retrieval.py`) enforcing token-budgeted, gated context retrieval with identity anchors to eliminate model "context rot".
+  - Implemented `UnifiedMemory` (`src/jarvis/memory/unified.py`) facade consolidating explicit facts, session summaries, task repositories, and temporal facts into a single SQLite WAL store.
+  - Wired `UnifiedMemory` into `AssistantRuntime` composition root (`src/jarvis/core/bootstrap.py`) and DI container.
+
+### Cross-Surface Recall & Presentation Interop
+
+- **One Store, Every Surface**:
+  - Connected Web API endpoints (`/api/memory`) to canonical `UnifiedMemory` so memory writes and reads immediately synchronize across Web, CLI, Voice, and Career OS.
+  - Added end-to-end cross-surface memory recall integration tests (`tests/integration/test_cross_surface_memory_recall.py`) proving real-time shared recall and post-session synthesis.
+  - Added consent and privacy controls: toggle enable/disable, explicit deletion, and zero-trace GDPR privacy purge (`clear()`).
+
+### Security & Packaging Cleanup (Known Structural Problem #5)
+
+- Removed user documents, resume drafts, and profile data mistakenly tracked inside the import path (`src/brjarvis/workspace/`). Relocated all assets to root `workspace/` and ignored `src/brjarvis/workspace/` in `.gitignore`.
+- All memory modules strictly adhere to Decision D6 invariants (< 600 LOC per module, single DB connection manager).
+- Verification: 426 unit & integration tests passing cleanly.
+
 ## [41.0.4-runtime-and-control-plane-fixes] - 2026-09-02
 
 ### Correctness

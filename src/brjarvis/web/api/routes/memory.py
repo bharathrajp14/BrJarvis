@@ -51,31 +51,75 @@ class UpdateContactRequest(BaseModel):
 
 @router.get("/memory")
 async def list_memories(scope: str = "all"):
-    """List persistent memories."""
+    """List persistent memories across legacy store and canonical UnifiedMemory."""
     from brjarvis.memory.persistent_store import load_entries
 
     scopes = ["user", "project"] if scope == "all" else [scope]
     entries = []
+    seen_names = set()
+
+    # 1. Canonical UnifiedMemory facts (One store, every surface)
+    try:
+        from jarvis.core.bootstrap import get_assistant_runtime
+
+        runtime = get_assistant_runtime()
+        if runtime.memory is not None:
+            canonical_facts = runtime.memory.list_facts()
+            for f in canonical_facts:
+                name = f["key"]
+                seen_names.add(name)
+                entries.append(
+                    {
+                        "name": name,
+                        "description": f"[{f['category'].title()}] {name}",
+                        "type": f["category"],
+                        "content": f["value"],
+                        "scope": "user",
+                        "created": time.strftime("%Y-%m-%d", time.localtime(f.get("created_at", time.time()))),
+                    }
+                )
+    except Exception as exc:
+        logger.debug("Canonical memory retrieval note: %s", exc)
+
+    # 2. Legacy store entries
     for s in scopes:
         for e in load_entries(s):
-            entries.append(
-                {
-                    "name": e.name,
-                    "description": e.description,
-                    "type": e.type,
-                    "content": e.content,
-                    "scope": e.scope,
-                    "created": e.created,
-                }
-            )
+            if e.name not in seen_names:
+                seen_names.add(e.name)
+                entries.append(
+                    {
+                        "name": e.name,
+                        "description": e.description,
+                        "type": e.type,
+                        "content": e.content,
+                        "scope": e.scope,
+                        "created": e.created,
+                    }
+                )
     return {"memories": entries}
 
 
 @router.post("/memory")
 async def save_memory_entry(req: SaveMemoryRequest):
-    """Save/update a persistent memory entry."""
+    """Save/update a persistent memory entry to both canonical memory and legacy store."""
     from brjarvis.memory.persistent_store import MemoryEntry, save_memory
 
+    # 1. Canonical UnifiedMemory
+    try:
+        from jarvis.core.bootstrap import get_assistant_runtime
+
+        runtime = get_assistant_runtime()
+        if runtime.memory is not None:
+            runtime.memory.remember(
+                key=req.name,
+                value=req.content,
+                category=req.type,
+                source="web_surface",
+            )
+    except Exception as exc:
+        logger.debug("Canonical memory save note: %s", exc)
+
+    # 2. Legacy store for backward compatibility
     entry = MemoryEntry(
         name=req.name,
         description=req.description,
@@ -89,10 +133,26 @@ async def save_memory_entry(req: SaveMemoryRequest):
 
 @router.delete("/memory/{name}")
 async def delete_memory_entry(name: str, scope: str = "user"):
-    """Delete a persistent memory entry."""
+    """Delete a persistent memory entry across canonical memory and legacy store."""
     from brjarvis.memory.persistent_store import delete_memory
 
-    if not delete_memory(name, scope=scope):
+    deleted = False
+
+    # 1. Canonical UnifiedMemory
+    try:
+        from jarvis.core.bootstrap import get_assistant_runtime
+
+        runtime = get_assistant_runtime()
+        if runtime.memory is not None:
+            deleted = runtime.memory.delete_fact(name) or deleted
+    except Exception as exc:
+        logger.debug("Canonical memory delete note: %s", exc)
+
+    # 2. Legacy store
+    legacy_deleted = delete_memory(name, scope=scope)
+    deleted = deleted or legacy_deleted
+
+    if not deleted:
         raise HTTPException(status_code=404, detail="Memory not found")
     return {"message": f"Memory '{name}' deleted successfully."}
 
