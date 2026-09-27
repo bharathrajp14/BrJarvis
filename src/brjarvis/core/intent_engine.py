@@ -18,19 +18,16 @@ import re
 import shutil
 import subprocess
 import sys
+import time as _time
 import webbrowser
 
 from brjarvis.core.intent_classifier import IntentClassifier, IntentTraceStore
 from brjarvis.core.intent_models import (
-    ActionIntent,
     AtomicIntentResult,
-    CompositeIntent,
     ExecutionTrace,
 )
 
 logger = logging.getLogger("JARVIS.IntentEngine")
-
-import time as _time
 
 
 class DeterministicIntentEngine:
@@ -1903,8 +1900,6 @@ class DeterministicIntentEngine:
         # 0av. Match Path Environment Telemetry Intent
         if any(phrase in clean for phrase in ["check path environment", "path environment", "system path"]):
             try:
-                import os
-
                 sys_path = os.environ.get("PATH", "")
                 parts = sys_path.split(os.pathsep)
                 lines = [f"• {p}" for p in parts[:10] if p]
