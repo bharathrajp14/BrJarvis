@@ -5,15 +5,15 @@ from __future__ import annotations
 import json
 from collections.abc import Iterable, Iterator, Mapping
 from pathlib import Path
-from typing import Any
+from typing import Any, BinaryIO
 
 from .contracts import Message, ModelRequest, ModelResponse, ProviderAdapter, ToolDefinition
 from .errors import GatewayError, NoRouteAvailableError
-from .routing import RouteDecision, RoutePolicy, Router
+from .routing import Capability, RouteDecision, RoutePolicy, Router
 
 
 class ModelGateway:
-    """Route every model request through one adapter registry and one failover path."""
+    """Route every model and capability request through one adapter registry and one failover path."""
 
     def __init__(
         self,
@@ -84,14 +84,15 @@ class ModelGateway:
         return cls.from_mapping(data, adapters, router=router)
 
     def route(
-        self, *, model: str | None = None, capability: str | None = None, policy: str = "default"
+        self, *, model: str | None = None, capability: str | Capability | None = None, policy: str = "default"
     ) -> RouteDecision:
+        cap_str = capability.value if isinstance(capability, Capability) else capability
         route_policy = self.policies.get(policy) or self.policies.get("default")
-        if policy == "default" and capability and capability in self.policies:
-            route_policy = self.policies[capability]
+        if (policy == "default" or policy not in self.policies) and cap_str and cap_str in self.policies:
+            route_policy = self.policies[cap_str]
         if route_policy is None:
             raise NoRouteAvailableError(f"Gateway policy '{policy}' is not configured")
-        return self.router.choose(self.adapters, policy=route_policy, model=model, capability=capability)
+        return self.router.choose(self.adapters, policy=route_policy, model=model, capability=cap_str)
 
     def generate(
         self,
@@ -102,10 +103,11 @@ class ModelGateway:
         tools: list[ToolDefinition] | None = None,
         max_tokens: int | None = None,
         temperature: float = 0.7,
-        capability: str | None = None,
+        capability: str | Capability | None = None,
         policy: str = "default",
         metadata: dict[str, Any] | None = None,
     ) -> ModelResponse:
+        cap_str = capability.value if isinstance(capability, Capability) else capability
         request = ModelRequest.from_values(
             messages,
             model=model,
@@ -115,7 +117,7 @@ class ModelGateway:
             temperature=temperature,
             metadata=metadata,
         )
-        decision = self.route(model=model, capability=capability, policy=policy)
+        decision = self.route(model=model, capability=cap_str, policy=policy)
         last_error: Exception | None = None
         for provider in decision.candidates:
             adapter = self.adapters[provider]
@@ -123,7 +125,7 @@ class ModelGateway:
                 response = adapter.generate(request.with_model(decision.model if model is None else model))
                 self.router.record_success(provider)
                 return response
-            except Exception as exc:  # provider failures are isolated for failover
+            except Exception as exc:
                 last_error = exc
                 self.router.record_failure(provider, exc)
         raise GatewayError(f"All gateway providers failed after {len(decision.candidates)} attempt(s)") from last_error
@@ -137,10 +139,11 @@ class ModelGateway:
         tools: list[ToolDefinition] | None = None,
         max_tokens: int | None = None,
         temperature: float = 0.7,
-        capability: str | None = None,
+        capability: str | Capability | None = None,
         policy: str = "default",
         metadata: dict[str, Any] | None = None,
     ) -> Iterator[str]:
+        cap_str = capability.value if isinstance(capability, Capability) else capability
         request = ModelRequest.from_values(
             messages,
             model=model,
@@ -150,7 +153,7 @@ class ModelGateway:
             temperature=temperature,
             metadata=metadata,
         )
-        decision = self.route(model=model, capability=capability, policy=policy)
+        decision = self.route(model=model, capability=cap_str, policy=policy)
         last_error: Exception | None = None
         for provider in decision.candidates:
             adapter = self.adapters[provider]
@@ -161,12 +164,102 @@ class ModelGateway:
                     yield chunk
                 self.router.record_success(provider)
                 return
-            except Exception as exc:  # retry another provider, including mid-stream failures
+            except Exception as exc:
                 last_error = exc
                 self.router.record_failure(provider, exc)
                 if emitted:
                     continue
         raise GatewayError(f"All gateway providers failed after {len(decision.candidates)} attempt(s)") from last_error
+
+    def transcribe(
+        self,
+        audio_source: str | Path | bytes | BinaryIO,
+        *,
+        model: str | None = None,
+        language: str | None = None,
+        prompt: str | None = None,
+        timestamps: bool = False,
+    ) -> dict[str, Any]:
+        """Execute speech-to-text with automatic fallback across eligible STT adapters."""
+        decision = self.route(capability=Capability.SPEECH_TO_TEXT, policy="speech_to_text")
+        last_error: Exception | None = None
+        for provider in decision.candidates:
+            adapter = self.adapters[provider]
+            if hasattr(adapter, "transcribe"):
+                try:
+                    result = adapter.transcribe(
+                        audio_source,
+                        model=model or decision.model,
+                        language=language,
+                        prompt=prompt,
+                        timestamps=timestamps,
+                    )
+                    self.router.record_success(provider)
+                    return result
+                except Exception as exc:
+                    last_error = exc
+                    self.router.record_failure(provider, exc)
+        raise GatewayError("All speech-to-text providers failed") from last_error
+
+    def synthesize_speech(
+        self,
+        text: str,
+        *,
+        model: str | None = None,
+        voice: str | None = None,
+        use_cache: bool = True,
+    ) -> Any:
+        """Execute text-to-speech with automatic fallback across eligible TTS adapters."""
+        decision = self.route(capability=Capability.TEXT_TO_SPEECH, policy="text_to_speech")
+        last_error: Exception | None = None
+        for provider in decision.candidates:
+            adapter = self.adapters[provider]
+            if hasattr(adapter, "synthesize_speech"):
+                try:
+                    result = adapter.synthesize_speech(
+                        text,
+                        model=model or decision.model,
+                        voice=voice,
+                        use_cache=use_cache,
+                    )
+                    self.router.record_success(provider)
+                    return result
+                except Exception as exc:
+                    last_error = exc
+                    self.router.record_failure(provider, exc)
+        raise GatewayError("All text-to-speech providers failed") from last_error
+
+    def generate_image(
+        self,
+        prompt: str,
+        *,
+        model: str | None = None,
+        width: int = 1024,
+        height: int = 1024,
+        aspect_ratio: str | None = None,
+        seed: int | None = None,
+    ) -> Any:
+        """Execute image generation with automatic fallback across eligible image adapters."""
+        decision = self.route(capability=Capability.IMAGE_GENERATION, policy="image_generation")
+        last_error: Exception | None = None
+        for provider in decision.candidates:
+            adapter = self.adapters[provider]
+            if hasattr(adapter, "generate_image"):
+                try:
+                    result = adapter.generate_image(
+                        prompt,
+                        model=model or decision.model,
+                        width=width,
+                        height=height,
+                        aspect_ratio=aspect_ratio,
+                        seed=seed,
+                    )
+                    self.router.record_success(provider)
+                    return result
+                except Exception as exc:
+                    last_error = exc
+                    self.router.record_failure(provider, exc)
+        raise GatewayError("All image generation providers failed") from last_error
 
     def status(self) -> dict[str, Any]:
         """Return safe provider and circuit state without credentials."""
@@ -182,3 +275,6 @@ class ModelGateway:
             },
             "circuits": self.router.status(),
         }
+
+
+__all__ = ["ModelGateway"]

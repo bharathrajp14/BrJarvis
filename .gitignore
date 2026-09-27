@@ -27,6 +27,7 @@ __pycache__/
 .pyright/
 
 # Runtime data & transient storage
+data/
 runtime/
 runtime/logs/
 runtime/captures/

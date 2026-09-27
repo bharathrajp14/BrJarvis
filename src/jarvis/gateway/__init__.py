@@ -12,7 +12,8 @@ from .errors import (
 )
 from .factory import build_configured_gateway
 from .model_gateway import ModelGateway
-from .routing import CircuitState, RouteDecision, RoutePolicy, Router
+from .quota import ProviderMetrics, ProviderQuotaManager, ProviderStatus, get_quota_manager
+from .routing import Capability, CircuitState, RouteDecision, RoutePolicy, Router, build_canonical_policies
 
 __all__ = [
     "ModelGateway",
@@ -22,10 +23,16 @@ __all__ = [
     "Message",
     "ToolDefinition",
     "ProviderAdapter",
+    "Capability",
     "RouteDecision",
     "RoutePolicy",
     "CircuitState",
     "Router",
+    "build_canonical_policies",
+    "ProviderStatus",
+    "ProviderMetrics",
+    "ProviderQuotaManager",
+    "get_quota_manager",
     "GatewayError",
     "AdapterUnavailableError",
     "NoRouteAvailableError",
