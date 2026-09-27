@@ -19,7 +19,6 @@ from brjarvis.core.intent_classifier import IntentClassifier, IntentTraceStore
 from brjarvis.core.intent_engine import DeterministicIntentEngine
 from brjarvis.core.intent_models import AtomicIntentResult, CompositeIntent
 
-
 # ==============================================================================
 # SECTION 19: REQUIRED CASES A THROUGH K
 # ==============================================================================

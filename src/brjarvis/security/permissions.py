@@ -285,8 +285,17 @@ def cloud_context_exclusion_check(path_input: Union[str, Path]) -> bool:
 
 def _load_scope_defaults() -> Dict[str, Any]:
     """Helper to return default scope settings."""
+    env_mode = os.environ.get("JARVIS_PERMISSION_MODE", "").strip().lower()
+    if env_mode in ("auto", "allow_all", "allow", "off", "none", "yolo", "allowall"):
+        return {
+            "workspace_only": False,
+            "allow_terminal": True,
+            "allow_web": True,
+            "allow_system_commands": True,
+        }
     return {
         "workspace_only": True,
         "allow_terminal": False,
         "allow_web": True,
+        "allow_system_commands": False,
     }

@@ -26,7 +26,6 @@ except ImportError:
 
 from .audio_bus import AudioBusMicrophoneSource
 from .audio_processor import AudioProcessor
-from .shortcuts import match_voice_shortcut
 from .tts import NeuralTTS
 
 GEMINI_VOICE_PERSONA_PROMPT = """
@@ -133,17 +132,10 @@ class GeminiLiveVoiceLoop:
 
                         logger.info(f"[GeminiLive] 🎤 Spoken: '{text}'")
 
-                        # Check fast voice shortcuts sub-10ms
-                        shortcut = match_voice_shortcut(text)
-                        if shortcut:
-                            tool_name, args = shortcut
-                            if tool_name == "stop_speech":
-                                self.interrupt_speech()
-                                continue
-                            elif self.assistant and hasattr(self.assistant, "orchestrator"):
-                                res = self.assistant.orchestrator.chat(f"Execute {tool_name} with {args}")
-                                self._speak_conversational(res)
-                                continue
+                        # Acoustic speech interruption check
+                        if text.lower().strip() in ("stop speaking", "be quiet", "shut up", "silence", "stop talking", "stop", "cancel"):
+                            self.interrupt_speech()
+                            continue
 
                         # Pass to Orchestrator with Gemini Voice Persona
                         if self.assistant and self.assistant.orchestrator:

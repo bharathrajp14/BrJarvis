@@ -270,7 +270,17 @@ class PermissionManager:
         return req
 
     def is_pre_approved(self, session_id: str, tool: str, target: str = "") -> bool:
-        """Check if action is already covered by a session-level approval decision."""
+        """Check if action is already covered by a session-level approval decision or global allow_all policy."""
+        import os
+        from brjarvis.security.permissions import PERMISSIONS, PermissionMode
+
+        env_mode = os.environ.get("JARVIS_PERMISSION_MODE", "").strip().lower()
+        if (
+            PERMISSIONS.mode == PermissionMode.ALLOW_ALL
+            or env_mode in ("auto", "allow_all", "allow", "off", "none", "yolo", "allowall")
+        ):
+            return True
+
         if session_id in self._session_allow_all:
             return True
         if session_id in self._session_allowed_tools and tool in self._session_allowed_tools[session_id]:

@@ -30,6 +30,10 @@ VALID_MODES = ["general", "coder", "analyst", "recon", "exploit", "report", "pla
 PERMISSION_ALIASES = {
     "auto": "allow_all",
     "allow_all": "allow_all",
+    "allow": "allow_all",
+    "allowall": "allow_all",
+    "yolo": "allow_all",
+    "all": "allow_all",
     "plan": "plan",
     "accept_edits": "accept_edits",
     "confirm_destructive": "confirm_destructive",

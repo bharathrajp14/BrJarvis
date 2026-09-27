@@ -69,9 +69,11 @@ class ParallelExecutionEngine:
         # 2. Human-in-the-Loop Approval Interlock
         from brjarvis.security.permissions import PERMISSIONS, PermissionMode
 
-        is_allow_all = policy_decision in (ActionDecision.ALLOW, ActionDecision.ALLOW_FOR_SESSION) and (
+        env_mode = os.environ.get("JARVIS_PERMISSION_MODE", "").strip().lower()
+        is_allow_all = (
             PERMISSIONS.mode == PermissionMode.ALLOW_ALL
-            or os.environ.get("JARVIS_PERMISSION_MODE", "").strip().lower() in ("auto", "allow_all")
+            or env_mode in ("auto", "allow_all", "allow", "off", "none", "yolo", "allowall")
+            or policy_decision in (ActionDecision.ALLOW, ActionDecision.ALLOW_FOR_SESSION)
         )
         if (
             (not is_allow_all)

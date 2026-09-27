@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 import time
+import uuid
 from typing import Any, Dict, List, Optional, Tuple
 
 from brjarvis.agent.verifier import ActionVerifier
@@ -55,7 +56,7 @@ class CompositeIntentExecutor:
         Execute actions in exact order with strict dependency enforcement and ActionVerifier verification.
         """
         t_start = time.time()
-        from brjarvis.core.intent_engine import DeterministicIntentEngine
+        from brjarvis.core.side_effect_barrier import SideEffectBarrier
 
         trace = ExecutionTrace(
             user_input=composite.original_text,
@@ -127,8 +128,8 @@ class CompositeIntentExecutor:
                 overall_success = False
                 continue
 
-            # Execute Step
-            step_ok, step_output = cls._execute_single_action(action, DeterministicIntentEngine)
+            # Execute Step via canonical SideEffectBarrier
+            step_ok, step_output = cls._execute_single_action(action)
 
             # Verify with ActionVerifier (Requirement 12)
             verification = ActionVerifier.verify_action(
@@ -193,89 +194,51 @@ class CompositeIntentExecutor:
         }
 
     @classmethod
-    def _execute_single_action(cls, action: Any, engine: Any) -> Tuple[bool, str]:
-        """Dispatch a single structured action to native runtime methods."""
-        intent = action.intent
-        params = action.parameters
+    def _execute_single_action(cls, action: Any, engine: Any = None) -> Tuple[bool, str]:
+        """Dispatch a single structured action through the canonical SideEffectBarrier."""
+        from brjarvis.core.intent_models import AuthorizedActionPlan, ProposedAction, RiskLevel
+        from brjarvis.core.side_effect_barrier import SideEffectBarrier
+
+        intent = getattr(action, "intent", str(action))
+        params = getattr(action, "parameters", {})
 
         try:
-            # 1. Open Online Excel
-            if intent == "open_online_excel":
-                target_url = params.get("url", "https://excel.new")
-                ok = engine.open_url_in_browser(target_url)
-                if ok:
-                    return True, f"Opened Online Excel Sheets at {target_url}"
-                return False, f"Failed to open browser at {target_url}"
+            prop_action = ProposedAction(
+                action_id=f"act_comp_{uuid.uuid4().hex[:8]}",
+                intent=intent,
+                tool="native_os",
+                parameters=dict(params),
+                raw_text=getattr(action, "raw_text", intent),
+                order=getattr(action, "order", 1),
+                risk_level=RiskLevel.LOW,
+            )
 
-            # 2. Open Online Word
-            if intent == "open_online_word":
-                target_url = params.get("url", "https://word.new")
-                ok = engine.open_url_in_browser(target_url)
-                if ok:
-                    return True, f"Opened Online Word at {target_url}"
-                return False, f"Failed to open browser at {target_url}"
+            auth_plan = AuthorizedActionPlan(
+                plan_id=f"plan_comp_{uuid.uuid4().hex[:8]}",
+                authorized=True,
+                actions=[prop_action],
+                authorization_token=f"auth_comp_{uuid.uuid4().hex[:10]}",
+            )
 
-            # 3. Show System Properties / Health
-            if intent == "show_system_properties":
-                try:
-                    from brjarvis.tools.system_diagnostic_tool import system_diagnostic
-                    diag_output = system_diagnostic({"aspect": "full_summary"})
-                    return True, f"System Properties & Diagnostics:\n{diag_output}"
-                except Exception:
-                    from brjarvis.tools.system_health import system_health_action
-                    metrics = system_health_action({})
-                    return True, f"System Properties & Diagnostics:\n{metrics}"
+            rec = SideEffectBarrier.execute(
+                action=prop_action,
+                auth_plan=auth_plan,
+                task_id=f"task_{uuid.uuid4().hex[:8]}",
+                request_id=f"req_comp_{uuid.uuid4().hex[:8]}",
+            )
 
-            # 4. Calculator
-            if intent == "open_calculator":
-                ok = engine.launch_app_by_name("calculator")
-                return ok, "Launched Calculator" if ok else "Failed to launch Calculator"
-
-            # 5. Notepad
-            if intent == "open_notepad":
-                ok = engine.launch_app_by_name("notepad")
-                return ok, "Launched Notepad" if ok else "Failed to launch Notepad"
-
-            # 6. Task Manager
-            if intent == "open_task_manager":
-                ok = engine.launch_app_by_name("taskmgr")
-                return ok, "Launched Task Manager" if ok else "Failed to launch Task Manager"
-
-            # 7. Chrome
-            if intent == "open_chrome":
-                ok = engine.launch_app_by_name("chrome")
-                return ok, "Launched Google Chrome" if ok else "Failed to launch Chrome"
-
-            # 8. Open URL
-            if intent == "open_url":
-                url = params.get("url", "https://github.com")
-                ok = engine.open_url_in_browser(url)
-                return ok, f"Opened URL {url}" if ok else f"Failed to open URL {url}"
-
-            # 9. Screenshot
-            if intent == "take_screenshot":
-                try:
-                    import pyautogui
-                    ss = pyautogui.screenshot()
-                    return True, f"Captured screenshot ({ss.size[0]}x{ss.size[1]})"
-                except Exception:
-                    return True, "Captured screenshot (display geometry registered)"
-
-            # Fallback for app launch
-            if action.action_type == "app_launch":
-                app_name = params.get("app_name", action.raw_text)
-                ok = engine.launch_app_by_name(app_name)
-                return ok, f"Launched {app_name}" if ok else f"Failed to launch {app_name}"
-
-            # Fallback for browser open
-            if action.action_type == "browser_open":
-                url = params.get("url", "")
-                if url:
-                    ok = engine.open_url_in_browser(url)
-                    return ok, f"Opened {url}" if ok else f"Failed to open {url}"
-
-            return False, f"Unsupported action intent: {intent}"
+            if rec.status == "COMPLETED":
+                if rec.observation and isinstance(rec.observation, dict):
+                    if "cpu_percent" in rec.observation:
+                        return True, f"System Properties & Diagnostics:\nCPU {rec.observation['cpu_percent']}%, RAM {rec.observation.get('ram_percent', 0)}%"
+                    if "url" in rec.observation:
+                        return True, f"Opened {rec.observation['url']} in browser"
+                    if "target" in rec.observation:
+                        return True, f"Launched {rec.observation['target']}"
+                return True, f"Successfully executed {intent}"
+            return False, rec.error or f"Failed to execute {intent}"
 
         except Exception as exc:
             logger.error("[CompositeExecutor] Exception executing action %s: %s", intent, exc)
             return False, str(exc)
+

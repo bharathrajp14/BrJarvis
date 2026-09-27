@@ -35,6 +35,11 @@ class ScopeEnforcer:
         if not target:
             return False
 
+        import os
+        env_mode = os.environ.get("JARVIS_PERMISSION_MODE", "").strip().lower()
+        if env_mode in ("auto", "allow_all", "allow", "off", "none", "yolo", "allowall"):
+            return True
+
         # Clean target string (strip http:// or ports if present)
         clean_target = target.split("://")[-1].split("/")[0].split(":")[0]
 

@@ -20,11 +20,10 @@ import re
 import threading
 import time
 import uuid
-
 from typing import Any, Iterator, Optional
 
 from brjarvis.agent.step_planner import StepPlanner
-from brjarvis.core.intent_engine import DeterministicIntentEngine
+from brjarvis.core.intent_engine import DeterministicSignalExtractor
 from brjarvis.events.bus import get_event_bus
 from brjarvis.events.types import TaskEvent
 from brjarvis.memory.task_memory_router import MemoryMode, get_task_memory_router
@@ -737,18 +736,9 @@ class JarvisOrchestrator:
                     break
 
             if last_url:
-                try:
-                    launched = DeterministicIntentEngine.open_url_in_browser(last_url, browser_name=target_browser)
-                    if launched:
-                        logger.debug(f"[Context] Resolved 'it' → {last_url} | Browser: {target_browser}")
-                        return (
-                            augmented
-                            + f"\n[SYSTEM CONTEXT: 'it' refers to {last_url} — already opened in {target_browser}. Confirm to user.]"
-                        )
-                except Exception as exc:
-                    logger.warning(f"[Context] Browser launch failed: {exc}")
+                logger.debug(f"[Context] Resolved 'it' → {last_url} | Browser: {target_browser}")
                 return (
-                    augmented + f"\n[SYSTEM CONTEXT: The last result URL was {last_url}. Open it in {target_browser}.]"
+                    augmented + f"\n[SYSTEM CONTEXT: The last result URL was {last_url}. Target browser: {target_browser}.]"
                 )
             else:
                 return (
@@ -811,35 +801,6 @@ class JarvisOrchestrator:
                 return execute_skill(best_skill, best_arg, self)
         except Exception as exc:
             logger.warning(f"[Orchestrator] Skill check error: {exc}")
-        return None
-
-    def _try_instant_action(self, user_input: str) -> Optional[str]:
-        """Tier-1 Deterministic Fast Path: Executes simple OS commands, app launches, volume/settings
-        with 0 LLM token consumption and sub-50ms latency."""
-        try:
-            res = DeterministicIntentEngine.parse_and_execute(user_input)
-            if res and res.get("executed"):
-                result_text = res.get("result", "Action executed successfully.")
-                self._record_turn("user", user_input)
-                self._record_turn("assistant", result_text, backend="fast_path", latency_ms=0)
-                self.working_memory.add("user", user_input)
-                self.working_memory.add("assistant", result_text)
-
-                try:
-                    event_bus = get_event_bus()
-                    event_bus.publish(
-                        TaskEvent(
-                            topic="task.fast_path.executed",
-                            task_id=str(uuid.uuid4()),
-                            goal=user_input,
-                            status="completed",
-                        )
-                    )
-                except Exception:
-                    pass
-                return result_text
-        except Exception as exc:
-            logger.debug(f"[Orchestrator] Fast-path bypass error: {exc}")
         return None
 
     def _gateway_capability(self, user_input: str, profile: Any) -> str:
@@ -1259,28 +1220,34 @@ class JarvisOrchestrator:
             if skill_result:
                 return skill_result
 
-        # ── Step 1: Canonical Atomicity & Composite Classification ─────────────
-        from brjarvis.core.intent_classifier import IntentClassifier
-        from brjarvis.core.composite_executor import CompositeIntentExecutor
-        from brjarvis.core.intent_models import CompositeIntent
+        # ── Step 1: Universal Canonical Request Runtime Execution ─────────────
+        from brjarvis.core.canonical_runtime import CanonicalRequestRuntime
+        from brjarvis.core.intent_models import AtomicityType, ExecutionState
 
-        classification = IntentClassifier.classify(user_input)
-
-        if isinstance(classification, CompositeIntent) and CompositeIntentExecutor.can_handle(classification):
-            logger.info("[Orchestrator] Multi-action composite intent detected. Executing sequential workflow...")
-            comp_res = CompositeIntentExecutor.execute(classification, orchestrator=self)
-            result_text = comp_res.get("result", "Composite workflow executed.")
+        runtime_res = CanonicalRequestRuntime.handle(user_input, orchestrator=self)
+        if runtime_res.state == ExecutionState.COMPLETED and runtime_res.low_latency_execution:
+            result_text = runtime_res.text
             self._record_turn("user", user_input)
-            self._record_turn("assistant", result_text, backend="composite_executor", latency_ms=0)
+            self._record_turn("assistant", result_text, backend="canonical_runtime", latency_ms=int(runtime_res.latency_ms))
             self.working_memory.add("user", user_input)
             self.working_memory.add("assistant", result_text)
             return result_text
 
-        # If atomic, try 0-token deterministic fast path
-        if not isinstance(classification, CompositeIntent):
-            instant = self._try_instant_action(user_input)
-            if instant:
-                return instant
+        if runtime_res.understanding.atomicity == AtomicityType.COMPOSITE and runtime_res.state in (ExecutionState.COMPLETED, ExecutionState.PARTIAL):
+            result_text = runtime_res.text
+            self._record_turn("user", user_input)
+            self._record_turn("assistant", result_text, backend="canonical_runtime", latency_ms=int(runtime_res.latency_ms))
+            self.working_memory.add("user", user_input)
+            self.working_memory.add("assistant", result_text)
+            return result_text
+
+        if runtime_res.understanding.atomicity in (AtomicityType.NEGATED, AtomicityType.INFORMATIONAL, AtomicityType.HYPOTHETICAL):
+            result_text = runtime_res.text
+            self._record_turn("user", user_input)
+            self._record_turn("assistant", result_text, backend="canonical_runtime", latency_ms=int(runtime_res.latency_ms))
+            self.working_memory.add("user", user_input)
+            self.working_memory.add("assistant", result_text)
+            return result_text
 
         skill_result = self._check_skill(user_input)
         if skill_result:
@@ -1395,29 +1362,29 @@ class JarvisOrchestrator:
                 yield skill_result
                 return
 
-        # ── Step 1: Canonical Atomicity & Composite Classification ─────────────
-        from brjarvis.core.intent_classifier import IntentClassifier
-        from brjarvis.core.composite_executor import CompositeIntentExecutor
-        from brjarvis.core.intent_models import CompositeIntent
+        # ── Step 1: Universal Canonical Request Runtime Execution ─────────────
+        from brjarvis.core.canonical_runtime import CanonicalRequestRuntime
+        from brjarvis.core.intent_models import AtomicityType, ExecutionState
 
-        classification = IntentClassifier.classify(user_input)
-
-        if isinstance(classification, CompositeIntent) and CompositeIntentExecutor.can_handle(classification):
-            logger.info("[Orchestrator] Multi-action composite intent detected in stream. Executing sequential workflow...")
-            comp_res = CompositeIntentExecutor.execute(classification, orchestrator=self)
-            result_text = comp_res.get("result", "Composite workflow executed.")
+        runtime_res = CanonicalRequestRuntime.handle(user_input, orchestrator=self)
+        if runtime_res.state in (ExecutionState.COMPLETED, ExecutionState.PARTIAL) and (
+            runtime_res.low_latency_execution
+            or runtime_res.understanding.atomicity in (
+                AtomicityType.ATOMIC,
+                AtomicityType.COMPOSITE,
+                AtomicityType.NEGATED,
+                AtomicityType.INFORMATIONAL,
+                AtomicityType.HYPOTHETICAL,
+                AtomicityType.CONVERSATIONAL,
+            )
+        ):
+            result_text = runtime_res.text
             self._record_turn("user", user_input)
-            self._record_turn("assistant", result_text, backend="composite_executor", latency_ms=0)
+            self._record_turn("assistant", result_text, backend="canonical_runtime", latency_ms=int(runtime_res.latency_ms))
             self.working_memory.add("user", user_input)
             self.working_memory.add("assistant", result_text)
             yield result_text
             return
-
-        if not isinstance(classification, CompositeIntent):
-            instant = self._try_instant_action(user_input)
-            if instant:
-                yield instant
-                return
 
         skill_result = self._check_skill(user_input)
         if skill_result:

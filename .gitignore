@@ -28,7 +28,8 @@ __pycache__/
 
 # Runtime data & transient storage
 data/
-runtime/
+/runtime/
+!tests/runtime/
 runtime/logs/
 runtime/captures/
 runtime/reports/

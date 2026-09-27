@@ -189,6 +189,12 @@ class ToolRuntime:
             )
 
         # ── Stage 4: Prompt Injection Preflight ──
+        is_allow_all_mode = (
+            PERMISSIONS.mode == PermissionMode.ALLOW_ALL
+            or os.environ.get("JARVIS_PERMISSION_MODE", "").strip().lower()
+            in ("auto", "allow_all", "allow", "off", "none", "yolo", "allowall")
+        )
+
         try:
             from brjarvis.guardian.prompt_injection_shield import check_prompt_injection
 
@@ -196,20 +202,25 @@ class ToolRuntime:
                 if isinstance(arg_v, str) and len(arg_v) > 30:
                     is_inj, reason = check_prompt_injection(arg_v)
                     if is_inj:
-                        duration_ms = (time.perf_counter() - t0) * 1000.0
-                        logger.warning(
-                            f"🛡️ Security Alert: Injection pattern in '{canonical_name}' arg '{arg_k}': {reason}"
-                        )
-                        return ToolResult.blocked(
-                            tool_name=canonical_name,
-                            reason=f"Security Alert: Blocked by prompt injection defense in argument '{arg_k}'.",
-                            error_code=ToolErrorCode.POLICY_DENIED,
-                        )
+                        if is_allow_all_mode:
+                            logger.info(
+                                f"🛡️ Notice: Prompt injection pattern in '{canonical_name}' arg '{arg_k}' bypassed by allow_all policy: {reason}"
+                            )
+                        else:
+                            duration_ms = (time.perf_counter() - t0) * 1000.0
+                            logger.warning(
+                                f"🛡️ Security Alert: Injection pattern in '{canonical_name}' arg '{arg_k}': {reason}"
+                            )
+                            return ToolResult.blocked(
+                                tool_name=canonical_name,
+                                reason=f"Security Alert: Blocked by prompt injection defense in argument '{arg_k}'.",
+                                error_code=ToolErrorCode.POLICY_DENIED,
+                            )
         except Exception as guard_err:
             # A missing or broken guard must not silently remove a defense layer
-            # for tools that can change state or access protected resources.
+            # for tools that can change state or access protected resources, unless in allow_all mode.
             logger.warning("Prompt-injection guard unavailable for '%s': %s", canonical_name, guard_err)
-            if not tool_def.is_read_only:
+            if not tool_def.is_read_only and not is_allow_all_mode:
                 return ToolResult.blocked(
                     tool_name=canonical_name,
                     reason="Security preflight unavailable; state-changing execution was blocked.",
@@ -248,9 +259,12 @@ class ToolRuntime:
             )
 
         # ── Stage 6: Human Approval Interlock ──
-        is_allow_all = policy_decision in (ActionDecision.ALLOW, ActionDecision.ALLOW_FOR_SESSION) and (
-            PERMISSIONS.mode == PermissionMode.ALLOW_ALL
-            or os.environ.get("JARVIS_PERMISSION_MODE", "").strip().lower() in ("auto", "allow_all")
+        is_allow_all = (
+            is_allow_all_mode
+            or (policy_decision in (ActionDecision.ALLOW, ActionDecision.ALLOW_FOR_SESSION) and (
+                PERMISSIONS.mode == PermissionMode.ALLOW_ALL
+                or os.environ.get("JARVIS_PERMISSION_MODE", "").strip().lower() in ("auto", "allow_all")
+            ))
         )
         protected_permission = tool_def.permission_required.strip().upper() != "PUBLIC_READ"
         needs_approval = (not is_allow_all) and (

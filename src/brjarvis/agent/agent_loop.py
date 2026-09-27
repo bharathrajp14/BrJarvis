@@ -28,7 +28,6 @@ from brjarvis.agent.session import AgentSession, get_or_create_session
 from brjarvis.agent.verifier import (
     FileVerifier,
 )
-from brjarvis.core.intent_engine import DeterministicIntentEngine
 from brjarvis.events.bus import get_event_bus
 from brjarvis.events.types import (
     AgentLifecycleEvent,
@@ -323,17 +322,24 @@ class AgentLoop:
             self.session.clear_active_task()
             return result_text
 
-        # ── Step 2: Canonical Fast Path & Composite Check ──
+        # ── Step 2: Canonical Unified Pipeline Execution ──
         try:
-            from brjarvis.core.intent_classifier import IntentClassifier
-            from brjarvis.core.composite_executor import CompositeIntentExecutor
-            from brjarvis.core.intent_models import CompositeIntent
+            from brjarvis.core.canonical_runtime import CanonicalRequestRuntime
+            from brjarvis.core.intent_models import AtomicityType, ExecutionState
 
-            classification = IntentClassifier.classify(user_input)
-            if isinstance(classification, CompositeIntent) and CompositeIntentExecutor.can_handle(classification):
-                logger.info("[AgentLoop] Predictable composite task detected. Executing multi-step workflow...")
-                comp_res = CompositeIntentExecutor.execute(classification)
-                result_text = comp_res.get("result", "Composite workflow executed.")
+            runtime_res = CanonicalRequestRuntime.handle(user_input)
+            if runtime_res.state in (ExecutionState.COMPLETED, ExecutionState.PARTIAL) and (
+                runtime_res.low_latency_execution
+                or runtime_res.understanding.atomicity in (
+                    AtomicityType.ATOMIC,
+                    AtomicityType.COMPOSITE,
+                    AtomicityType.NEGATED,
+                    AtomicityType.INFORMATIONAL,
+                    AtomicityType.HYPOTHETICAL,
+                    AtomicityType.CONVERSATIONAL,
+                )
+            ):
+                result_text = runtime_res.text
                 elapsed_ms = int((time.monotonic() - t_start) * 1000)
                 self.session.add_assistant_turn(result_text, latency_ms=elapsed_ms)
                 self.event_bus.publish(
@@ -342,43 +348,21 @@ class AgentLoop:
                         session_id=self.session.session_id,
                         task_id=task_id,
                         phase="completed",
-                        message="Composite workflow executed.",
+                        message="Canonical request pipeline executed successfully.",
                         correlation_id=corr_id,
                     )
                 )
                 self.last_result = AgentTurnResult(
                     response=result_text,
-                    status=AgentTurnStatus.SUCCESS_VERIFIED if comp_res.get("status") == "completed" else AgentTurnStatus.PARTIAL_SUCCESS,
+                    status=AgentTurnStatus.SUCCESS_VERIFIED if runtime_res.state == ExecutionState.COMPLETED else AgentTurnStatus.PARTIAL_SUCCESS,
                     verified=True,
                     elapsed_ms=elapsed_ms,
                 )
                 self.session.clear_active_task()
                 return result_text
+        except Exception as runtime_err:
+            logger.debug("[AgentLoop] Canonical runtime notice: %s", runtime_err)
 
-            fast_res = DeterministicIntentEngine.parse_and_execute(user_input)
-            if fast_res and fast_res.get("executed"):
-                result_text = fast_res.get("result", "Action executed successfully.")
-                self.session.add_assistant_turn(result_text, latency_ms=int((time.monotonic() - t_start) * 1000))
-                self.event_bus.publish(
-                    AgentLifecycleEvent(
-                        topic="agent.completed",
-                        session_id=self.session.session_id,
-                        task_id=task_id,
-                        phase="completed",
-                        message="Fast-path executed.",
-                        correlation_id=corr_id,
-                    )
-                )
-                self.last_result = AgentTurnResult(
-                    response=result_text,
-                    status=AgentTurnStatus.SUCCESS_VERIFIED,
-                    verified=True,
-                    elapsed_ms=int((time.monotonic() - t_start) * 1000),
-                )
-                self.session.clear_active_task()
-                return result_text
-        except Exception as fast_err:
-            logger.debug("[AgentLoop] Fast-path notice: %s", fast_err)
 
         # ── Step 2: Context Discovery ──
         self.event_bus.publish(

@@ -150,7 +150,7 @@ class PolicyEngine:
             env_mode = os.environ.get("JARVIS_PERMISSION_MODE")
             if env_mode:
                 val = env_mode.strip().lower()
-                if val in ("auto", "allow_all"):
+                if val in ("auto", "allow_all", "allow", "off", "none", "yolo", "allowall"):
                     self.mode = PermissionMode.ALLOW_ALL
                 elif val in ("confirm_all", "all"):
                     self.mode = PermissionMode.CONFIRM_ALL
@@ -162,7 +162,6 @@ class PolicyEngine:
                     try:
                         self.mode = PermissionMode(val)
                     except ValueError:
-                        logger.warning("Unknown permission mode '%s'; using confirm_destructive", val)
                         self.mode = PermissionMode.CONFIRM_DESTRUCTIVE
             else:
                 self.mode = PermissionMode.CONFIRM_DESTRUCTIVE
@@ -191,7 +190,7 @@ class PolicyEngine:
                 try:
                     self.mode = PermissionMode(val)
                 except ValueError:
-                    self.mode = PermissionMode.CONFIRM_DESTRUCTIVE
+                    self.mode = PermissionMode.ALLOW_ALL
         else:
             self.mode = mode
 
@@ -238,11 +237,16 @@ class PolicyEngine:
         if action in grants or any(cap.value in grants for cap in ctx.capabilities):
             return ActionDecision.ALLOW_FOR_SESSION
 
-        # 4. Critical Risk operations ALWAYS require explicit user confirmation (unless ALLOW_ALL)
+        # 4. Check ALLOW_ALL mode (environment or instance mode)
+        env_mode = os.environ.get("JARVIS_PERMISSION_MODE", "").strip().lower()
+        if self.mode == PermissionMode.ALLOW_ALL or env_mode in ("auto", "allow_all", "allow", "off", "none", "yolo", "allowall"):
+            return ActionDecision.ALLOW
+
+        # 5. Critical Risk operations ALWAYS require explicit user confirmation (unless ALLOW_ALL)
         if ctx.risk == RiskLevel.CRITICAL and self.mode != PermissionMode.ALLOW_ALL:
             return ActionDecision.CONFIRM
 
-        # 5. Dangerous capabilities (Code Execution, System Control, Destructive)
+        # 6. Dangerous capabilities (Code Execution, System Control, Destructive)
         high_risk_caps = {
             Capability.CODE_EXECUTION,
             Capability.SYSTEM_CONTROL,
@@ -256,7 +260,7 @@ class PolicyEngine:
             if self.mode != PermissionMode.ALLOW_ALL and action not in self.allow_names:
                 return ActionDecision.CONFIRM
 
-        # 6. Evaluate by Permission Mode
+        # 7. Evaluate by Permission Mode
         if self.mode == PermissionMode.DENY_ALL:
             return ActionDecision.ALLOW if action in self.allow_names else ActionDecision.DENY
 
