@@ -1253,13 +1253,38 @@ class JarvisOrchestrator:
         if mode_result:
             return mode_result
 
+        # Explicit slash skill command (e.g. /skill <name>)
+        if user_input.strip().startswith("/skill"):
+            skill_result = self._check_skill(user_input)
+            if skill_result:
+                return skill_result
+
+        # ── Step 1: Canonical Atomicity & Composite Classification ─────────────
+        from brjarvis.core.intent_classifier import IntentClassifier
+        from brjarvis.core.composite_executor import CompositeIntentExecutor
+        from brjarvis.core.intent_models import CompositeIntent
+
+        classification = IntentClassifier.classify(user_input)
+
+        if isinstance(classification, CompositeIntent) and CompositeIntentExecutor.can_handle(classification):
+            logger.info("[Orchestrator] Multi-action composite intent detected. Executing sequential workflow...")
+            comp_res = CompositeIntentExecutor.execute(classification, orchestrator=self)
+            result_text = comp_res.get("result", "Composite workflow executed.")
+            self._record_turn("user", user_input)
+            self._record_turn("assistant", result_text, backend="composite_executor", latency_ms=0)
+            self.working_memory.add("user", user_input)
+            self.working_memory.add("assistant", result_text)
+            return result_text
+
+        # If atomic, try 0-token deterministic fast path
+        if not isinstance(classification, CompositeIntent):
+            instant = self._try_instant_action(user_input)
+            if instant:
+                return instant
+
         skill_result = self._check_skill(user_input)
         if skill_result:
             return skill_result
-
-        instant = self._try_instant_action(user_input)
-        if instant:
-            return instant
 
         # ── Composite Stage Decomposition ─────────────────────────────────────
         try:
@@ -1363,14 +1388,40 @@ class JarvisOrchestrator:
             yield mode_result
             return
 
+        # Explicit slash skill command (e.g. /skill <name>)
+        if user_input.strip().startswith("/skill"):
+            skill_result = self._check_skill(user_input)
+            if skill_result:
+                yield skill_result
+                return
+
+        # ── Step 1: Canonical Atomicity & Composite Classification ─────────────
+        from brjarvis.core.intent_classifier import IntentClassifier
+        from brjarvis.core.composite_executor import CompositeIntentExecutor
+        from brjarvis.core.intent_models import CompositeIntent
+
+        classification = IntentClassifier.classify(user_input)
+
+        if isinstance(classification, CompositeIntent) and CompositeIntentExecutor.can_handle(classification):
+            logger.info("[Orchestrator] Multi-action composite intent detected in stream. Executing sequential workflow...")
+            comp_res = CompositeIntentExecutor.execute(classification, orchestrator=self)
+            result_text = comp_res.get("result", "Composite workflow executed.")
+            self._record_turn("user", user_input)
+            self._record_turn("assistant", result_text, backend="composite_executor", latency_ms=0)
+            self.working_memory.add("user", user_input)
+            self.working_memory.add("assistant", result_text)
+            yield result_text
+            return
+
+        if not isinstance(classification, CompositeIntent):
+            instant = self._try_instant_action(user_input)
+            if instant:
+                yield instant
+                return
+
         skill_result = self._check_skill(user_input)
         if skill_result:
             yield skill_result
-            return
-
-        instant = self._try_instant_action(user_input)
-        if instant:
-            yield instant
             return
 
         # ── Adaptive Memory Classification (TaskMemoryRouter) ─────────────────

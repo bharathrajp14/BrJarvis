@@ -193,7 +193,7 @@
   },
   "snippingtool": {
     "name": "SnippingTool.exe",
-    "path": "C:\\Program Files\\WindowsApps\\Microsoft.ScreenSketch_11.2605.38.0_x64__8wekyb3d8bbwe\\SnippingTool\\SnippingTool.exe",
+    "path": "C:\\Program Files\\WindowsApps\\Microsoft.ScreenSketch_11.2607.23.0_x64__8wekyb3d8bbwe\\SnippingTool\\SnippingTool.exe",
     "type": "executable",
     "source": "Registry App Paths"
   },
@@ -205,13 +205,13 @@
   },
   "windowspackagemanagerserver": {
     "name": "WindowsPackageManagerServer.exe",
-    "path": "C:\\Program Files\\WindowsApps\\Microsoft.DesktopAppInstaller_1.29.290.0_x64__8wekyb3d8bbwe\\WindowsPackageManagerServer.exe",
+    "path": "C:\\Program Files\\WindowsApps\\Microsoft.DesktopAppInstaller_1.29.380.0_x64__8wekyb3d8bbwe\\WindowsPackageManagerServer.exe",
     "type": "executable",
     "source": "Registry App Paths"
   },
   "winget": {
     "name": "winget.exe",
-    "path": "C:\\Program Files\\WindowsApps\\Microsoft.DesktopAppInstaller_1.29.290.0_x64__8wekyb3d8bbwe\\winget.exe",
+    "path": "C:\\Program Files\\WindowsApps\\Microsoft.DesktopAppInstaller_1.29.380.0_x64__8wekyb3d8bbwe\\winget.exe",
     "type": "executable",
     "source": "Registry App Paths"
   },
@@ -953,54 +953,6 @@
     "type": "shortcut",
     "source": "Start Menu"
   },
-  "character map": {
-    "name": "Character Map",
-    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Accessories\\System Tools\\Character Map.lnk",
-    "type": "shortcut",
-    "source": "Start Menu"
-  },
-  "debuggable package manager": {
-    "name": "Debuggable Package Manager",
-    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Visual Studio 2022\\Visual Studio Tools\\Debuggable Package Manager.lnk",
-    "type": "shortcut",
-    "source": "Start Menu"
-  },
-  "developer command prompt for vs 2022": {
-    "name": "Developer Command Prompt for VS 2022",
-    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Visual Studio 2022\\Visual Studio Tools\\Developer Command Prompt for VS 2022.lnk",
-    "type": "shortcut",
-    "source": "Start Menu"
-  },
-  "developer powershell for vs 2022": {
-    "name": "Developer PowerShell for VS 2022",
-    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Visual Studio 2022\\Visual Studio Tools\\Developer PowerShell for VS 2022.lnk",
-    "type": "shortcut",
-    "source": "Start Menu"
-  },
-  "x64 native tools command prompt for vs 2022": {
-    "name": "x64 Native Tools Command Prompt for VS 2022",
-    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Visual Studio 2022\\Visual Studio Tools\\VC\\x64 Native Tools Command Prompt for VS 2022.lnk",
-    "type": "shortcut",
-    "source": "Start Menu"
-  },
-  "x64_x86 cross tools command prompt for vs 2022": {
-    "name": "x64_x86 Cross Tools Command Prompt for VS 2022",
-    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Visual Studio 2022\\Visual Studio Tools\\VC\\x64_x86 Cross Tools Command Prompt for VS 2022.lnk",
-    "type": "shortcut",
-    "source": "Start Menu"
-  },
-  "x86 native tools command prompt for vs 2022": {
-    "name": "x86 Native Tools Command Prompt for VS 2022",
-    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Visual Studio 2022\\Visual Studio Tools\\VC\\x86 Native Tools Command Prompt for VS 2022.lnk",
-    "type": "shortcut",
-    "source": "Start Menu"
-  },
-  "x86_x64 cross tools command prompt for vs 2022": {
-    "name": "x86_x64 Cross Tools Command Prompt for VS 2022",
-    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Visual Studio 2022\\Visual Studio Tools\\VC\\x86_x64 Cross Tools Command Prompt for VS 2022.lnk",
-    "type": "shortcut",
-    "source": "Start Menu"
-  },
   "application verifier (x64)": {
     "name": "Application Verifier (X64)",
     "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Windows Kits\\Application Verifier (X64)\\Application Verifier (X64).lnk",
@@ -1058,6 +1010,54 @@
   "windows software development kit": {
     "name": "Windows Software Development Kit",
     "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Windows Kits\\Windows Software Development Kit\\Windows Software Development Kit.lnk",
+    "type": "shortcut",
+    "source": "Start Menu"
+  },
+  "debuggable package manager": {
+    "name": "Debuggable Package Manager",
+    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Visual Studio 2022\\Visual Studio Tools\\Debuggable Package Manager.lnk",
+    "type": "shortcut",
+    "source": "Start Menu"
+  },
+  "developer command prompt for vs 2022": {
+    "name": "Developer Command Prompt for VS 2022",
+    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Visual Studio 2022\\Visual Studio Tools\\Developer Command Prompt for VS 2022.lnk",
+    "type": "shortcut",
+    "source": "Start Menu"
+  },
+  "developer powershell for vs 2022": {
+    "name": "Developer PowerShell for VS 2022",
+    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Visual Studio 2022\\Visual Studio Tools\\Developer PowerShell for VS 2022.lnk",
+    "type": "shortcut",
+    "source": "Start Menu"
+  },
+  "x64 native tools command prompt for vs 2022": {
+    "name": "x64 Native Tools Command Prompt for VS 2022",
+    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Visual Studio 2022\\Visual Studio Tools\\VC\\x64 Native Tools Command Prompt for VS 2022.lnk",
+    "type": "shortcut",
+    "source": "Start Menu"
+  },
+  "x64_x86 cross tools command prompt for vs 2022": {
+    "name": "x64_x86 Cross Tools Command Prompt for VS 2022",
+    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Visual Studio 2022\\Visual Studio Tools\\VC\\x64_x86 Cross Tools Command Prompt for VS 2022.lnk",
+    "type": "shortcut",
+    "source": "Start Menu"
+  },
+  "x86 native tools command prompt for vs 2022": {
+    "name": "x86 Native Tools Command Prompt for VS 2022",
+    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Visual Studio 2022\\Visual Studio Tools\\VC\\x86 Native Tools Command Prompt for VS 2022.lnk",
+    "type": "shortcut",
+    "source": "Start Menu"
+  },
+  "x86_x64 cross tools command prompt for vs 2022": {
+    "name": "x86_x64 Cross Tools Command Prompt for VS 2022",
+    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Visual Studio 2022\\Visual Studio Tools\\VC\\x86_x64 Cross Tools Command Prompt for VS 2022.lnk",
+    "type": "shortcut",
+    "source": "Start Menu"
+  },
+  "character map": {
+    "name": "Character Map",
+    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Accessories\\System Tools\\Character Map.lnk",
     "type": "shortcut",
     "source": "Start Menu"
   },
@@ -1412,6 +1412,18 @@
   "bash": {
     "name": "bash",
     "path": "C:\\Users\\bhara\\AppData\\Local\\Microsoft\\WindowsApps\\bash.exe",
+    "type": "executable",
+    "source": "Standard Directory"
+  },
+  "codex-chrome-native-host": {
+    "name": "codex-chrome-native-host",
+    "path": "C:\\Users\\bhara\\AppData\\Local\\Microsoft\\WindowsApps\\codex-chrome-native-host.exe",
+    "type": "executable",
+    "source": "Standard Directory"
+  },
+  "codex-core-command-runner": {
+    "name": "codex-core-command-runner",
+    "path": "C:\\Users\\bhara\\AppData\\Local\\Microsoft\\WindowsApps\\codex-core-command-runner.exe",
     "type": "executable",
     "source": "Standard Directory"
   },

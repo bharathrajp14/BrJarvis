@@ -323,8 +323,37 @@ class AgentLoop:
             self.session.clear_active_task()
             return result_text
 
-        # ── Step 2: Fast Path Check ──
+        # ── Step 2: Canonical Fast Path & Composite Check ──
         try:
+            from brjarvis.core.intent_classifier import IntentClassifier
+            from brjarvis.core.composite_executor import CompositeIntentExecutor
+            from brjarvis.core.intent_models import CompositeIntent
+
+            classification = IntentClassifier.classify(user_input)
+            if isinstance(classification, CompositeIntent) and CompositeIntentExecutor.can_handle(classification):
+                logger.info("[AgentLoop] Predictable composite task detected. Executing multi-step workflow...")
+                comp_res = CompositeIntentExecutor.execute(classification)
+                result_text = comp_res.get("result", "Composite workflow executed.")
+                elapsed_ms = int((time.monotonic() - t_start) * 1000)
+                self.session.add_assistant_turn(result_text, latency_ms=elapsed_ms)
+                self.event_bus.publish(
+                    AgentLifecycleEvent(
+                        topic="agent.completed",
+                        session_id=self.session.session_id,
+                        task_id=task_id,
+                        phase="completed",
+                        message="Composite workflow executed.",
+                        correlation_id=corr_id,
+                    )
+                )
+                self.last_result = AgentTurnResult(
+                    response=result_text,
+                    status=AgentTurnStatus.SUCCESS_VERIFIED if comp_res.get("status") == "completed" else AgentTurnStatus.PARTIAL_SUCCESS,
+                    verified=True,
+                    elapsed_ms=elapsed_ms,
+                )
+                self.session.clear_active_task()
+                return result_text
 
             fast_res = DeterministicIntentEngine.parse_and_execute(user_input)
             if fast_res and fast_res.get("executed"):

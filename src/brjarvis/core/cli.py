@@ -170,6 +170,18 @@ def main(runtime: Optional[ApplicationRuntime] = None) -> int:
         session.commands.execute(f"/plan {parsed.plan}")
         return 0
 
+    # Providers CLI diagnostics (test, health, models, quotas)
+    if parsed.query and parsed.query[0].lower() in ("providers", "provider"):
+        subcmd = parsed.query[1].lower() if len(parsed.query) > 1 else "health"
+        try:
+            from jarvis.gateway.cli import handle_providers_cli
+
+            return handle_providers_cli(subcmd)
+        except Exception as e:
+            logger.error("Failed to run providers command: %s", e)
+            print(f"Error running providers command: {e}")
+            return 1
+
     # One-shot query mode
     if parsed.query:
         query_text = " ".join(parsed.query).strip()

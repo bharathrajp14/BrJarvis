@@ -65,7 +65,13 @@ class ElevenLabsAdapter(BaseAdapter):
             return False
         # If marked as auth failure or in cooldown, do not attempt
         status = self._quota_manager.get_status(self.provider)
-        return status not in (ProviderStatus.AUTH_FAILURE, ProviderStatus.DISABLED, ProviderStatus.RATE_LIMITED, ProviderStatus.QUOTA_EXHAUSTED)
+        return status not in (
+            ProviderStatus.AUTH_FAILED,
+            ProviderStatus.AUTH_FAILURE,
+            ProviderStatus.RATE_LIMITED,
+            ProviderStatus.OPEN_CIRCUIT,
+            ProviderStatus.OFFLINE,
+        )
 
     def synthesize_speech(
         self,

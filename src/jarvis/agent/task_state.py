@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import json
 import time
 from dataclasses import asdict, dataclass, field
+from pathlib import Path
 from typing import Any
 
 from .contracts import TaskStatus
@@ -128,7 +130,7 @@ class TaskState:
     """Represents the persisted, durable state of a running or completed task."""
 
     task_id: str
-    user_request: str
+    user_request: str = ""
     status: TaskStatus = TaskStatus.CREATED
     current_step: int = 0
     total_steps: int = 0
@@ -139,6 +141,46 @@ class TaskState:
     evidence: list[str] = field(default_factory=list)
     created_at: float = field(default_factory=time.time)
     updated_at: float = field(default_factory=time.time)
+
+    def __init__(
+        self,
+        task_id: str,
+        user_request: str = "",
+        *,
+        description: str = "",
+        status: TaskStatus = TaskStatus.CREATED,
+        current_step: int = 0,
+        total_steps: int = 0,
+        revision: int = 0,
+        actions: list[dict[str, Any]] | None = None,
+        checkpoints: list[dict[str, Any]] | None = None,
+        events: list[dict[str, Any]] | None = None,
+        evidence: list[str] | None = None,
+        created_at: float | None = None,
+        updated_at: float | None = None,
+        **kwargs: Any,
+    ) -> None:
+        self.task_id = task_id
+        self.user_request = user_request or description or kwargs.get("user_request", "")
+        self.status = status if isinstance(status, TaskStatus) else TaskStatus(status)
+        self.current_step = current_step
+        self.total_steps = total_steps
+        self.revision = revision
+        self.actions = list(actions) if actions is not None else []
+        self.checkpoints = list(checkpoints) if checkpoints is not None else []
+        self.events = list(events) if events is not None else []
+        self.evidence = list(evidence) if evidence is not None else []
+        self.created_at = created_at if created_at is not None else time.time()
+        self.updated_at = updated_at if updated_at is not None else time.time()
+
+    @property
+    def steps(self) -> list[str]:
+        """User-readable steps list."""
+        return [str(a.get("action", a)) for a in self.actions]
+
+    def add_step(self, step_desc: str) -> None:
+        """Add a high-level step."""
+        self.advance_step({"action": step_desc})
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize state machine to a plain dictionary."""
@@ -222,3 +264,26 @@ class TaskState:
         self.checkpoints.append(cp)
         self.updated_at = time.time()
         return cp
+
+
+class TaskStateStore:
+    """Durable file-backed task state storage for restart recovery."""
+
+    def __init__(self, storage_dir: Path | str) -> None:
+        self.storage_dir = Path(storage_dir)
+        self.storage_dir.mkdir(parents=True, exist_ok=True)
+
+    def save(self, state: TaskState) -> Path:
+        path = self.storage_dir / f"{state.task_id}.json"
+        path.write_text(json.dumps(state.to_dict(), indent=2), encoding="utf-8")
+        return path
+
+    def load(self, task_id: str) -> TaskState | None:
+        path = self.storage_dir / f"{task_id}.json"
+        if not path.is_file():
+            return None
+        return TaskState.from_dict(json.loads(path.read_text(encoding="utf-8")))
+
+    def list_tasks(self) -> list[str]:
+        return [p.stem for p in self.storage_dir.glob("*.json")]
+

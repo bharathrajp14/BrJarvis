@@ -51,7 +51,12 @@ class BaseAdapter(ABC):
             return False
         if model and self._models and model not in self._models:
             return False
-        return not capability or capability.lower() in self._capabilities
+        if not capability:
+            return True
+        from ..routing import CAPABILITY_ALIASES
+
+        aliases = CAPABILITY_ALIASES.get(capability.lower(), {capability.lower()})
+        return bool(self._capabilities & aliases)
 
     def _require_available(self) -> None:
         if not self.available:

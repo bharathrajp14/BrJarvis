@@ -1,4 +1,4 @@
-"""Build the multi-provider autonomous gateway with real adapters and capability routing."""
+"""Build the multi-provider autonomous gateway with normalized provider identity."""
 
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ def _load_env_dict(root_dir: Path) -> dict[str, str]:
 
 
 def build_configured_gateway(config_path: str | Path | None = None) -> ModelGateway:
-    """Load configuration and instantiate all local and external provider adapters."""
+    """Load configuration and instantiate all normalized providers."""
     root_dir = Path(__file__).resolve().parents[3]
     source = Path(config_path or root_dir / "config" / "models.yaml")
     data = yaml.safe_load(source.read_text(encoding="utf-8")) or {}
@@ -59,31 +59,25 @@ def build_configured_gateway(config_path: str | Path | None = None) -> ModelGate
 
     hierarchy = tuple(str(model) for model in routing.get("fallback_hierarchy", []))
     default_model = str(routing.get("default_model", hierarchy[0] if hierarchy else "gemini-3.1-pro-high"))
-    model_ids = tuple(dict.fromkeys((default_model, *hierarchy)))
     capabilities_cfg = routing.get("capabilities", {})
+    cap_model_values = tuple(str(v) for v in capabilities_cfg.values()) if isinstance(capabilities_cfg, dict) else ()
+    model_ids = tuple(dict.fromkeys((default_model, *hierarchy, *cap_model_values)))
 
     quota_mgr = get_quota_manager()
     adapters: dict[str, ProviderAdapter] = {}
 
-    # 1. Primary Intelligence Gateway: Local Proxy models
-    all_proxy_models = frozenset(model_ids)
+    # 1. Primary Intelligence Gateway: Local Proxy (Single normalized provider with multiple models)
     adapters["proxy"] = OpenAIAdapter(
         provider="proxy",
         model=default_model,
         api_key=proxy_api_key,
         base_url=base_url,
-        models=all_proxy_models,
-        capabilities=frozenset({"chat", "code", "reasoning", "vision", "image", "image_understanding"}),
+        models=frozenset(model_ids),
+        capabilities=frozenset({
+            "chat", "code", "reasoning", "vision", "image", "image_understanding",
+            "text_reasoning", "deep_reasoning", "fast_reasoning",
+        }),
     )
-    for model_id in model_ids:
-        adapters[model_id] = OpenAIAdapter(
-            provider="proxy",
-            model=model_id,
-            api_key=proxy_api_key,
-            base_url=base_url,
-            models=frozenset({model_id}),
-            capabilities=frozenset({"chat", "code", "reasoning", "vision", "image", "image_understanding"}),
-        )
 
     # 2. Provider A: Groq STT
     groq_key = _read_env_val("GROQ_API_KEY", env_map)
@@ -105,25 +99,31 @@ def build_configured_gateway(config_path: str | Path | None = None) -> ModelGate
     elevenlabs_key = _read_env_val("ELEVENLABS_API_KEY", env_map)
     adapters["elevenlabs"] = ElevenLabsAdapter(api_key=elevenlabs_key, quota_manager=quota_mgr)
 
-    # Build canonical capability policies
-    policies: list[RoutePolicy] = [
-        RoutePolicy(name="default", providers=("proxy", *model_ids)),
-        *build_canonical_policies(set(adapters.keys())),
-    ]
-
-    # Overlay any specific routes from models.yaml
+    # Build canonical capability policies with configuration overrides
+    canonical_policies = build_canonical_policies(set(adapters.keys()))
     if isinstance(capabilities_cfg, dict):
-        for capability, model in capabilities_cfg.items():
-            model_id = str(model)
-            if model_id in adapters:
-                policies.append(
-                    RoutePolicy(
-                        name=str(capability),
-                        providers=(model_id,),
-                        required_capabilities=frozenset({str(capability).lower()}),
-                        max_fallbacks=1,
-                    )
+        updated_policies: list[RoutePolicy] = []
+        for p in canonical_policies:
+            if p.name in capabilities_cfg:
+                target_model = str(capabilities_cfg[p.name])
+                pref = dict(p.preferred_models)
+                pref["proxy"] = target_model
+                p = RoutePolicy(
+                    name=p.name,
+                    capability=p.capability,
+                    providers=p.providers,
+                    default_model=target_model,
+                    preferred_models=pref,
+                    required_capabilities=p.required_capabilities,
+                    max_fallbacks=p.max_fallbacks,
                 )
+            updated_policies.append(p)
+        canonical_policies = updated_policies
+
+    policies: list[RoutePolicy] = [
+        RoutePolicy(name="default", providers=("proxy", "openrouter"), default_model=default_model),
+        *canonical_policies,
+    ]
 
     cooldown = float(data.get("cooldown_seconds", 15.0))
     router = Router(cooldown_seconds=cooldown, quota_manager=quota_mgr)

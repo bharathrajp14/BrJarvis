@@ -3,6 +3,11 @@
 Zero-LLM Fast Action Router.
 Parses standard user intentions (launching apps, opening websites, controlling audio/system)
 and executes them deterministically via native OS commands in 0ms with ZERO LLM token consumption.
+
+ARCHITECTURAL CONTRACT (Section 16):
+'0-token execution' means: No LLM inference was needed because the COMPLETE request
+was deterministically understood as a single atomic action.
+It must NEVER mean: We found one keyword without asking an LLM.
 """
 
 from __future__ import annotations
@@ -14,6 +19,14 @@ import shutil
 import subprocess
 import sys
 import webbrowser
+
+from brjarvis.core.intent_classifier import IntentClassifier, IntentTraceStore
+from brjarvis.core.intent_models import (
+    ActionIntent,
+    AtomicIntentResult,
+    CompositeIntent,
+    ExecutionTrace,
+)
 
 logger = logging.getLogger("JARVIS.IntentEngine")
 
@@ -190,6 +203,32 @@ class DeterministicIntentEngine:
             return False
 
     @classmethod
+    def parse_atomic_intent(cls, text: str) -> AtomicIntentResult:
+        """
+        Classifies whether the user utterance represents a single, complete atomic intent.
+        Reports what portion was consumed and if any unconsumed text remains.
+        Enforces:
+          - exactly one actionable intent
+          - whole utterance belongs to that intent
+          - no unresolved second action
+          - no sequencing
+          - no follow-up operation
+          - safe for deterministic execution
+        """
+        res = IntentClassifier.classify(text)
+        if isinstance(res, AtomicIntentResult):
+            return res
+        return AtomicIntentResult(
+            matched=True,
+            atomic=False,
+            intent="composite_task",
+            consumed_text="",
+            remaining_text=text,
+            confidence=0.95,
+            requires_planner=True,
+        )
+
+    @classmethod
     def parse_and_execute(cls, text: str) -> dict | None:
         """
         0-token deterministic shortcut execution.
@@ -206,8 +245,75 @@ class DeterministicIntentEngine:
         if _enabled not in ("1", "true", "yes", "on"):
             return None  # Explicitly disabled — route to AI loop
 
+        _t0 = _time.time()
+
+        # ── Canonical Atomicity Gate (Requirements 2, 3, 6, 7, 8, 16) ─────────────
+        # DETERMINISTIC EXECUTION IS ALLOWED ONLY WHEN THE ENTIRE USER UTTERANCE
+        # IS CONFIDENTLY CLASSIFIED AS ONE ATOMIC ACTION.
+        atomic_res = cls.parse_atomic_intent(text)
+        if not atomic_res.matched or not atomic_res.atomic or atomic_res.requires_planner or atomic_res.confidence < 0.8:
+            logger.info(
+                "[IntentEngine] Utterance is not atomic deterministic (atomic=%s, confidence=%.2f, remaining='%s'). "
+                "Bypassing deterministic execution — routing to planner/agent loop.",
+                atomic_res.atomic,
+                atomic_res.confidence,
+                atomic_res.remaining_text,
+            )
+            trace = ExecutionTrace(
+                user_input=text,
+                classification="composite" if not atomic_res.atomic else "non_deterministic",
+                atomic=atomic_res.atomic,
+                deterministic=False,
+                intent=atomic_res.intent,
+                steps=[atomic_res.intent] if atomic_res.intent else [],
+                planner_required=True,
+                execution_started=_t0,
+                execution_completed=_time.time(),
+                success=True,
+                details={"routing": "planner"},
+            )
+            IntentTraceStore.record(trace)
+            return None
+
         # `clean` is defined here so Pyright can resolve it in the block below.
         clean: str = text.lower().strip().rstrip(".!?")
+        res = cls._match_and_execute(text, clean, atomic_res)
+        if res and res.get("executed"):
+            trace = ExecutionTrace(
+                user_input=text,
+                classification="atomic",
+                atomic=True,
+                deterministic=True,
+                intent=res.get("intent", atomic_res.intent),
+                steps=[res.get("intent", atomic_res.intent)],
+                planner_required=False,
+                execution_started=_t0,
+                execution_completed=_time.time(),
+                success=True,
+                details=res,
+            )
+            IntentTraceStore.record(trace)
+            res["trace"] = trace.to_dict()
+            return res
+
+        trace = ExecutionTrace(
+            user_input=text,
+            classification="unmatched_atomic",
+            atomic=True,
+            deterministic=False,
+            intent=atomic_res.intent,
+            steps=[],
+            planner_required=True,
+            execution_started=_t0,
+            execution_completed=_time.time(),
+            success=False,
+        )
+        IntentTraceStore.record(trace)
+        return None
+
+    @classmethod
+    def _match_and_execute(cls, text: str, clean: str, atomic_res: AtomicIntentResult) -> dict | None:
+        """Internal deterministic matchers. Only invoked for confirmed atomic requests."""
 
         # 000z. Match System Power Control (Shutdown / Power Off / Restart / Reboot / Lock / Sleep)
         _poweroff_keys = (
@@ -303,7 +409,7 @@ class DeterministicIntentEngine:
             except Exception as e:
                 logger.warning("Lock execution error: %s", e)
 
-        # 000a. Match System Hardware / Performance Diagnostics (e.g. "show cpu", "cpu usage", "ram usage", "system status", "system health")
+        # 000a. Match System Hardware / Performance Diagnostics (e.g. "show cpu", "cpu usage", "ram usage", "system status", "system health", "show cpu and ram usage")
         if clean.startswith(
             (
                 "show cpu",
@@ -318,7 +424,7 @@ class DeterministicIntentEngine:
                 "system health",
                 "check system health",
             )
-        ):
+        ) or (atomic_res and atomic_res.intent == "system_health_grouped"):
             try:
                 from brjarvis.tools.system_health import system_health_action
 
@@ -455,7 +561,23 @@ class DeterministicIntentEngine:
                     "tokens_saved": 2400,
                 }
 
-        # 00. Match Website URL Intent (e.g. "open github.com", "go to reddit.com", "launch https://google.com in brave")
+        # 00. Match Website URL Intent (e.g. "open github.com", "go to reddit.com", "launch https://google.com in brave", "open chrome and github")
+        if atomic_res and atomic_res.intent == "browser_open_url_grouped":
+            grouped_m = re.match(r"^(?:open|launch|run)\s+([a-z0-9]+)\s+and\s+([a-z0-9_\-\.\/]+)$", clean)
+            if grouped_m:
+                b_name = grouped_m.group(1).strip()
+                t_site = grouped_m.group(2).strip()
+                target_url = t_site if t_site.startswith(("http://", "https://")) else (f"https://{t_site}.com" if "." not in t_site else f"https://{t_site}")
+                success = cls.open_url_in_browser(target_url, browser_name=b_name)
+                if success:
+                    return {
+                        "executed": True,
+                        "intent": "open_url",
+                        "target": target_url,
+                        "result": f"Opened {target_url} in {b_name.title()} (0-Token Execution).",
+                        "tokens_saved": 2000,
+                    }
+
         url_match = re.search(
             r"^(?:open|launch|go\s+to|visit)\s+((?:https?://)?[a-zA-Z0-9\.-]+\.(?:com|org|net|io|dev|ai|co|gov|edu|in)(?:/\S*)?)",
             clean,

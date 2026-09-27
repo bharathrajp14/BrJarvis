@@ -7,7 +7,7 @@ from .decision_engine import DecisionEngine, DecisionRecord, get_decision_engine
 from .execution_ledger import ExecutionLedger, LedgerEntry
 from .loop import AgentLoop, clean_response_text, parse_tool_call, parse_tool_calls
 from .session import AgentSession, get_or_create_session
-from .task_state import InvalidStateTransitionError, TaskState
+from .task_state import InvalidStateTransitionError, TaskState, TaskStateStore
 from .verifier import FileVerifier, ProcessVerifier, VerificationResult
 
 __all__ = [
@@ -24,6 +24,7 @@ __all__ = [
     "LedgerStatus",
     "ProcessVerifier",
     "TaskState",
+    "TaskStateStore",
     "TaskStatus",
     "VerificationResult",
     "clean_response_text",
