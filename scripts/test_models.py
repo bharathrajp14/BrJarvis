@@ -4,11 +4,11 @@ Tests every model across all three provider tiers and prints a live report.
 """
 from __future__ import annotations
 
+import json
 import os
 import sys
-import time
-import json
 import threading
+import time
 from pathlib import Path
 from typing import NamedTuple
 
@@ -29,8 +29,8 @@ except ImportError:
     sys.exit(1)
 
 # ── Provider configs ─────────────────────────────────────────────────────────
-PROXY_BASE  = os.environ.get("BRJARVIS_PROXY_BASE_URL", "http://127.0.0.1:20128/v1")
-PROXY_KEY   = os.environ.get("BRJARVIS_PROXY_API_KEY",  os.environ.get("OPENAI_API_KEY", ""))
+PROXY_BASE  = os.environ.get("BRJARVIS_PROXY_BASE_URL", "http://localhost:8045/v1")
+PROXY_KEY   = os.environ.get("BRJARVIS_PROXY_API_KEY",  os.environ.get("OPENAI_API_KEY", "sk-5ec70bf9fa324084b7a7326babf52c45"))
 OR_BASE     = os.environ.get("OPENROUTER_BASE_URL",     "https://openrouter.ai/api/v1")
 OR_KEY      = os.environ.get("OPENROUTER_API_KEY",      "")
 OMR_BASE    = os.environ.get("OMNIROUTER_BASE_URL",     "http://127.0.0.1:20128/v1")
@@ -38,26 +38,36 @@ OMR_KEY     = os.environ.get("OMNIROUTER_API_KEY",      "")
 
 # ── All models to probe ───────────────────────────────────────────────────────
 PROXY_MODELS = [
-    "antigravity/gemini-3.7-flash-high",
-    "antigravity/gemini-3.7-flash-medium",
-    "antigravity/gemini-3.7-flash-low",
-    "antigravity/gemini-pro-agent",
-    "antigravity/gemini-3.1-pro-low",
-    "antigravity/gemini-3.1-flash-lite",
-    "antigravity/claude-sonnet-4-6",
-    "antigravity/claude-opus-4-6-thinking",
-    "kr/claude-sonnet-4.5",
-    "kr/deepseek-3.2",
-    "kr/qwen3-coder-next",
-    "github/gpt-4o-mini",
+    "gemini-3.1-pro-high",
+    "claude-sonnet-4-6",
+    "claude-opus-4-6-thinking",
+    "gemini-3.8-flash-high",
+    "gemini-3.8-flash-medium",
+    "gemini-3.8-flash-low",
+    "gemini-3.8-flash-tiered",
+    "gemini-3.7-flash-high",
+    "gemini-3.7-flash-medium",
+    "gemini-3.7-flash-low",
+    "gemini-3.7-flash-tiered",
+    "gemini-3.6-flash-high",
+    "gemini-3.6-flash-medium",
+    "gemini-3.6-flash-low",
+    "gemini-3.1-pro-low",
+    "gemini-3.1-flash-image",
+    "gemini-pro-agent",
+    "gemini-2.5-pro",
+    "gpt-oss-120b-medium",
 ]
 
 OPENROUTER_MODELS = [
-    "meta-llama/llama-3.1-8b-instruct:free",
-    "google/gemma-3-27b-it:free",
-    "deepseek/deepseek-r1-0528:free",
-    "mistralai/mistral-7b-instruct:free",
-    "qwen/qwen-2.5-7b-instruct:free",
+    "nvidia/nemotron-3.5-lightning:free",
+    "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+    "nvidia/nemotron-3-super-120b-a12b:free",
+    "poolside/laguna-s-2.1:free",
+    "cohere/north-mini-code:free",
+    "dots-studio/dots-3-note-preview:free",
+    "inclusionai/ling-3.0-flash-fin:free",
 ]
 
 OMNIROUTER_MODELS = [

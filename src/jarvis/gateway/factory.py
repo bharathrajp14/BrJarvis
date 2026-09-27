@@ -23,9 +23,19 @@ def build_configured_gateway(config_path: str | Path | None = None) -> ModelGate
     data = yaml.safe_load(source.read_text(encoding="utf-8")) or {}
     proxy = data.get("proxy", {})
     routing = data.get("routing", {})
-    base_url = str(proxy.get("base_url", "http://127.0.0.1:20128/v1"))
-    api_key_env = str(proxy.get("api_key_env", "OPENAI_API_KEY"))
-    api_key = os.environ.get(api_key_env, "")
+    base_url = str(proxy.get("base_url", "http://localhost:8045/v1"))
+    api_key_env = str(proxy.get("api_key_env", "BRJARVIS_PROXY_API_KEY"))
+    api_key = os.environ.get(api_key_env) or os.environ.get("OPENAI_API_KEY") or os.environ.get("BRJARVIS_PROXY_API_KEY", "")
+    if not api_key:
+        env_file = Path(__file__).resolve().parents[3] / ".env"
+        if env_file.exists():
+            for line in env_file.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, _, v = line.partition("=")
+                    if k.strip() in (api_key_env, "BRJARVIS_PROXY_API_KEY", "OPENAI_API_KEY") and v.strip():
+                        api_key = v.strip()
+                        break
     hierarchy = tuple(str(model) for model in routing.get("fallback_hierarchy", []))
     default_model = str(routing.get("default_model", hierarchy[0] if hierarchy else "gpt-4o-mini"))
     model_ids = tuple(dict.fromkeys((default_model, *hierarchy)))

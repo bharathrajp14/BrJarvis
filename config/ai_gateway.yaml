@@ -1,9 +1,9 @@
 # ════════════════════════════════════════════════════════════════════════════
 #  BR JARVIS — AI Gateway Routing Configuration
 #  Three-Tier Provider Hierarchy:
-#    TIER 1 (PRIMARY)   — Antigravity Custom Proxy  (http://127.0.0.1:20128/v1)
+#    TIER 1 (PRIMARY)   — Antigravity Custom Proxy  (http://localhost:8045/v1)
 #    TIER 2 (SECONDARY) — OpenRouter Free Models    (https://openrouter.ai/api/v1)
-#    TIER 3 (EMERGENCY) — OmniRouter                (http://127.0.0.1:20128/v1)
+#    TIER 3 (EMERGENCY) — OmniRouter                (http://localhost:8045/v1)
 #
 #  API keys are referenced by environment-variable name only.
 #  Supported strategies: priority, weighted, round_robin, cost, latency.
@@ -18,8 +18,8 @@ backends:
 
   - id: proxy_gemini_36_flash_high
     provider: openai-compatible
-    model: antigravity/gemini-3.7-flash-high
-    base_url: http://127.0.0.1:20128/v1
+    model: gemini-3.1-pro-high
+    base_url: http://localhost:8045/v1
     api_key_env: BRJARVIS_PROXY_API_KEY
     enabled: true
     priority: 10
@@ -31,8 +31,8 @@ backends:
 
   - id: proxy_gemini_pro_high
     provider: openai-compatible
-    model: antigravity/gemini-3.7-flash-high
-    base_url: http://127.0.0.1:20128/v1
+    model: gemini-3.1-pro-high
+    base_url: http://localhost:8045/v1
     api_key_env: BRJARVIS_PROXY_API_KEY
     enabled: true
     priority: 11
@@ -44,8 +44,8 @@ backends:
 
   - id: proxy_claude_sonnet46
     provider: openai-compatible
-    model: antigravity/claude-sonnet-4-6
-    base_url: http://127.0.0.1:20128/v1
+    model: claude-sonnet-4-6
+    base_url: http://localhost:8045/v1
     api_key_env: BRJARVIS_PROXY_API_KEY
     enabled: true
     priority: 12
@@ -57,8 +57,8 @@ backends:
 
   - id: proxy_claude_opus46_thinking
     provider: openai-compatible
-    model: antigravity/claude-opus-4-6-thinking
-    base_url: http://127.0.0.1:20128/v1
+    model: claude-opus-4-6-thinking
+    base_url: http://localhost:8045/v1
     api_key_env: BRJARVIS_PROXY_API_KEY
     enabled: true
     priority: 13
@@ -71,7 +71,7 @@ backends:
   - id: proxy_gemini_25_pro
     provider: openai-compatible
     model: gemini-2.5-pro
-    base_url: http://127.0.0.1:20128/v1
+    base_url: http://localhost:8045/v1
     api_key_env: BRJARVIS_PROXY_API_KEY
     enabled: true
     priority: 14
@@ -83,8 +83,8 @@ backends:
 
   - id: proxy_gemini_37_flash_high
     provider: openai-compatible
-    model: antigravity/gemini-3.7-flash-high
-    base_url: http://127.0.0.1:20128/v1
+    model: gemini-3.1-pro-high
+    base_url: http://localhost:8045/v1
     api_key_env: BRJARVIS_PROXY_API_KEY
     enabled: true
     priority: 15
@@ -96,8 +96,8 @@ backends:
 
   - id: proxy_gemini_3_flash_agent
     provider: openai-compatible
-    model: antigravity/gemini-pro-agent
-    base_url: http://127.0.0.1:20128/v1
+    model: gemini-pro-agent
+    base_url: http://localhost:8045/v1
     api_key_env: BRJARVIS_PROXY_API_KEY
     enabled: true
     priority: 16
@@ -109,8 +109,8 @@ backends:
 
   - id: proxy_gemini_31_flash_image
     provider: openai-compatible
-    model: antigravity/gemini-3.7-flash-high
-    base_url: http://127.0.0.1:20128/v1
+    model: gemini-3.1-pro-high
+    base_url: http://localhost:8045/v1
     api_key_env: BRJARVIS_PROXY_API_KEY
     enabled: true
     priority: 17
@@ -123,7 +123,7 @@ backends:
   - id: proxy_gemini_36_flash_low
     provider: openai-compatible
     model: antigravity/gemini-3.7-flash-low
-    base_url: http://127.0.0.1:20128/v1
+    base_url: http://localhost:8045/v1
     api_key_env: BRJARVIS_PROXY_API_KEY
     enabled: true
     priority: 18
@@ -136,7 +136,7 @@ backends:
   - id: proxy_gemini_35_flash_extra_low
     provider: openai-compatible
     model: antigravity/gemini-3.1-pro-low
-    base_url: http://127.0.0.1:20128/v1
+    base_url: http://localhost:8045/v1
     api_key_env: BRJARVIS_PROXY_API_KEY
     enabled: true
     priority: 19
@@ -149,7 +149,7 @@ backends:
   - id: proxy_gpt_oss_120b
     provider: openai-compatible
     model: github/gpt-4o-mini
-    base_url: http://127.0.0.1:20128/v1
+    base_url: http://localhost:8045/v1
     api_key_env: BRJARVIS_PROXY_API_KEY
     enabled: true
     priority: 20
@@ -162,7 +162,7 @@ backends:
   - id: proxy_gemini_pro_agent
     provider: openai-compatible
     model: gemini-pro-agent
-    base_url: http://127.0.0.1:20128/v1
+    base_url: http://localhost:8045/v1
     api_key_env: BRJARVIS_PROXY_API_KEY
     enabled: true
     priority: 21
@@ -260,7 +260,7 @@ backends:
   - id: omnirouter_fallback
     provider: openai-compatible
     model: auto
-    base_url: http://127.0.0.1:20128/v1
+    base_url: http://localhost:8045/v1
     api_key_env: OMNIROUTER_API_KEY
     enabled: true
     priority: 85
