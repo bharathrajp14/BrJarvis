@@ -265,7 +265,7 @@ def create_app() -> FastAPI:
 
                 is_valid = False
                 if token:
-                    if hmac.compare_digest(token, SERVER_API_KEY):
+                    if len(token) == len(SERVER_API_KEY) and hmac.compare_digest(token, SERVER_API_KEY):
                         is_valid = True
                     elif verify_session(token):
                         is_valid = True
@@ -354,7 +354,6 @@ def create_app() -> FastAPI:
         "Cache-Control": "no-cache, no-store, must-revalidate",
         "Pragma": "no-cache",
         "Expires": "0",
-        "Clear-Site-Data": '"cache"',  # Tells browsers to drop SW cache on each load
     }
 
     def _use_rebuilt_ui() -> bool:

@@ -64,3 +64,4 @@ async def test_login_sets_scoped_cookie_and_throttles_failures(monkeypatch: pyte
     assert "Path=/" in cookie
     assert "HttpOnly" in cookie
     assert "SameSite=strict" in cookie
+    assert not auth._LOGIN_FAILURES.get("198.51.100.10")

@@ -28,12 +28,13 @@ def test_python_runtime_and_venv():
 
 
 def test_dotenv_and_config_loading():
-    """Verify that configuration loads properly with .env file presence."""
+    """Verify that configuration loads from the template without requiring a local .env."""
     cfg = get_config(force_reload=True)
     assert isinstance(cfg, JarvisConfig)
     assert cfg.assistant.name is not None
     assert cfg.models.default_backend is not None
-    assert paths.DOTENV_FILE.exists(), ".env file must exist at project root"
+    template = paths.PROJECT_ROOT / ".env.template"
+    assert template.exists(), ".env.template must exist so operators can create a local .env"
 
 
 def test_truthful_doctor_diagnostics():

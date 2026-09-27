@@ -4,7 +4,7 @@ import {
   Activity, ArrowLeft, ArrowRight, Bell, Bot, BriefcaseBusiness, Building2, Check, ChevronRight,
   CircleAlert, CircleCheck, CircleDot, Clock3, Command, Database, Download, ExternalLink, FileCheck2,
   FileCode2, FilePlus2, FileText, FolderOpen, FolderPlus, FolderTree, Gauge, Globe2, HeartHandshake,
-  KeyRound, Layers3, LayoutDashboard, ListFilter, ListTodo, LoaderCircle, LockKeyhole, Menu,
+  KeyRound, Layers3, LayoutDashboard, ListFilter, ListTodo, LoaderCircle, LockKeyhole, LogOut, Menu,
   Moon, Network, PanelLeftClose, Plus, RefreshCw, Rocket, Search, Send, Settings2, ShieldCheck,
   Sparkles, Star, Sun, TerminalSquare, Trash2, Upload, UserPlus, UserRound, UsersRound, Wifi,
   WifiOff, X, Zap,
@@ -15,7 +15,7 @@ import type {
   PanelHealth, SearchResult, Task, TaskStatus, TimelineEvent, ViewId, WorkspaceEntry,
 } from '../contracts/domain';
 import { apiClient } from '../platform/api-client';
-import { loadAuthSnapshot, loginWithApiKey, type AuthSnapshot } from '../platform/auth-client';
+import { loadAuthSnapshot, loginWithApiKey, logoutSession, type AuthSnapshot } from '../platform/auth-client';
 import { RealtimeClient } from '../platform/websocket-client';
 import { dispatch, getSnapshot, subscribe } from '../state/app-store';
 import '../styles/tokens.css';
@@ -185,6 +185,23 @@ export function App() {
     }
   };
 
+  const submitLogout = async () => {
+    try {
+      await logoutSession();
+    } catch {
+      // Local session state is still cleared so the operator is signed out of this browser.
+    }
+    realtime.disconnect();
+    setAuth((current) => ({
+      authRequired: current?.authRequired ?? true,
+      authenticated: false,
+      label: 'Operator',
+      scope: 'Signed out',
+    }));
+    setOperator({ label: 'Operator', scope: 'Signed out' });
+    notify('Session ended.');
+  };
+
   if (!auth) return <BootScreen />;
   if (auth.authRequired && !auth.authenticated) return <LoginScreen busy={authBusy} error={authError} onSubmit={submitLogin} />;
 
@@ -241,6 +258,7 @@ export function App() {
         </nav>
         <div className="sidebar-footer">
           <div className="operator"><div className="operator-avatar"><UserRound size={17} /></div><div><strong>{operator.label}</strong><span>{operator.scope}</span></div></div>
+          <button className="icon-button" onClick={() => void submitLogout()} aria-label="Sign out" title="Sign out"><LogOut size={16} /></button>
           <button className="collapse-button desktop-only" onClick={() => setCompactNav((value) => !value)} aria-label={compactNav ? 'Expand navigation' : 'Collapse navigation'}><PanelLeftClose size={17} /><span>Collapse</span></button>
         </div>
       </aside>

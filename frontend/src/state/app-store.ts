@@ -29,11 +29,15 @@ export function subscribe(listener: () => void) {
 export function dispatch(action: AppAction) {
   switch (action.type) {
     case 'hydrate': {
-      const selectedTaskStillExists = action.snapshot.tasks.some((task) => task.id === snapshot.activeTaskId);
+      const incoming = structuredClone(action.snapshot);
+      const preservedTaskId =
+        snapshot.activeTaskId && incoming.tasks.some((task) => task.id === snapshot.activeTaskId)
+          ? snapshot.activeTaskId
+          : (incoming.activeTaskId || incoming.tasks[0]?.id || '');
       snapshot = {
-        ...action.snapshot,
-        activeView: snapshot.activeView,
-        activeTaskId: selectedTaskStillExists ? snapshot.activeTaskId : (action.snapshot.activeTaskId || action.snapshot.tasks[0]?.id || ''),
+        ...incoming,
+        activeView: snapshot.activeView || incoming.activeView,
+        activeTaskId: preservedTaskId,
         connection: snapshot.connection,
       };
       break;

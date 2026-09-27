@@ -3,13 +3,16 @@ import type { UiEvent } from '../contracts/events';
 const API_BASE = ((import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '').replace(/\/$/, '');
 type EventHandler = (event: UiEvent) => void;
 
+const MAX_SEEN_EVENTS = 500;
+
 export class RealtimeClient {
   private socket: WebSocket | null = null;
+  private sequence = 0;
   private heartbeat: number | undefined;
   private reconnectTimer: number | undefined;
   private reconnectAttempt = 0;
   private connecting = false;
-  private stopped = true;
+  private closed = true;
   private readonly seen = new Set<string>();
   private readonly seenOrder: string[] = [];
   private readonly listeners = new Set<EventHandler>();
@@ -22,13 +25,16 @@ export class RealtimeClient {
   }
 
   async connect() {
-    this.stopped = false;
+    this.closed = false;
     if (this.connecting || (this.socket && this.socket.readyState <= WebSocket.OPEN)) return;
     this.connecting = true;
     this.onStatus('connecting');
     try {
       const ticket = await this.requestTicket();
-      if (this.stopped) return;
+      if (this.closed) {
+        this.connecting = false;
+        return;
+      }
       const origin = API_BASE ? new URL(API_BASE, globalThis.location.href) : new URL(globalThis.location.href);
       origin.protocol = origin.protocol === 'https:' ? 'wss:' : 'ws:';
       origin.pathname = '/api/v1/ws';
@@ -37,7 +43,10 @@ export class RealtimeClient {
       const socket = new WebSocket(origin.toString());
       this.socket = socket;
       socket.onopen = () => {
-        if (this.stopped || socket !== this.socket) return;
+        if (this.closed || socket !== this.socket) {
+          socket.close();
+          return;
+        }
         this.connecting = false;
         this.reconnectAttempt = 0;
         this.clearHeartbeat();
@@ -52,27 +61,35 @@ export class RealtimeClient {
         this.socket = null;
         this.connecting = false;
         this.clearHeartbeat();
-        if (!this.stopped) this.scheduleReconnect();
+        if (!this.closed) this.scheduleReconnect();
       };
       socket.onerror = () => {
-        if (socket !== this.socket || this.stopped) return;
+        if (socket !== this.socket || this.closed) return;
         this.onStatus('offline');
       };
     } catch {
       this.connecting = false;
-      if (!this.stopped) this.scheduleReconnect();
+      if (!this.closed) this.scheduleReconnect();
     }
   }
 
   disconnect() {
-    this.stopped = true;
+    this.closed = true;
     this.clearHeartbeat();
-    if (this.reconnectTimer) window.clearTimeout(this.reconnectTimer);
-    this.reconnectTimer = undefined;
+    if (this.reconnectTimer) {
+      window.clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = undefined;
+    }
     const socket = this.socket;
     this.socket = null;
-    socket?.close();
+    if (socket) {
+      socket.onclose = null;
+      socket.onerror = null;
+      socket.onmessage = null;
+      socket.close();
+    }
     this.connecting = false;
+    this.onStatus('offline');
   }
 
   send(payload: Record<string, unknown>) {
@@ -88,17 +105,16 @@ export class RealtimeClient {
 
   private receive(raw: string) {
     try {
-      const parsed = JSON.parse(raw) as UiEvent & { event_id?: string };
-      const eventId = parsed.event_id;
-      if (eventId) {
-        if (this.seen.has(eventId)) return;
-        this.seen.add(eventId);
-        this.seenOrder.push(eventId);
-        if (this.seenOrder.length > 500) {
-          const oldest = this.seenOrder.shift();
-          if (oldest) this.seen.delete(oldest);
-        }
+      const parsed = JSON.parse(raw) as UiEvent & { event_id?: string; sequence?: number };
+      const eventId = parsed.event_id ?? `${parsed.type}:${parsed.sequence ?? 0}`;
+      if (this.seen.has(eventId)) return;
+      this.seen.add(eventId);
+      this.seenOrder.push(eventId);
+      if (this.seenOrder.length > MAX_SEEN_EVENTS) {
+        const expired = this.seenOrder.splice(0, this.seenOrder.length - MAX_SEEN_EVENTS);
+        expired.forEach((id) => this.seen.delete(id));
       }
+      if (typeof parsed.sequence === 'number') this.sequence = Math.max(this.sequence, parsed.sequence);
       this.listeners.forEach((listener) => listener(parsed));
     } catch {
       // The next authoritative REST snapshot repairs malformed or unknown events.
@@ -111,7 +127,7 @@ export class RealtimeClient {
   }
 
   private scheduleReconnect() {
-    if (this.stopped || this.reconnectTimer) return;
+    if (this.closed || this.reconnectTimer) return;
     this.onStatus('offline');
     const delay = Math.min(30000, 800 * 2 ** this.reconnectAttempt++);
     this.reconnectTimer = window.setTimeout(() => {

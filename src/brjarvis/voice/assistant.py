@@ -71,10 +71,10 @@ except ImportError:
 
 try:
     from brjarvis.desktop.ui_mark import JarvisUI
-except ImportError:
+except Exception:
     try:
-        from brjarvis.ui import JarvisUI
-    except ImportError:
+        from brjarvis.ui.app import HeadlessJarvisUI as JarvisUI
+    except Exception:
 
         class JarvisUI:
             def __init__(self):
