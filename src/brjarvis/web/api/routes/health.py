@@ -65,3 +65,47 @@ async def get_status():
         "time": time.strftime("%I:%M %p"),
         "os": platform.system(),
     }
+
+
+@router.get("/ready")
+@router.get("/api/ready")
+@router.get("/api/v1/ready")
+async def ready_check():
+    """Readiness probe checking application runtime status."""
+    try:
+        from brjarvis.core.runtime import get_runtime
+
+        rt = get_runtime()
+        return {"status": "ready", "runtime": "healthy" if rt else "uninitialized"}
+    except Exception as exc:
+        return {"status": "not_ready", "error": str(exc)}
+
+
+@router.get("/diagnostics")
+@router.get("/api/diagnostics")
+@router.get("/api/v1/diagnostics")
+async def get_diagnostics():
+    """Return machine-readable comprehensive system diagnostics."""
+    try:
+        from jarvis.core.bootstrap import run_doctor
+
+        return run_doctor()
+    except Exception:
+        from brjarvis.diagnostics.doctor import run_diagnostics_audit
+
+        return run_diagnostics_audit()
+
+
+@router.get("/metrics")
+@router.get("/api/metrics")
+@router.get("/api/v1/metrics")
+async def get_metrics():
+    """Return machine-readable runtime performance and system telemetry."""
+    metrics = _hardware_metrics()
+    return {
+        "status": "online",
+        "cpu_percent": metrics["cpu_percent"],
+        "memory_percent": metrics["memory_percent"],
+        "disk_percent": metrics["disk_percent"],
+        "timestamp": time.time(),
+    }

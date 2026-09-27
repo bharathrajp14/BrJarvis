@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from .bridge import LegacyToolBridge, bridge_legacy_tools
 from .builtin import register_default_tools
 from .contracts import (
     ToolContext,
@@ -14,6 +15,7 @@ from .registry import ToolHandler, ToolRegistry, get_tool_registry
 from .runtime import ToolRuntime
 
 __all__ = [
+    "LegacyToolBridge",
     "ToolContext",
     "ToolDefinition",
     "ToolHandler",
@@ -22,6 +24,7 @@ __all__ = [
     "ToolResult",
     "ToolRiskLevel",
     "ToolRuntime",
+    "bridge_legacy_tools",
     "get_tool_registry",
     "register_default_tools",
 ]

@@ -5,9 +5,9 @@ from __future__ import annotations
 from .contracts import AgentTurnResult, AgentTurnStatus, LedgerStatus, TaskStatus
 from .decision_engine import DecisionEngine, DecisionRecord, get_decision_engine
 from .execution_ledger import ExecutionLedger, LedgerEntry
-from .loop import AgentLoop, clean_response_text, parse_tool_call
+from .loop import AgentLoop, clean_response_text, parse_tool_call, parse_tool_calls
 from .session import AgentSession, get_or_create_session
-from .task_state import TaskState
+from .task_state import InvalidStateTransitionError, TaskState
 from .verifier import FileVerifier, ProcessVerifier, VerificationResult
 
 __all__ = [
@@ -19,6 +19,7 @@ __all__ = [
     "DecisionRecord",
     "ExecutionLedger",
     "FileVerifier",
+    "InvalidStateTransitionError",
     "LedgerEntry",
     "LedgerStatus",
     "ProcessVerifier",
@@ -29,4 +30,5 @@ __all__ = [
     "get_decision_engine",
     "get_or_create_session",
     "parse_tool_call",
+    "parse_tool_calls",
 ]

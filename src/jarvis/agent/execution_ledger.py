@@ -64,8 +64,6 @@ class ExecutionLedger:
         for entry in entries:
             v_icon = "✓" if entry.verification_status == LedgerStatus.SUCCESS else "✗"
             status_text = entry.status.value
-            lines.append(
-                f"- {v_icon} **{entry.step_id}** (`{entry.tool_name}`): {status_text} — {entry.evidence}"
-            )
+            lines.append(f"- {v_icon} **{entry.step_id}** (`{entry.tool_name}`): {status_text} — {entry.evidence}")
 
         return "\n".join(lines)

@@ -105,9 +105,7 @@ class TaskRepository:
     def list_tasks(self, limit: int = 50) -> list[TaskState]:
         """List tasks ordered by updated timestamp descending."""
         with self.db.read_connection() as conn:
-            rows = conn.execute(
-                "SELECT * FROM tasks ORDER BY updated_at DESC LIMIT ?", (limit,)
-            ).fetchall()
+            rows = conn.execute("SELECT * FROM tasks ORDER BY updated_at DESC LIMIT ?", (limit,)).fetchall()
             return [
                 TaskState(
                     task_id=r["task_id"],
@@ -188,10 +186,12 @@ class SessionRepository:
                 created_at=s_row["created_at"],
             )
             for m in m_rows:
-                sess.history.append({
-                    "role": m["role"],
-                    "content": m["content"],
-                    "latency_ms": m["latency_ms"],
-                    "timestamp": m["timestamp"],
-                })
+                sess.history.append(
+                    {
+                        "role": m["role"],
+                        "content": m["content"],
+                        "latency_ms": m["latency_ms"],
+                        "timestamp": m["timestamp"],
+                    }
+                )
             return sess

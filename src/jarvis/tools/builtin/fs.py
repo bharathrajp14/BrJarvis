@@ -80,11 +80,13 @@ def handle_file_list(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
 
         items: list[dict[str, Any]] = []
         for entry in safe_path.iterdir():
-            items.append({
-                "name": entry.name,
-                "is_dir": entry.is_dir(),
-                "size": entry.stat().st_size if entry.is_file() else None,
-            })
+            items.append(
+                {
+                    "name": entry.name,
+                    "is_dir": entry.is_dir(),
+                    "size": entry.stat().st_size if entry.is_file() else None,
+                }
+            )
 
         evidence = f"Listed {len(items)} items in {raw_path}"
         return ToolResult.ok(output=items, evidence=evidence)
@@ -129,7 +131,9 @@ def register_fs_tools(registry: ToolRegistry) -> None:
             name="file_list",
             description="List files and directories within a workspace path.",
             parameters=[
-                ToolParameter("path", "string", "Relative directory path (default: current)", required=False, default="."),
+                ToolParameter(
+                    "path", "string", "Relative directory path (default: current)", required=False, default="."
+                ),
             ],
             risk_level=ToolRiskLevel.LOW,
             capabilities=frozenset({"fs", "read"}),

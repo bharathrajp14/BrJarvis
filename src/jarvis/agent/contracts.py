@@ -19,17 +19,37 @@ class AgentTurnStatus(str, Enum):
 
 
 class TaskStatus(str, Enum):
-    """State machine states for a durable agent task."""
+    """Rigorous 14-state task lifecycle state machine."""
 
     CREATED = "created"
+    QUEUED = "queued"
+    PLANNING = "planning"
+    WAITING_FOR_APPROVAL = "waiting_for_approval"
     RUNNING = "running"
+    WAITING_FOR_TOOL = "waiting_for_tool"
+    WAITING_FOR_USER = "waiting_for_user"
+    VERIFYING = "verifying"
+    RECOVERING = "recovering"
     PAUSED = "paused"
-    WAITING_APPROVAL = "waiting_approval"
     COMPLETED = "completed"
-    PARTIAL = "partial"
     FAILED = "failed"
     CANCELLED = "cancelled"
-    RECOVERING = "recovering"
+    ROLLED_BACK = "rolled_back"
+
+    # Backward-compatible aliases
+    WAITING_APPROVAL = "waiting_for_approval"
+    PARTIAL = "partial"
+
+    @classmethod
+    def _missing_(cls, value: object) -> TaskStatus | None:
+        if isinstance(value, str):
+            val_norm = value.strip().lower()
+            if val_norm == "waiting_approval":
+                return cls.WAITING_FOR_APPROVAL
+            for member in cls:
+                if member.value == val_norm or member.name.lower() == val_norm:
+                    return member
+        return None
 
 
 class LedgerStatus(str, Enum):

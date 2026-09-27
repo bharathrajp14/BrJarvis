@@ -23,31 +23,37 @@ class AgentSession:
 
     def add_user_turn(self, content: str) -> None:
         """Append a user message turn."""
-        self.history.append({
-            "role": "user",
-            "content": content,
-            "timestamp": time.time(),
-        })
+        self.history.append(
+            {
+                "role": "user",
+                "content": content,
+                "timestamp": time.time(),
+            }
+        )
 
     def add_assistant_turn(self, content: str, latency_ms: int = 0) -> None:
         """Append an assistant response turn."""
-        self.history.append({
-            "role": "assistant",
-            "content": content,
-            "latency_ms": latency_ms,
-            "timestamp": time.time(),
-        })
+        self.history.append(
+            {
+                "role": "assistant",
+                "content": content,
+                "latency_ms": latency_ms,
+                "timestamp": time.time(),
+            }
+        )
 
     def add_tool_turn(self, tool_name: str, args: dict[str, Any], result: Any, verified: bool) -> None:
         """Append a tool execution observation."""
-        self.history.append({
-            "role": "tool",
-            "tool": tool_name,
-            "args": args,
-            "result": result,
-            "verified": verified,
-            "timestamp": time.time(),
-        })
+        self.history.append(
+            {
+                "role": "tool",
+                "tool": tool_name,
+                "args": args,
+                "result": result,
+                "verified": verified,
+                "timestamp": time.time(),
+            }
+        )
 
     def get_recent_history(self, limit: int = 10) -> list[dict[str, Any]]:
         """Retrieve recent conversation messages suitable for prompt construction."""

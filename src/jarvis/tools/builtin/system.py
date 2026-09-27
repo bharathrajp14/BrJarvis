@@ -27,10 +27,7 @@ def handle_system_status(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
         "python_executable": sys.executable,
         "workspace": str(ctx.workspace_dir),
     }
-    evidence = (
-        f"Platform: {info['platform']} {info['release']} ({info['machine']}), "
-        f"Python {info['python_version']}"
-    )
+    evidence = f"Platform: {info['platform']} {info['release']} ({info['machine']}), Python {info['python_version']}"
     return ToolResult.ok(output=info, evidence=evidence)
 
 

@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Any
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -49,18 +51,43 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # Health checks
+    # Health, readiness, diagnostic, and telemetry endpoints (Section 15)
+    @app.get("/health", tags=["health"])
     @app.get("/healthz", tags=["health"])
-    def healthz() -> dict[str, str]:
-        return {"status": "ok", "version": VERSION}
+    def health() -> dict[str, Any]:
+        return {"status": "ok", "version": VERSION, "timestamp": time.time()}
 
+    @app.get("/ready", tags=["health"])
     @app.get("/readyz", tags=["health"])
-    def readyz() -> dict[str, str]:
+    def ready() -> dict[str, Any]:
         try:
             runtime = get_assistant_runtime()
             return {"status": "ready", "runtime": "healthy" if runtime else "uninitialized"}
         except Exception as exc:
             return {"status": "not_ready", "error": str(exc)}
+
+    @app.get("/diagnostics", tags=["diagnostics"])
+    def diagnostics() -> dict[str, Any]:
+        from jarvis.core.bootstrap import run_doctor
+
+        return run_doctor()
+
+    @app.get("/metrics", tags=["telemetry"])
+    def metrics() -> dict[str, Any]:
+        try:
+            import psutil
+
+            proc = psutil.Process()
+            mem = proc.memory_info()
+            return {
+                "status": "online",
+                "cpu_percent": psutil.cpu_percent(interval=None),
+                "process_memory_mb": round(mem.rss / (1024 * 1024), 2),
+                "total_system_memory_percent": psutil.virtual_memory().percent,
+                "timestamp": time.time(),
+            }
+        except Exception:
+            return {"status": "online", "timestamp": time.time()}
 
     # Mount API routers
     app.include_router(control_plane_router)

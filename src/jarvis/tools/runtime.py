@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 from typing import Any
 
-from .contracts import ToolContext, ToolResult, ToolRiskLevel
+from .contracts import ToolContext, ToolResult
 from .registry import ToolRegistry, get_tool_registry
 
 logger = logging.getLogger("jarvis.tools.runtime")
@@ -51,7 +51,7 @@ class ToolRuntime:
             )
 
         # High/Critical risk approval check
-        if definition.risk_level in {ToolRiskLevel.HIGH, ToolRiskLevel.CRITICAL} and not ctx.approved:
+        if definition.risk_level.requires_approval and not ctx.approved:
             elapsed = int((time.monotonic() - t0) * 1000)
             return ToolResult(
                 status="waiting_approval",

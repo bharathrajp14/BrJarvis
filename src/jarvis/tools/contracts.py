@@ -13,10 +13,32 @@ from typing import Any
 class ToolRiskLevel(str, Enum):
     """Risk tiers for tool execution policies and approval interlocks."""
 
+    # Canonical classes from Master Directive
+    READ_ONLY = "read_only"
+    LOW_RISK_WRITE = "low_risk_write"
+    HIGH_RISK_WRITE = "high_risk_write"
+    DESTRUCTIVE = "destructive"
+    EXTERNAL_COMMUNICATION = "external_communication"
+    CREDENTIAL_ACCESS = "credential_access"
+    SYSTEM_CONTROL = "system_control"
+
+    # Compatibility aliases
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
+
+    @property
+    def requires_approval(self) -> bool:
+        """Whether actions with this risk tier require explicit user approval by default."""
+        return self in {
+            ToolRiskLevel.HIGH,
+            ToolRiskLevel.CRITICAL,
+            ToolRiskLevel.HIGH_RISK_WRITE,
+            ToolRiskLevel.DESTRUCTIVE,
+            ToolRiskLevel.CREDENTIAL_ACCESS,
+            ToolRiskLevel.SYSTEM_CONTROL,
+        }
 
 
 @dataclass(slots=True)

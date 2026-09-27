@@ -32,7 +32,9 @@ class TaskExecutionDiagnostic:
         return asdict(self)
 
     @classmethod
-    def failure(cls, task_id: str, message: str, *, stage: str | None = None, error: Exception | None = None) -> "TaskExecutionDiagnostic":
+    def failure(
+        cls, task_id: str, message: str, *, stage: str | None = None, error: Exception | None = None
+    ) -> "TaskExecutionDiagnostic":
         """Build a failure diagnostic without exposing secret values."""
         return cls(
             task_id=task_id,

@@ -89,7 +89,9 @@ def register_terminal_tools(registry: ToolRegistry) -> None:
             description="Execute a shell command with timeout bounds inside the project directory.",
             parameters=[
                 ToolParameter("command", "string", "Shell command to run", required=True),
-                ToolParameter("timeout_seconds", "integer", "Max execution time in seconds", required=False, default=30),
+                ToolParameter(
+                    "timeout_seconds", "integer", "Max execution time in seconds", required=False, default=30
+                ),
             ],
             risk_level=ToolRiskLevel.HIGH,
             capabilities=frozenset({"terminal", "process"}),

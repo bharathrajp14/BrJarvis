@@ -11,7 +11,6 @@ class PathLayoutError(ValueError):
     """Raised when a path escapes the configured project or workspace root."""
 
 
-
 def find_project_root(start: Path | None = None) -> Path:
     """Find the repository root without depending on the old brjarvis package."""
     candidate = (start or Path(__file__)).resolve()

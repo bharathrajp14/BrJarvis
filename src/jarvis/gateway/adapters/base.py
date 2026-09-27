@@ -85,7 +85,9 @@ class InMemoryAdapter(BaseAdapter):
 
     def generate(self, request: ModelRequest) -> ModelResponse:
         self.requests.append(request)
-        response = self.responses.pop(0) if self.responses else ModelResponse(text="ok", provider="test", model="test-model")
+        response = (
+            self.responses.pop(0) if self.responses else ModelResponse(text="ok", provider="test", model="test-model")
+        )
         return response
 
     def stream(self, request: ModelRequest) -> Iterator[str]:

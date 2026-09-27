@@ -83,7 +83,9 @@ class ModelGateway:
             raise ValueError("Gateway configuration root must be a mapping")
         return cls.from_mapping(data, adapters, router=router)
 
-    def route(self, *, model: str | None = None, capability: str | None = None, policy: str = "default") -> RouteDecision:
+    def route(
+        self, *, model: str | None = None, capability: str | None = None, policy: str = "default"
+    ) -> RouteDecision:
         route_policy = self.policies.get(policy) or self.policies.get("default")
         if policy == "default" and capability and capability in self.policies:
             route_policy = self.policies[capability]

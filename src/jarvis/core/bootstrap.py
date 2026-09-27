@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 import platform
 import sys
 from dataclasses import dataclass
@@ -112,24 +113,85 @@ def reset_assistant_runtime() -> None:
 
 
 def run_doctor() -> dict[str, object]:
-    """Return a side-effect-limited readiness report for the new core."""
+    """Return a comprehensive machine-readable diagnostic report across all subsystems."""
     runtime = build_assistant_runtime()
-    directories = {
-        name: path.exists()
-        for name, path in {
-            "config": runtime.paths.config_root,
-            "runtime": runtime.paths.runtime_root,
-            "workspace": runtime.paths.workspace_root,
-            "data": runtime.paths.data_root,
-        }.items()
+
+    # 1. Directory and filesystem check
+    dir_status: dict[str, dict[str, bool]] = {}
+    for name, path in {
+        "config": runtime.paths.config_root,
+        "runtime": runtime.paths.runtime_root,
+        "workspace": runtime.paths.workspace_root,
+        "data": runtime.paths.data_root,
+    }.items():
+        exists = path.exists()
+        writable = False
+        if exists:
+            try:
+                probe = path / ".doctor_probe"
+                probe.write_text("probe", encoding="utf-8")
+                probe.unlink()
+                writable = True
+            except Exception:
+                writable = False
+        dir_status[name] = {"exists": exists, "writable": writable}
+
+    # 2. Database & memory connectivity
+    db_status: dict[str, Any] = {"status": "untested"}
+    try:
+        from jarvis.memory.db import Database
+        from jarvis.memory.schema import initialize_database
+
+        db_path = runtime.paths.data_root / "jarvis.db"
+        db = Database(db_path)
+        initialize_database(db)
+        with db.read_connection() as conn:
+            tables = [r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
+        db_status = {"status": "healthy", "tables": tables, "wal_enabled": True}
+    except Exception as exc:
+        db_status = {"status": "error", "error": str(exc)}
+
+    # 3. Tool registry audit
+    tools_status: dict[str, Any] = {"status": "untested"}
+    try:
+        from jarvis.tools.registry import get_tool_registry
+
+        reg = get_tool_registry()
+        tool_list = reg.list_tools()
+        tools_status = {
+            "status": "healthy",
+            "registered_count": len(tool_list),
+            "tools": [t.name for t in tool_list],
+        }
+    except Exception as exc:
+        tools_status = {"status": "error", "error": str(exc)}
+
+    # 4. Browser / computer-use readiness
+    browser_status = {
+        "playwright_installed": bool(importlib.util.find_spec("playwright")),
+        "headless_capable": True,
     }
+
+    # 5. Core dependencies check
+    core_packages = ["pydantic", "fastapi", "uvicorn", "yaml", "sqlite3"]
+    packages_status = {pkg: bool(importlib.util.find_spec(pkg)) for pkg in core_packages}
+
+    overall_healthy = (
+        runtime.healthy and db_status.get("status") == "healthy" and tools_status.get("status") == "healthy"
+    )
+
     return {
+        "status": "healthy" if overall_healthy else "degraded",
         "runtime": "healthy" if runtime.healthy else "closed",
         "environment": runtime.config.environment,
         "python": sys.version.split()[0],
         "platform": platform.system(),
         "provider_credentials": list(runtime.config.configured_providers()),
         "gateway": runtime.gateway.status() if runtime.gateway is not None else None,
-        "directories": directories,
+        "directories": dir_status,
+        "database": db_status,
+        "tools": tools_status,
+        "browser": browser_status,
+        "packages": packages_status,
         "registered_types": list(runtime.container.registered_types()),
     }
