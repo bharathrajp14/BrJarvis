@@ -1,13 +1,11 @@
 import type { AppSnapshot } from '../contracts/domain';
 
-/**
- * Empty, truthful state used while the server is loading or unavailable.
- * It intentionally contains no sample tasks, metrics, artifacts, or events.
- */
+/** Truthful state used while the control plane is loading or unavailable. */
 export const emptySnapshot: AppSnapshot = {
   activeView: 'command',
   activeTaskId: '',
   connection: 'connecting',
+  backend: 'offline',
   capabilities: [],
   tasks: [],
   approvals: [],
@@ -19,4 +17,6 @@ export const emptySnapshot: AppSnapshot = {
   contacts: [],
   connectors: [],
   timeline: [],
+  unreadNotifications: 0,
+  panelHealth: {},
 };

@@ -1,845 +1,757 @@
 {
-  "entrypoints": [
+  "description": "Conservative static import reachability; dynamic imports are not inferred.",
+  "module_count": 477,
+  "python_loc": 116864,
+  "seed_groups": {
+    "start": [
+      "brjarvis.apps.bootstrap",
+      "brjarvis.core.version",
+      "brjarvis.diagnostics.doctor"
+    ],
+    "apps": [
+      "brjarvis",
+      "brjarvis.apps",
+      "brjarvis.apps.cli",
+      "brjarvis.apps.desktop",
+      "brjarvis.apps.voice",
+      "brjarvis.apps.web",
+      "brjarvis.web"
+    ],
+    "package_apps": [
+      "brjarvis.apps",
+      "brjarvis.apps.bootstrap",
+      "brjarvis.apps.cli",
+      "brjarvis.apps.desktop",
+      "brjarvis.apps.voice",
+      "brjarvis.apps.web"
+    ],
+    "surface_entrypoints": [
+      "brjarvis.career",
+      "brjarvis.core.cli",
+      "brjarvis.desktop.float_widget",
+      "brjarvis.voice.assistant",
+      "brjarvis.web.api.server"
+    ]
+  },
+  "reachable_counts": {
+    "from_start": 241,
+    "from_apps": 246,
+    "from_package_apps": 246,
+    "from_surfaces": 238,
+    "union": 246
+  },
+  "reachable_union": [
+    "brjarvis",
+    "brjarvis.actions",
+    "brjarvis.actions._credentials",
+    "brjarvis.actions._gemini_client",
+    "brjarvis.actions.app_resolver",
+    "brjarvis.actions.calendar_engine",
+    "brjarvis.actions.clipboard_utils",
+    "brjarvis.actions.custom_commands",
+    "brjarvis.actions.file_importer",
+    "brjarvis.actions.hotkeys",
+    "brjarvis.actions.open_app",
+    "brjarvis.actions.rag_library",
+    "brjarvis.actions.routine_engine",
+    "brjarvis.actions.send_message",
+    "brjarvis.actions.telegram_automation",
+    "brjarvis.actions.whatsapp_automation",
+    "brjarvis.agent",
+    "brjarvis.agent.artifacts",
+    "brjarvis.agent.error_handler",
+    "brjarvis.agent.execution_ledger",
+    "brjarvis.agent.executor",
+    "brjarvis.agent.goal_decomposer",
+    "brjarvis.agent.planner",
+    "brjarvis.agent.recovery_engine",
+    "brjarvis.agent.recovery_watchdog",
+    "brjarvis.agent.task_queue",
+    "brjarvis.agent.task_state",
+    "brjarvis.agent.verifier",
+    "brjarvis.apps",
     "brjarvis.apps.bootstrap",
     "brjarvis.apps.cli",
+    "brjarvis.apps.desktop",
+    "brjarvis.apps.voice",
     "brjarvis.apps.web",
+    "brjarvis.career",
+    "brjarvis.career.analytics",
+    "brjarvis.career.api_routes",
+    "brjarvis.career.application_engine.assistant",
+    "brjarvis.career.application_engine.duplicate_guard",
+    "brjarvis.career.application_engine.package_builder",
+    "brjarvis.career.application_engine.policy",
+    "brjarvis.career.application_engine.questions",
+    "brjarvis.career.application_engine.tracker",
+    "brjarvis.career.application_engine.verifier",
+    "brjarvis.career.ats_engine",
+    "brjarvis.career.ats_engine.scorer",
+    "brjarvis.career.calendar_engine",
+    "brjarvis.career.calendar_engine.manager",
+    "brjarvis.career.canva.auth",
+    "brjarvis.career.canva.capability",
+    "brjarvis.career.cover_letter.generator",
+    "brjarvis.career.crm",
+    "brjarvis.career.crm.database",
+    "brjarvis.career.crm.followup_engine",
+    "brjarvis.career.crm.state_machine",
+    "brjarvis.career.email_intelligence",
+    "brjarvis.career.email_intelligence.classifier",
+    "brjarvis.career.email_intelligence.injection_guard",
+    "brjarvis.career.email_intelligence.interview_detector",
+    "brjarvis.career.email_intelligence.matcher",
+    "brjarvis.career.email_intelligence.offer_detector",
+    "brjarvis.career.email_intelligence.rejection_detector",
+    "brjarvis.career.email_intelligence.service",
+    "brjarvis.career.interview_prep",
+    "brjarvis.career.job_engine",
+    "brjarvis.career.job_engine.adapters",
+    "brjarvis.career.job_engine.deduplicator",
+    "brjarvis.career.job_engine.finder",
+    "brjarvis.career.job_engine.matcher",
+    "brjarvis.career.job_engine.models",
+    "brjarvis.career.job_engine.ranker",
+    "brjarvis.career.memory_integration",
+    "brjarvis.career.models",
+    "brjarvis.career.notifications",
+    "brjarvis.career.profile_manager",
+    "brjarvis.career.resume_engine",
+    "brjarvis.career.resume_engine.exporter",
+    "brjarvis.career.resume_engine.models",
+    "brjarvis.career.resume_engine.renderer",
+    "brjarvis.career.resume_engine.tailoring",
+    "brjarvis.career.resume_engine.templates",
+    "brjarvis.career.resume_engine.version_manager",
+    "brjarvis.career.spreadsheet",
+    "brjarvis.career.spreadsheet.projection",
+    "brjarvis.career.spreadsheet.tracker_excel",
+    "brjarvis.connectors",
+    "brjarvis.connectors.base",
+    "brjarvis.connectors.gmail",
+    "brjarvis.core",
     "brjarvis.core.bootstrap",
+    "brjarvis.core.cli",
+    "brjarvis.core.config",
+    "brjarvis.core.di",
+    "brjarvis.core.execution",
+    "brjarvis.core.execution.capability_checker",
+    "brjarvis.core.execution.completion_gate",
+    "brjarvis.core.execution.dependency_resolver",
+    "brjarvis.core.execution.environment_resolver",
+    "brjarvis.core.execution.process_runner",
+    "brjarvis.core.execution.recovery_manager",
+    "brjarvis.core.execution.trace",
+    "brjarvis.core.execution.types",
+    "brjarvis.core.execution.universal_runtime",
+    "brjarvis.core.execution.verifier",
+    "brjarvis.core.health",
+    "brjarvis.core.lifecycle",
+    "brjarvis.core.logging",
+    "brjarvis.core.native_bridge",
+    "brjarvis.core.paths",
+    "brjarvis.core.process",
+    "brjarvis.core.runtime",
+    "brjarvis.core.terminal",
+    "brjarvis.core.version",
+    "brjarvis.desktop",
+    "brjarvis.desktop.float_widget",
+    "brjarvis.desktop.floating_runtime",
+    "brjarvis.desktop.floating_surface",
+    "brjarvis.desktop.floating_voice",
+    "brjarvis.desktop.ui_mark",
+    "brjarvis.diagnostics",
+    "brjarvis.diagnostics.doctor",
+    "brjarvis.events",
+    "brjarvis.events.bus",
+    "brjarvis.events.store",
+    "brjarvis.events.types",
+    "brjarvis.execution",
+    "brjarvis.gateway",
+    "brjarvis.gateway.benchmark",
+    "brjarvis.gateway.capabilities",
+    "brjarvis.gateway.client",
+    "brjarvis.gateway.discovery",
+    "brjarvis.gateway.execution",
+    "brjarvis.gateway.health",
+    "brjarvis.gateway.model_gateway",
+    "brjarvis.gateway.models_registry",
+    "brjarvis.guardian",
+    "brjarvis.guardian.audit_log",
+    "brjarvis.guardian.core",
+    "brjarvis.guardian.kill_switch",
+    "brjarvis.guardian.prompt_injection_shield",
+    "brjarvis.guardian.redteam",
+    "brjarvis.integrations",
+    "brjarvis.integrations.mobile",
+    "brjarvis.integrations.mobile.gateway",
+    "brjarvis.integrations.mobile.protocol",
+    "brjarvis.integrations.mobile.session",
+    "brjarvis.memory",
+    "brjarvis.memory.archiver",
+    "brjarvis.memory.cache",
+    "brjarvis.memory.canonical_db",
+    "brjarvis.memory.config_manager",
+    "brjarvis.memory.conflict_engine",
+    "brjarvis.memory.contact_manager",
+    "brjarvis.memory.domain",
+    "brjarvis.memory.experience_replay",
+    "brjarvis.memory.lessons",
+    "brjarvis.memory.memory_types",
+    "brjarvis.memory.persistent_store",
+    "brjarvis.memory.reflection",
+    "brjarvis.memory.retrieval",
+    "brjarvis.memory.sqlite_lock",
+    "brjarvis.memory.store",
+    "brjarvis.memory.temporal",
+    "brjarvis.memory.unified_memory",
+    "brjarvis.memory.vector_store",
+    "brjarvis.memory.working",
+    "brjarvis.memory.workspace_store",
+    "brjarvis.orchestrator",
+    "brjarvis.plugins",
+    "brjarvis.reasoning",
+    "brjarvis.reasoning.decision_engine",
+    "brjarvis.router",
+    "brjarvis.router.smart_router",
+    "brjarvis.router.task_profile",
+    "brjarvis.security",
+    "brjarvis.security.capabilities",
+    "brjarvis.security.credentials",
+    "brjarvis.security.path_policy",
+    "brjarvis.security.permission_request",
+    "brjarvis.security.permissions",
+    "brjarvis.security.policy_engine",
+    "brjarvis.skills",
+    "brjarvis.skills.skill_engine",
+    "brjarvis.tools",
+    "brjarvis.tools.domain",
+    "brjarvis.tools.normalizer",
+    "brjarvis.tools.registry",
+    "brjarvis.tools.resolver",
+    "brjarvis.tools.runtime",
+    "brjarvis.tools.tool_result",
+    "brjarvis.tools.tool_runtime",
+    "brjarvis.tools.validator",
+    "brjarvis.ui",
+    "brjarvis.ui._qt",
+    "brjarvis.ui.app",
+    "brjarvis.ui.colors",
+    "brjarvis.ui.main_window",
+    "brjarvis.ui.overlays",
+    "brjarvis.ui.widgets",
+    "brjarvis.vision",
+    "brjarvis.vision.accessibility",
+    "brjarvis.vision.dom_bridge",
+    "brjarvis.vision.engine",
+    "brjarvis.vision.hybrid_pipeline",
+    "brjarvis.vision.ocr_engine",
+    "brjarvis.vision.screen_analyst",
+    "brjarvis.vision.types",
+    "brjarvis.voice",
+    "brjarvis.voice.assistant",
+    "brjarvis.voice.audio_bus",
+    "brjarvis.voice.audio_processor",
+    "brjarvis.voice.gemini_live",
+    "brjarvis.voice.gemini_stt",
+    "brjarvis.voice.multilingual",
+    "brjarvis.voice.noise_calibrator",
+    "brjarvis.voice.prompt_refiner",
+    "brjarvis.voice.ring_buffer",
+    "brjarvis.voice.shortcuts",
+    "brjarvis.voice.silero_vad",
+    "brjarvis.voice.sound_effects",
+    "brjarvis.voice.state_machine",
+    "brjarvis.voice.stt",
+    "brjarvis.voice.tts",
+    "brjarvis.voice.whisper_local",
+    "brjarvis.web",
+    "brjarvis.web.api",
     "brjarvis.web.api.app",
-    "cli.main",
-    "desktop.main",
-    "float_widget",
-    "main",
-    "permissions",
-    "server",
-    "start",
-    "ui",
-    "ui_mark",
-    "voice.main",
-    "web.main"
+    "brjarvis.web.api.routes.artifacts",
+    "brjarvis.web.api.routes.auth",
+    "brjarvis.web.api.routes.automations",
+    "brjarvis.web.api.routes.chat",
+    "brjarvis.web.api.routes.connectors",
+    "brjarvis.web.api.routes.conversations",
+    "brjarvis.web.api.routes.devices",
+    "brjarvis.web.api.routes.health",
+    "brjarvis.web.api.routes.memory",
+    "brjarvis.web.api.routes.notifications",
+    "brjarvis.web.api.routes.projects",
+    "brjarvis.web.api.routes.routines",
+    "brjarvis.web.api.routes.search",
+    "brjarvis.web.api.routes.skills",
+    "brjarvis.web.api.routes.tasks",
+    "brjarvis.web.api.routes.voice",
+    "brjarvis.web.api.routes.websocket",
+    "brjarvis.web.api.server",
+    "brjarvis.web.api.state"
   ],
-  "total_modules": 542,
-  "reachable_count": 379,
-  "test_only_count": 44,
-  "dead_count": 119,
-  "dead_loc": 19404,
-  "test_only_loc": 17635,
-  "test_only": [
-    {
-      "module": "brjarvis.actions.process_optimizer",
-      "path": "src\\brjarvis\\actions\\process_optimizer.py",
-      "loc": 70
-    },
-    {
-      "module": "brjarvis.agent.agent_loop",
-      "path": "src\\brjarvis\\agent\\agent_loop.py",
-      "loc": 638
-    },
-    {
-      "module": "brjarvis.agent.cross_device_planner",
-      "path": "src\\brjarvis\\agent\\cross_device_planner.py",
-      "loc": 282
-    },
-    {
-      "module": "brjarvis.agent.session",
-      "path": "src\\brjarvis\\agent\\session.py",
-      "loc": 563
-    },
-    {
-      "module": "brjarvis.agent.stage_decomposer",
-      "path": "src\\brjarvis\\agent\\stage_decomposer.py",
-      "loc": 961
-    },
-    {
-      "module": "brjarvis.agent.step_planner",
-      "path": "src\\brjarvis\\agent\\step_planner.py",
-      "loc": 152
-    },
-    {
-      "module": "brjarvis.career.ats_engine",
-      "path": "src\\brjarvis\\career\\ats_engine\\__init__.py",
-      "loc": 9
-    },
-    {
-      "module": "brjarvis.context.builder",
-      "path": "src\\brjarvis\\context\\builder.py",
-      "loc": 137
-    },
-    {
-      "module": "brjarvis.context.compressor",
-      "path": "src\\brjarvis\\context\\compressor.py",
-      "loc": 86
-    },
-    {
-      "module": "brjarvis.context.token_counter",
-      "path": "src\\brjarvis\\context\\token_counter.py",
-      "loc": 58
-    },
-    {
-      "module": "brjarvis.context.types",
-      "path": "src\\brjarvis\\context\\types.py",
-      "loc": 89
-    },
-    {
-      "module": "brjarvis.contracts.session",
-      "path": "src\\brjarvis\\contracts\\session.py",
-      "loc": 105
-    },
-    {
-      "module": "brjarvis.core.intent_engine",
-      "path": "src\\brjarvis\\core\\intent_engine.py",
-      "loc": 2394
-    },
-    {
-      "module": "brjarvis.core.terminal.actions",
-      "path": "src\\brjarvis\\core\\terminal\\actions.py",
-      "loc": 149
-    },
-    {
-      "module": "brjarvis.core.terminal.autocomplete",
-      "path": "src\\brjarvis\\core\\terminal\\autocomplete.py",
-      "loc": 276
-    },
-    {
-      "module": "brjarvis.core.terminal.commands",
-      "path": "src\\brjarvis\\core\\terminal\\commands.py",
-      "loc": 2068
-    },
-    {
-      "module": "brjarvis.core.terminal.components",
-      "path": "src\\brjarvis\\core\\terminal\\components.py",
-      "loc": 451
-    },
-    {
-      "module": "brjarvis.core.terminal.events",
-      "path": "src\\brjarvis\\core\\terminal\\events.py",
-      "loc": 245
-    },
-    {
-      "module": "brjarvis.core.terminal.guard",
-      "path": "src\\brjarvis\\core\\terminal\\guard.py",
-      "loc": 289
-    },
-    {
-      "module": "brjarvis.core.terminal.hit_test",
-      "path": "src\\brjarvis\\core\\terminal\\hit_test.py",
-      "loc": 128
-    },
-    {
-      "module": "brjarvis.core.terminal.interactive_tui",
-      "path": "src\\brjarvis\\core\\terminal\\interactive_tui.py",
-      "loc": 281
-    },
-    {
-      "module": "brjarvis.core.terminal.renderer",
-      "path": "src\\brjarvis\\core\\terminal\\renderer.py",
-      "loc": 1048
-    },
-    {
-      "module": "brjarvis.core.terminal.selection",
-      "path": "src\\brjarvis\\core\\terminal\\selection.py",
-      "loc": 277
-    },
-    {
-      "module": "brjarvis.core.terminal.session",
-      "path": "src\\brjarvis\\core\\terminal\\session.py",
-      "loc": 690
-    },
-    {
-      "module": "brjarvis.core.terminal.theme",
-      "path": "src\\brjarvis\\core\\terminal\\theme.py",
-      "loc": 139
-    },
-    {
-      "module": "brjarvis.core.terminal.viewport",
-      "path": "src\\brjarvis\\core\\terminal\\viewport.py",
-      "loc": 133
-    },
-    {
-      "module": "brjarvis.gateway.routing",
-      "path": "src\\brjarvis\\gateway\\routing.py",
-      "loc": 357
-    },
-    {
-      "module": "brjarvis.history.audit_writer",
-      "path": "src\\brjarvis\\history\\audit_writer.py",
-      "loc": 150
-    },
-    {
-      "module": "brjarvis.history.linker",
-      "path": "src\\brjarvis\\history\\linker.py",
-      "loc": 205
-    },
-    {
-      "module": "brjarvis.history.session_store",
-      "path": "src\\brjarvis\\history\\session_store.py",
-      "loc": 411
-    },
-    {
-      "module": "brjarvis.integrations.mobile.device_controller",
-      "path": "src\\brjarvis\\integrations\\mobile\\device_controller.py",
-      "loc": 153
-    },
-    {
-      "module": "brjarvis.integrations.mobile.screen_understanding",
-      "path": "src\\brjarvis\\integrations\\mobile\\screen_understanding.py",
-      "loc": 135
-    },
-    {
-      "module": "brjarvis.memory.consolidator",
-      "path": "src\\brjarvis\\memory\\consolidator.py",
-      "loc": 158
-    },
-    {
-      "module": "brjarvis.memory.conversation_store",
-      "path": "src\\brjarvis\\memory\\conversation_store.py",
-      "loc": 254
-    },
-    {
-      "module": "brjarvis.memory.memory_context",
-      "path": "src\\brjarvis\\memory\\memory_context.py",
-      "loc": 140
-    },
-    {
-      "module": "brjarvis.memory.memory_scan",
-      "path": "src\\brjarvis\\memory\\memory_scan.py",
-      "loc": 116
-    },
-    {
-      "module": "brjarvis.memory.session_lifecycle",
-      "path": "src\\brjarvis\\memory\\session_lifecycle.py",
-      "loc": 182
-    },
-    {
-      "module": "brjarvis.memory.task_memory_router",
-      "path": "src\\brjarvis\\memory\\task_memory_router.py",
-      "loc": 193
-    },
-    {
-      "module": "brjarvis.orchestrator.core",
-      "path": "src\\brjarvis\\orchestrator\\core.py",
-      "loc": 1384
-    },
-    {
-      "module": "brjarvis.router.core",
-      "path": "src\\brjarvis\\router\\core.py",
-      "loc": 539
-    },
-    {
-      "module": "brjarvis.router.diagnostics",
-      "path": "src\\brjarvis\\router\\diagnostics.py",
-      "loc": 267
-    },
-    {
-      "module": "brjarvis.tools.diagnostics",
-      "path": "src\\brjarvis\\tools\\diagnostics.py",
-      "loc": 136
-    },
-    {
-      "module": "brjarvis.web.api.routes",
-      "path": "src\\brjarvis\\web\\api\\routes\\__init__.py",
-      "loc": 3
-    },
-    {
-      "module": "brjarvis.workflow.tool_orchestration",
-      "path": "src\\brjarvis\\workflow\\tool_orchestration.py",
-      "loc": 1134
-    }
+  "unreachable_union": [
+    "brjarvis.actions.app_analyzer",
+    "brjarvis.actions.app_tracker",
+    "brjarvis.actions.automation_engine",
+    "brjarvis.actions.background_monitor",
+    "brjarvis.actions.channel_action_dispatcher",
+    "brjarvis.actions.chat_export",
+    "brjarvis.actions.cli_controller",
+    "brjarvis.actions.clipboard_history",
+    "brjarvis.actions.computer_control",
+    "brjarvis.actions.computer_settings",
+    "brjarvis.actions.desktop",
+    "brjarvis.actions.email_assistant",
+    "brjarvis.actions.fast_file_search",
+    "brjarvis.actions.file_processor",
+    "brjarvis.actions.galaxy",
+    "brjarvis.actions.gmail_auth",
+    "brjarvis.actions.image_generator",
+    "brjarvis.actions.live_os_control",
+    "brjarvis.actions.longform_builder",
+    "brjarvis.actions.proactive",
+    "brjarvis.actions.proactive_listener",
+    "brjarvis.actions.process_optimizer",
+    "brjarvis.actions.reminder",
+    "brjarvis.actions.reminders",
+    "brjarvis.actions.scheduler",
+    "brjarvis.actions.screen_processor",
+    "brjarvis.actions.screen_share",
+    "brjarvis.actions.smart_email_sender",
+    "brjarvis.actions.system_cleanup",
+    "brjarvis.actions.system_monitor",
+    "brjarvis.actions.system_optimizer",
+    "brjarvis.actions.transcriber",
+    "brjarvis.actions.video_generator",
+    "brjarvis.actions.weather_report",
+    "brjarvis.actions.web_app_controller",
+    "brjarvis.actions.web_search",
+    "brjarvis.actions.youtube_video",
+    "brjarvis.agent.agent_loop",
+    "brjarvis.agent.cross_device_planner",
+    "brjarvis.agent.executor_engine",
+    "brjarvis.agent.planner_engine",
+    "brjarvis.agent.scratchpad",
+    "brjarvis.agent.session",
+    "brjarvis.agent.stage_decomposer",
+    "brjarvis.agent.step_planner",
+    "brjarvis.agent.types",
+    "brjarvis.career.application_engine",
+    "brjarvis.career.canva",
+    "brjarvis.career.canva.adapter",
+    "brjarvis.career.cover_letter",
+    "brjarvis.career.crm.event_pipeline",
+    "brjarvis.career.job_engine.adapters.ashby",
+    "brjarvis.career.job_engine.adapters.base",
+    "brjarvis.career.job_engine.adapters.company_site",
+    "brjarvis.career.job_engine.adapters.generic_browser",
+    "brjarvis.career.job_engine.adapters.greenhouse",
+    "brjarvis.career.job_engine.adapters.lever",
+    "brjarvis.career.tools",
+    "brjarvis.computer",
+    "brjarvis.computer.operator",
+    "brjarvis.computer.types",
+    "brjarvis.config",
+    "brjarvis.config.complexity_router",
+    "brjarvis.config.model_loader",
+    "brjarvis.config.models",
+    "brjarvis.connectors.calendar",
+    "brjarvis.connectors.capabilities",
+    "brjarvis.connectors.filesystem",
+    "brjarvis.connectors.github",
+    "brjarvis.connectors.hub",
+    "brjarvis.connectors.mcp_proxy",
+    "brjarvis.connectors.notion",
+    "brjarvis.connectors.rss_news",
+    "brjarvis.connectors.slack",
+    "brjarvis.connectors.telegram",
+    "brjarvis.connectors.weather",
+    "brjarvis.connectors.web_search",
+    "brjarvis.connectors.wikipedia",
+    "brjarvis.connectors.youtube",
+    "brjarvis.context",
+    "brjarvis.context.builder",
+    "brjarvis.context.compressor",
+    "brjarvis.context.engine",
+    "brjarvis.context.token_counter",
+    "brjarvis.context.types",
+    "brjarvis.contracts",
+    "brjarvis.contracts.agent",
+    "brjarvis.contracts.events",
+    "brjarvis.contracts.memory",
+    "brjarvis.contracts.model",
+    "brjarvis.contracts.security",
+    "brjarvis.contracts.session",
+    "brjarvis.contracts.task",
+    "brjarvis.contracts.tool",
+    "brjarvis.contracts.verification",
+    "brjarvis.contracts.workflow",
+    "brjarvis.core.intent_engine",
+    "brjarvis.core.terminal.actions",
+    "brjarvis.core.terminal.autocomplete",
+    "brjarvis.core.terminal.commands",
+    "brjarvis.core.terminal.components",
+    "brjarvis.core.terminal.events",
+    "brjarvis.core.terminal.guard",
+    "brjarvis.core.terminal.hit_test",
+    "brjarvis.core.terminal.interactive_tui",
+    "brjarvis.core.terminal.renderer",
+    "brjarvis.core.terminal.selection",
+    "brjarvis.core.terminal.session",
+    "brjarvis.core.terminal.theme",
+    "brjarvis.core.terminal.viewport",
+    "brjarvis.core.workspace_engine",
+    "brjarvis.events.handlers",
+    "brjarvis.evolution",
+    "brjarvis.evolution.engine",
+    "brjarvis.gateway.routing",
+    "brjarvis.guardian.redteam.recon",
+    "brjarvis.guardian.redteam.report",
+    "brjarvis.guardian.redteam.scope",
+    "brjarvis.guardian.redteam.vuln_scanner",
+    "brjarvis.guardian.rollback",
+    "brjarvis.guardian.snapshot",
+    "brjarvis.history",
+    "brjarvis.history.audit_writer",
+    "brjarvis.history.linker",
+    "brjarvis.history.replay",
+    "brjarvis.history.session_store",
+    "brjarvis.integrations.backends",
+    "brjarvis.integrations.backends.anthropic",
+    "brjarvis.integrations.backends.base",
+    "brjarvis.integrations.backends.deepseek",
+    "brjarvis.integrations.backends.gemini",
+    "brjarvis.integrations.backends.manus",
+    "brjarvis.integrations.backends.mistral",
+    "brjarvis.integrations.backends.nvidia",
+    "brjarvis.integrations.backends.ollama",
+    "brjarvis.integrations.backends.openai_compat",
+    "brjarvis.integrations.mobile.device_controller",
+    "brjarvis.integrations.mobile.screen_understanding",
+    "brjarvis.memory.consolidator",
+    "brjarvis.memory.conversation_store",
+    "brjarvis.memory.handoff",
+    "brjarvis.memory.memory_context",
+    "brjarvis.memory.memory_manager",
+    "brjarvis.memory.memory_scan",
+    "brjarvis.memory.session_lifecycle",
+    "brjarvis.memory.task_memory_router",
+    "brjarvis.multi_agent",
+    "brjarvis.multi_agent.subagent",
+    "brjarvis.native",
+    "brjarvis.orchestrator.core",
+    "brjarvis.plugins.plugin_manager",
+    "brjarvis.reasoning.engine",
+    "brjarvis.reasoning.types",
+    "brjarvis.router.core",
+    "brjarvis.router.diagnostics",
+    "brjarvis.screen_server",
+    "brjarvis.skills.builtin",
+    "brjarvis.skills.builtin_connectors",
+    "brjarvis.skills.builtin_editor",
+    "brjarvis.skills.builtin_extras",
+    "brjarvis.skills.builtin_pro",
+    "brjarvis.skills.builtin_rag",
+    "brjarvis.skills.builtin_writer",
+    "brjarvis.skills.executor",
+    "brjarvis.skills.installer",
+    "brjarvis.skills.loader",
+    "brjarvis.skills.registry",
+    "brjarvis.tools.agent_tools",
+    "brjarvis.tools.app_analyzer_tools",
+    "brjarvis.tools.app_connectors",
+    "brjarvis.tools.app_tracker_tools",
+    "brjarvis.tools.audit_tools",
+    "brjarvis.tools.automation_tools",
+    "brjarvis.tools.autonomous_browser_agent",
+    "brjarvis.tools.background_monitor_tools",
+    "brjarvis.tools.batch_file_tool",
+    "brjarvis.tools.browser_agent_v2",
+    "brjarvis.tools.browser_automation",
+    "brjarvis.tools.calendar_tools",
+    "brjarvis.tools.code_refactor_tool",
+    "brjarvis.tools.code_tools",
+    "brjarvis.tools.connector_tools",
+    "brjarvis.tools.contact_tools",
+    "brjarvis.tools.custom_command_tools",
+    "brjarvis.tools.diagnostics",
+    "brjarvis.tools.doc_tools",
+    "brjarvis.tools.excel_tools",
+    "brjarvis.tools.export_tools",
+    "brjarvis.tools.file_import_tools",
+    "brjarvis.tools.file_processor_tools",
+    "brjarvis.tools.file_search_semantic",
+    "brjarvis.tools.file_tools",
+    "brjarvis.tools.files",
+    "brjarvis.tools.git_repo_tool",
+    "brjarvis.tools.gmail_auth_tools",
+    "brjarvis.tools.image_tools",
+    "brjarvis.tools.legacy_actions_tools",
+    "brjarvis.tools.live_os_tools",
+    "brjarvis.tools.mcp_connector",
+    "brjarvis.tools.memory_tools",
+    "brjarvis.tools.pc_tools",
+    "brjarvis.tools.pdf_tools",
+    "brjarvis.tools.proactive_listener_tools",
+    "brjarvis.tools.process_tools",
+    "brjarvis.tools.qa_testing_tool",
+    "brjarvis.tools.rag_tools",
+    "brjarvis.tools.recall_tools",
+    "brjarvis.tools.redteam_tools",
+    "brjarvis.tools.reminder_tools",
+    "brjarvis.tools.sandbox",
+    "brjarvis.tools.sandbox_process",
+    "brjarvis.tools.scratchpad_tools",
+    "brjarvis.tools.skills_tools",
+    "brjarvis.tools.smart_email_tools",
+    "brjarvis.tools.system_diagnostic_tool",
+    "brjarvis.tools.system_health",
+    "brjarvis.tools.system_tools",
+    "brjarvis.tools.telegram_tools",
+    "brjarvis.tools.transcription_tools",
+    "brjarvis.tools.video_tools",
+    "brjarvis.tools.web",
+    "brjarvis.tools.web_app_tools",
+    "brjarvis.tools.web_extractor",
+    "brjarvis.tools.web_tools",
+    "brjarvis.tools.whatsapp_tools",
+    "brjarvis.tools.window_manager",
+    "brjarvis.tools.workspace_tools",
+    "brjarvis.web.api.routes",
+    "brjarvis.workflow",
+    "brjarvis.workflow.task_dag",
+    "brjarvis.workflow.tool_orchestration"
   ],
-  "dead": [
-    {
-      "module": "apps",
-      "path": "apps\\__init__.py",
-      "loc": 9
-    },
-    {
-      "module": "brjarvis.actions.browser_control",
-      "path": "src\\brjarvis\\actions\\browser_control.py",
-      "loc": 1103
-    },
-    {
-      "module": "brjarvis.actions.code_helper",
-      "path": "src\\brjarvis\\actions\\code_helper.py",
-      "loc": 605
-    },
-    {
-      "module": "brjarvis.actions.dev_agent",
-      "path": "src\\brjarvis\\actions\\dev_agent.py",
-      "loc": 638
-    },
-    {
-      "module": "brjarvis.actions.file_controller",
-      "path": "src\\brjarvis\\actions\\file_controller.py",
-      "loc": 557
-    },
-    {
-      "module": "brjarvis.actions.flight_finder",
-      "path": "src\\brjarvis\\actions\\flight_finder.py",
-      "loc": 372
-    },
-    {
-      "module": "brjarvis.actions.game_updater",
-      "path": "src\\brjarvis\\actions\\game_updater.py",
-      "loc": 1079
-    },
-    {
-      "module": "brjarvis.actions.proactive",
-      "path": "src\\brjarvis\\actions\\proactive.py",
-      "loc": 127
-    },
-    {
-      "module": "brjarvis.actions.repo_controller",
-      "path": "src\\brjarvis\\actions\\repo_controller.py",
-      "loc": 61
-    },
-    {
-      "module": "brjarvis.actions.sqlite_manager",
-      "path": "src\\brjarvis\\actions\\sqlite_manager.py",
-      "loc": 74
-    },
-    {
-      "module": "brjarvis.agent.critic_agent",
-      "path": "src\\brjarvis\\agent\\critic_agent.py",
-      "loc": 93
-    },
-    {
-      "module": "brjarvis.agent.executor_engine",
-      "path": "src\\brjarvis\\agent\\executor_engine.py",
-      "loc": 289
-    },
-    {
-      "module": "brjarvis.agent.planner_engine",
-      "path": "src\\brjarvis\\agent\\planner_engine.py",
-      "loc": 190
-    },
-    {
-      "module": "brjarvis.agent.planning_mode",
-      "path": "src\\brjarvis\\agent\\planning_mode.py",
-      "loc": 180
-    },
-    {
-      "module": "brjarvis.agent.task_lifecycle",
-      "path": "src\\brjarvis\\agent\\task_lifecycle.py",
-      "loc": 139
-    },
-    {
-      "module": "brjarvis.agent.task_scheduler",
-      "path": "src\\brjarvis\\agent\\task_scheduler.py",
-      "loc": 71
-    },
-    {
-      "module": "brjarvis.agent.transcript_logger",
-      "path": "src\\brjarvis\\agent\\transcript_logger.py",
-      "loc": 84
-    },
-    {
-      "module": "brjarvis.agent.types",
-      "path": "src\\brjarvis\\agent\\types.py",
-      "loc": 62
-    },
-    {
-      "module": "brjarvis.apps",
-      "path": "src\\brjarvis\\apps\\__init__.py",
-      "loc": 16
-    },
-    {
-      "module": "brjarvis.career.application_engine",
-      "path": "src\\brjarvis\\career\\application_engine\\__init__.py",
-      "loc": 23
-    },
-    {
-      "module": "brjarvis.career.calendar_engine",
-      "path": "src\\brjarvis\\career\\calendar_engine\\__init__.py",
-      "loc": 9
-    },
-    {
-      "module": "brjarvis.career.canva",
-      "path": "src\\brjarvis\\career\\canva\\__init__.py",
-      "loc": 13
-    },
-    {
-      "module": "brjarvis.career.cover_letter",
-      "path": "src\\brjarvis\\career\\cover_letter\\__init__.py",
-      "loc": 8
-    },
-    {
-      "module": "brjarvis.career.crm",
-      "path": "src\\brjarvis\\career\\crm\\__init__.py",
-      "loc": 17
-    },
-    {
-      "module": "brjarvis.career.crm.event_pipeline",
-      "path": "src\\brjarvis\\career\\crm\\event_pipeline.py",
-      "loc": 180
-    },
-    {
-      "module": "brjarvis.career.email_intelligence",
-      "path": "src\\brjarvis\\career\\email_intelligence\\__init__.py",
-      "loc": 21
-    },
-    {
-      "module": "brjarvis.career.job_engine.adapters.ashby",
-      "path": "src\\brjarvis\\career\\job_engine\\adapters\\ashby.py",
-      "loc": 169
-    },
-    {
-      "module": "brjarvis.career.job_engine.adapters.base",
-      "path": "src\\brjarvis\\career\\job_engine\\adapters\\base.py",
-      "loc": 77
-    },
-    {
-      "module": "brjarvis.career.job_engine.adapters.company_site",
-      "path": "src\\brjarvis\\career\\job_engine\\adapters\\company_site.py",
-      "loc": 59
-    },
-    {
-      "module": "brjarvis.career.job_engine.adapters.generic_browser",
-      "path": "src\\brjarvis\\career\\job_engine\\adapters\\generic_browser.py",
-      "loc": 108
-    },
-    {
-      "module": "brjarvis.career.job_engine.adapters.greenhouse",
-      "path": "src\\brjarvis\\career\\job_engine\\adapters\\greenhouse.py",
-      "loc": 250
-    },
-    {
-      "module": "brjarvis.career.job_engine.adapters.lever",
-      "path": "src\\brjarvis\\career\\job_engine\\adapters\\lever.py",
-      "loc": 178
-    },
-    {
-      "module": "brjarvis.career.resume_engine",
-      "path": "src\\brjarvis\\career\\resume_engine\\__init__.py",
-      "loc": 39
-    },
-    {
-      "module": "brjarvis.career.spreadsheet",
-      "path": "src\\brjarvis\\career\\spreadsheet\\__init__.py",
-      "loc": 11
-    },
-    {
-      "module": "brjarvis.computer.operator",
-      "path": "src\\brjarvis\\computer\\operator.py",
-      "loc": 300
-    },
-    {
-      "module": "brjarvis.computer.recovery",
-      "path": "src\\brjarvis\\computer\\recovery.py",
-      "loc": 116
-    },
-    {
-      "module": "brjarvis.computer.semantic_operator",
-      "path": "src\\brjarvis\\computer\\semantic_operator.py",
-      "loc": 116
-    },
-    {
-      "module": "brjarvis.computer.types",
-      "path": "src\\brjarvis\\computer\\types.py",
-      "loc": 48
-    },
-    {
-      "module": "brjarvis.config.model_loader",
-      "path": "src\\brjarvis\\config\\model_loader.py",
-      "loc": 75
-    },
-    {
-      "module": "brjarvis.context.engine",
-      "path": "src\\brjarvis\\context\\engine.py",
-      "loc": 124
-    },
-    {
-      "module": "brjarvis.context.token_manager",
-      "path": "src\\brjarvis\\context\\token_manager.py",
-      "loc": 99
-    },
-    {
-      "module": "brjarvis.contracts.agent",
-      "path": "src\\brjarvis\\contracts\\agent.py",
-      "loc": 88
-    },
-    {
-      "module": "brjarvis.contracts.events",
-      "path": "src\\brjarvis\\contracts\\events.py",
-      "loc": 43
-    },
-    {
-      "module": "brjarvis.contracts.memory",
-      "path": "src\\brjarvis\\contracts\\memory.py",
-      "loc": 81
-    },
-    {
-      "module": "brjarvis.contracts.model",
-      "path": "src\\brjarvis\\contracts\\model.py",
-      "loc": 94
-    },
-    {
-      "module": "brjarvis.contracts.security",
-      "path": "src\\brjarvis\\contracts\\security.py",
-      "loc": 78
-    },
-    {
-      "module": "brjarvis.contracts.task",
-      "path": "src\\brjarvis\\contracts\\task.py",
-      "loc": 128
-    },
-    {
-      "module": "brjarvis.contracts.tool",
-      "path": "src\\brjarvis\\contracts\\tool.py",
-      "loc": 126
-    },
-    {
-      "module": "brjarvis.contracts.verification",
-      "path": "src\\brjarvis\\contracts\\verification.py",
-      "loc": 54
-    },
-    {
-      "module": "brjarvis.contracts.workflow",
-      "path": "src\\brjarvis\\contracts\\workflow.py",
-      "loc": 58
-    },
-    {
-      "module": "brjarvis.core.bootstrapper",
-      "path": "src\\brjarvis\\core\\bootstrapper.py",
-      "loc": 15
-    },
-    {
-      "module": "brjarvis.core.code_graph",
-      "path": "src\\brjarvis\\core\\code_graph.py",
-      "loc": 231
-    },
-    {
-      "module": "brjarvis.core.compat",
-      "path": "src\\brjarvis\\core\\compat.py",
-      "loc": 302
-    },
-    {
-      "module": "brjarvis.core.error_middleware",
-      "path": "src\\brjarvis\\core\\error_middleware.py",
-      "loc": 53
-    },
-    {
-      "module": "brjarvis.core.errors",
-      "path": "src\\brjarvis\\core\\errors.py",
-      "loc": 138
-    },
-    {
-      "module": "brjarvis.core.installer",
-      "path": "src\\brjarvis\\core\\installer.py",
-      "loc": 146
-    },
-    {
-      "module": "brjarvis.core.integration",
-      "path": "src\\brjarvis\\core\\integration.py",
-      "loc": 53
-    },
-    {
-      "module": "brjarvis.core.personality",
-      "path": "src\\brjarvis\\core\\personality.py",
-      "loc": 38
-    },
-    {
-      "module": "brjarvis.core.retry",
-      "path": "src\\brjarvis\\core\\retry.py",
-      "loc": 108
-    },
-    {
-      "module": "brjarvis.core.sanitizer",
-      "path": "src\\brjarvis\\core\\sanitizer.py",
-      "loc": 3
-    },
-    {
-      "module": "brjarvis.core.timeouts",
-      "path": "src\\brjarvis\\core\\timeouts.py",
-      "loc": 24
-    },
-    {
-      "module": "brjarvis.diagnostics",
-      "path": "src\\brjarvis\\diagnostics\\__init__.py",
-      "loc": 16
-    },
-    {
-      "module": "brjarvis.events.handlers",
-      "path": "src\\brjarvis\\events\\handlers.py",
-      "loc": 21
-    },
-    {
-      "module": "brjarvis.gateway.probe",
-      "path": "src\\brjarvis\\gateway\\probe.py",
-      "loc": 141
-    },
-    {
-      "module": "brjarvis.guardian.redteam.recon",
-      "path": "src\\brjarvis\\guardian\\redteam\\recon.py",
-      "loc": 85
-    },
-    {
-      "module": "brjarvis.guardian.redteam.report",
-      "path": "src\\brjarvis\\guardian\\redteam\\report.py",
-      "loc": 109
-    },
-    {
-      "module": "brjarvis.guardian.redteam.vuln_scanner",
-      "path": "src\\brjarvis\\guardian\\redteam\\vuln_scanner.py",
-      "loc": 54
-    },
-    {
-      "module": "brjarvis.guardian.rollback",
-      "path": "src\\brjarvis\\guardian\\rollback.py",
-      "loc": 65
-    },
-    {
-      "module": "brjarvis.guardian.snapshot",
-      "path": "src\\brjarvis\\guardian\\snapshot.py",
-      "loc": 157
-    },
-    {
-      "module": "brjarvis.history.audit_engine",
-      "path": "src\\brjarvis\\history\\audit_engine.py",
-      "loc": 174
-    },
-    {
-      "module": "brjarvis.history.replay",
-      "path": "src\\brjarvis\\history\\replay.py",
-      "loc": 261
-    },
-    {
-      "module": "brjarvis.integrations.backends.adapter",
-      "path": "src\\brjarvis\\integrations\\backends\\adapter.py",
-      "loc": 330
-    },
-    {
-      "module": "brjarvis.integrations.backends.anthropic",
-      "path": "src\\brjarvis\\integrations\\backends\\anthropic.py",
-      "loc": 154
-    },
-    {
-      "module": "brjarvis.integrations.backends.deepseek",
-      "path": "src\\brjarvis\\integrations\\backends\\deepseek.py",
-      "loc": 123
-    },
-    {
-      "module": "brjarvis.integrations.backends.manus",
-      "path": "src\\brjarvis\\integrations\\backends\\manus.py",
-      "loc": 230
-    },
-    {
-      "module": "brjarvis.integrations.backends.mistral",
-      "path": "src\\brjarvis\\integrations\\backends\\mistral.py",
-      "loc": 97
-    },
-    {
-      "module": "brjarvis.integrations.backends.nvidia",
-      "path": "src\\brjarvis\\integrations\\backends\\nvidia.py",
-      "loc": 119
-    },
-    {
-      "module": "brjarvis.integrations.backends.ollama",
-      "path": "src\\brjarvis\\integrations\\backends\\ollama.py",
-      "loc": 142
-    },
-    {
-      "module": "brjarvis.integrations.backends.openai_compat",
-      "path": "src\\brjarvis\\integrations\\backends\\openai_compat.py",
-      "loc": 73
-    },
-    {
-      "module": "brjarvis.memory.decay",
-      "path": "src\\brjarvis\\memory\\decay.py",
-      "loc": 69
-    },
-    {
-      "module": "brjarvis.memory.diagnostics",
-      "path": "src\\brjarvis\\memory\\diagnostics.py",
-      "loc": 184
-    },
-    {
-      "module": "brjarvis.memory.handoff",
-      "path": "src\\brjarvis\\memory\\handoff.py",
-      "loc": 297
-    },
-    {
-      "module": "brjarvis.memory.knowledge_graph",
-      "path": "src\\brjarvis\\memory\\knowledge_graph.py",
-      "loc": 157
-    },
-    {
-      "module": "brjarvis.memory.migrate_legacy_memory",
-      "path": "src\\brjarvis\\memory\\migrate_legacy_memory.py",
-      "loc": 185
-    },
-    {
-      "module": "brjarvis.memory.temporal_kg",
-      "path": "src\\brjarvis\\memory\\temporal_kg.py",
-      "loc": 139
-    },
-    {
-      "module": "brjarvis.orchestrator.speculative",
-      "path": "src\\brjarvis\\orchestrator\\speculative.py",
-      "loc": 19
-    },
-    {
-      "module": "brjarvis.plugins.plugin_manager",
-      "path": "src\\brjarvis\\plugins\\plugin_manager.py",
-      "loc": 139
-    },
-    {
-      "module": "brjarvis.reasoning.cognitive_loop",
-      "path": "src\\brjarvis\\reasoning\\cognitive_loop.py",
-      "loc": 97
-    },
-    {
-      "module": "brjarvis.reasoning.engine",
-      "path": "src\\brjarvis\\reasoning\\engine.py",
-      "loc": 184
-    },
-    {
-      "module": "brjarvis.reasoning.meta_cognition",
-      "path": "src\\brjarvis\\reasoning\\meta_cognition.py",
-      "loc": 125
-    },
-    {
-      "module": "brjarvis.reasoning.prompt_cache",
-      "path": "src\\brjarvis\\reasoning\\prompt_cache.py",
-      "loc": 64
-    },
-    {
-      "module": "brjarvis.reasoning.speculative",
-      "path": "src\\brjarvis\\reasoning\\speculative.py",
-      "loc": 213
-    },
-    {
-      "module": "brjarvis.reasoning.speculative_engine",
-      "path": "src\\brjarvis\\reasoning\\speculative_engine.py",
-      "loc": 24
-    },
-    {
-      "module": "brjarvis.reasoning.speculative_selector",
-      "path": "src\\brjarvis\\reasoning\\speculative_selector.py",
-      "loc": 53
-    },
-    {
-      "module": "brjarvis.reasoning.types",
-      "path": "src\\brjarvis\\reasoning\\types.py",
-      "loc": 92
-    },
-    {
-      "module": "brjarvis.screen_server.ws_server",
-      "path": "src\\brjarvis\\screen_server\\ws_server.py",
-      "loc": 142
-    },
-    {
-      "module": "brjarvis.security.sanitizer",
-      "path": "src\\brjarvis\\security\\sanitizer.py",
-      "loc": 87
-    },
-    {
-      "module": "brjarvis.skills.builtin",
-      "path": "src\\brjarvis\\skills\\builtin.py",
-      "loc": 424
-    },
-    {
-      "module": "brjarvis.skills.builtin_connectors",
-      "path": "src\\brjarvis\\skills\\builtin_connectors.py",
-      "loc": 216
-    },
-    {
-      "module": "brjarvis.skills.builtin_editor",
-      "path": "src\\brjarvis\\skills\\builtin_editor.py",
-      "loc": 126
-    },
-    {
-      "module": "brjarvis.skills.builtin_extras",
-      "path": "src\\brjarvis\\skills\\builtin_extras.py",
-      "loc": 159
-    },
-    {
-      "module": "brjarvis.skills.builtin_pro",
-      "path": "src\\brjarvis\\skills\\builtin_pro.py",
-      "loc": 1242
-    },
-    {
-      "module": "brjarvis.skills.builtin_rag",
-      "path": "src\\brjarvis\\skills\\builtin_rag.py",
-      "loc": 125
-    },
-    {
-      "module": "brjarvis.skills.builtin_writer",
-      "path": "src\\brjarvis\\skills\\builtin_writer.py",
-      "loc": 198
-    },
-    {
-      "module": "brjarvis.skills.executor",
-      "path": "src\\brjarvis\\skills\\executor.py",
-      "loc": 82
-    },
-    {
-      "module": "brjarvis.skills.hot_reload",
-      "path": "src\\brjarvis\\skills\\hot_reload.py",
-      "loc": 68
-    },
-    {
-      "module": "brjarvis.skills.installer",
-      "path": "src\\brjarvis\\skills\\installer.py",
-      "loc": 357
-    },
-    {
-      "module": "brjarvis.skills.loader",
-      "path": "src\\brjarvis\\skills\\loader.py",
-      "loc": 269
-    },
-    {
-      "module": "brjarvis.skills.registry",
-      "path": "src\\brjarvis\\skills\\registry.py",
-      "loc": 83
-    },
-    {
-      "module": "brjarvis.tools.tool_ranker",
-      "path": "src\\brjarvis\\tools\\tool_ranker.py",
-      "loc": 251
-    },
-    {
-      "module": "brjarvis.voice.tts_queue",
-      "path": "src\\brjarvis\\voice\\tts_queue.py",
-      "loc": 116
-    },
-    {
-      "module": "brjarvis.web",
-      "path": "src\\brjarvis\\web\\__init__.py",
-      "loc": 5
-    },
-    {
-      "module": "brjarvis.web.api",
-      "path": "src\\brjarvis\\web\\api\\__init__.py",
-      "loc": 13
-    },
-    {
-      "module": "brjarvis.workflow.task_dag",
-      "path": "src\\brjarvis\\workflow\\task_dag.py",
-      "loc": 413
-    },
-    {
-      "module": "setup",
-      "path": "setup.py",
-      "loc": 13
-    },
-    {
-      "module": "setup_native",
-      "path": "setup_native.py",
-      "loc": 10
-    },
-    {
-      "module": "web.api",
-      "path": "apps\\web\\api\\__init__.py",
-      "loc": 20
-    },
-    {
-      "module": "web.dashboard",
-      "path": "apps\\web\\dashboard\\__init__.py",
-      "loc": 2
-    },
-    {
-      "module": "web.dashboard.server",
-      "path": "apps\\web\\dashboard\\server.py",
-      "loc": 941
-    }
+  "unreachable_paths": [
+    "src\\brjarvis\\actions\\app_analyzer.py",
+    "src\\brjarvis\\actions\\app_tracker.py",
+    "src\\brjarvis\\actions\\automation_engine.py",
+    "src\\brjarvis\\actions\\background_monitor.py",
+    "src\\brjarvis\\actions\\channel_action_dispatcher.py",
+    "src\\brjarvis\\actions\\chat_export.py",
+    "src\\brjarvis\\actions\\cli_controller.py",
+    "src\\brjarvis\\actions\\clipboard_history.py",
+    "src\\brjarvis\\actions\\computer_control.py",
+    "src\\brjarvis\\actions\\computer_settings.py",
+    "src\\brjarvis\\actions\\desktop.py",
+    "src\\brjarvis\\actions\\email_assistant.py",
+    "src\\brjarvis\\actions\\fast_file_search.py",
+    "src\\brjarvis\\actions\\file_processor.py",
+    "src\\brjarvis\\actions\\galaxy.py",
+    "src\\brjarvis\\actions\\gmail_auth.py",
+    "src\\brjarvis\\actions\\image_generator.py",
+    "src\\brjarvis\\actions\\live_os_control.py",
+    "src\\brjarvis\\actions\\longform_builder.py",
+    "src\\brjarvis\\actions\\proactive.py",
+    "src\\brjarvis\\actions\\proactive_listener.py",
+    "src\\brjarvis\\actions\\process_optimizer.py",
+    "src\\brjarvis\\actions\\reminder.py",
+    "src\\brjarvis\\actions\\reminders.py",
+    "src\\brjarvis\\actions\\scheduler.py",
+    "src\\brjarvis\\actions\\screen_processor.py",
+    "src\\brjarvis\\actions\\screen_share.py",
+    "src\\brjarvis\\actions\\smart_email_sender.py",
+    "src\\brjarvis\\actions\\system_cleanup.py",
+    "src\\brjarvis\\actions\\system_monitor.py",
+    "src\\brjarvis\\actions\\system_optimizer.py",
+    "src\\brjarvis\\actions\\transcriber.py",
+    "src\\brjarvis\\actions\\video_generator.py",
+    "src\\brjarvis\\actions\\weather_report.py",
+    "src\\brjarvis\\actions\\web_app_controller.py",
+    "src\\brjarvis\\actions\\web_search.py",
+    "src\\brjarvis\\actions\\youtube_video.py",
+    "src\\brjarvis\\agent\\agent_loop.py",
+    "src\\brjarvis\\agent\\cross_device_planner.py",
+    "src\\brjarvis\\agent\\executor_engine.py",
+    "src\\brjarvis\\agent\\planner_engine.py",
+    "src\\brjarvis\\agent\\scratchpad.py",
+    "src\\brjarvis\\agent\\session.py",
+    "src\\brjarvis\\agent\\stage_decomposer.py",
+    "src\\brjarvis\\agent\\step_planner.py",
+    "src\\brjarvis\\agent\\types.py",
+    "src\\brjarvis\\career\\application_engine\\__init__.py",
+    "src\\brjarvis\\career\\canva\\__init__.py",
+    "src\\brjarvis\\career\\canva\\adapter.py",
+    "src\\brjarvis\\career\\cover_letter\\__init__.py",
+    "src\\brjarvis\\career\\crm\\event_pipeline.py",
+    "src\\brjarvis\\career\\job_engine\\adapters\\ashby.py",
+    "src\\brjarvis\\career\\job_engine\\adapters\\base.py",
+    "src\\brjarvis\\career\\job_engine\\adapters\\company_site.py",
+    "src\\brjarvis\\career\\job_engine\\adapters\\generic_browser.py",
+    "src\\brjarvis\\career\\job_engine\\adapters\\greenhouse.py",
+    "src\\brjarvis\\career\\job_engine\\adapters\\lever.py",
+    "src\\brjarvis\\career\\tools.py",
+    "src\\brjarvis\\computer\\__init__.py",
+    "src\\brjarvis\\computer\\operator.py",
+    "src\\brjarvis\\computer\\types.py",
+    "src\\brjarvis\\config\\__init__.py",
+    "src\\brjarvis\\config\\complexity_router.py",
+    "src\\brjarvis\\config\\model_loader.py",
+    "src\\brjarvis\\config\\models.py",
+    "src\\brjarvis\\connectors\\calendar.py",
+    "src\\brjarvis\\connectors\\capabilities.py",
+    "src\\brjarvis\\connectors\\filesystem.py",
+    "src\\brjarvis\\connectors\\github.py",
+    "src\\brjarvis\\connectors\\hub.py",
+    "src\\brjarvis\\connectors\\mcp_proxy.py",
+    "src\\brjarvis\\connectors\\notion.py",
+    "src\\brjarvis\\connectors\\rss_news.py",
+    "src\\brjarvis\\connectors\\slack.py",
+    "src\\brjarvis\\connectors\\telegram.py",
+    "src\\brjarvis\\connectors\\weather.py",
+    "src\\brjarvis\\connectors\\web_search.py",
+    "src\\brjarvis\\connectors\\wikipedia.py",
+    "src\\brjarvis\\connectors\\youtube.py",
+    "src\\brjarvis\\context\\__init__.py",
+    "src\\brjarvis\\context\\builder.py",
+    "src\\brjarvis\\context\\compressor.py",
+    "src\\brjarvis\\context\\engine.py",
+    "src\\brjarvis\\context\\token_counter.py",
+    "src\\brjarvis\\context\\types.py",
+    "src\\brjarvis\\contracts\\__init__.py",
+    "src\\brjarvis\\contracts\\agent.py",
+    "src\\brjarvis\\contracts\\events.py",
+    "src\\brjarvis\\contracts\\memory.py",
+    "src\\brjarvis\\contracts\\model.py",
+    "src\\brjarvis\\contracts\\security.py",
+    "src\\brjarvis\\contracts\\session.py",
+    "src\\brjarvis\\contracts\\task.py",
+    "src\\brjarvis\\contracts\\tool.py",
+    "src\\brjarvis\\contracts\\verification.py",
+    "src\\brjarvis\\contracts\\workflow.py",
+    "src\\brjarvis\\core\\intent_engine.py",
+    "src\\brjarvis\\core\\terminal\\actions.py",
+    "src\\brjarvis\\core\\terminal\\autocomplete.py",
+    "src\\brjarvis\\core\\terminal\\commands.py",
+    "src\\brjarvis\\core\\terminal\\components.py",
+    "src\\brjarvis\\core\\terminal\\events.py",
+    "src\\brjarvis\\core\\terminal\\guard.py",
+    "src\\brjarvis\\core\\terminal\\hit_test.py",
+    "src\\brjarvis\\core\\terminal\\interactive_tui.py",
+    "src\\brjarvis\\core\\terminal\\renderer.py",
+    "src\\brjarvis\\core\\terminal\\selection.py",
+    "src\\brjarvis\\core\\terminal\\session.py",
+    "src\\brjarvis\\core\\terminal\\theme.py",
+    "src\\brjarvis\\core\\terminal\\viewport.py",
+    "src\\brjarvis\\core\\workspace_engine.py",
+    "src\\brjarvis\\events\\handlers.py",
+    "src\\brjarvis\\evolution\\__init__.py",
+    "src\\brjarvis\\evolution\\engine.py",
+    "src\\brjarvis\\gateway\\routing.py",
+    "src\\brjarvis\\guardian\\redteam\\recon.py",
+    "src\\brjarvis\\guardian\\redteam\\report.py",
+    "src\\brjarvis\\guardian\\redteam\\scope.py",
+    "src\\brjarvis\\guardian\\redteam\\vuln_scanner.py",
+    "src\\brjarvis\\guardian\\rollback.py",
+    "src\\brjarvis\\guardian\\snapshot.py",
+    "src\\brjarvis\\history\\__init__.py",
+    "src\\brjarvis\\history\\audit_writer.py",
+    "src\\brjarvis\\history\\linker.py",
+    "src\\brjarvis\\history\\replay.py",
+    "src\\brjarvis\\history\\session_store.py",
+    "src\\brjarvis\\integrations\\backends\\__init__.py",
+    "src\\brjarvis\\integrations\\backends\\anthropic.py",
+    "src\\brjarvis\\integrations\\backends\\base.py",
+    "src\\brjarvis\\integrations\\backends\\deepseek.py",
+    "src\\brjarvis\\integrations\\backends\\gemini.py",
+    "src\\brjarvis\\integrations\\backends\\manus.py",
+    "src\\brjarvis\\integrations\\backends\\mistral.py",
+    "src\\brjarvis\\integrations\\backends\\nvidia.py",
+    "src\\brjarvis\\integrations\\backends\\ollama.py",
+    "src\\brjarvis\\integrations\\backends\\openai_compat.py",
+    "src\\brjarvis\\integrations\\mobile\\device_controller.py",
+    "src\\brjarvis\\integrations\\mobile\\screen_understanding.py",
+    "src\\brjarvis\\memory\\consolidator.py",
+    "src\\brjarvis\\memory\\conversation_store.py",
+    "src\\brjarvis\\memory\\handoff.py",
+    "src\\brjarvis\\memory\\memory_context.py",
+    "src\\brjarvis\\memory\\memory_manager.py",
+    "src\\brjarvis\\memory\\memory_scan.py",
+    "src\\brjarvis\\memory\\session_lifecycle.py",
+    "src\\brjarvis\\memory\\task_memory_router.py",
+    "src\\brjarvis\\multi_agent\\__init__.py",
+    "src\\brjarvis\\multi_agent\\subagent.py",
+    "src\\brjarvis\\native\\__init__.py",
+    "src\\brjarvis\\orchestrator\\core.py",
+    "src\\brjarvis\\plugins\\plugin_manager.py",
+    "src\\brjarvis\\reasoning\\engine.py",
+    "src\\brjarvis\\reasoning\\types.py",
+    "src\\brjarvis\\router\\core.py",
+    "src\\brjarvis\\router\\diagnostics.py",
+    "src\\brjarvis\\screen_server\\__init__.py",
+    "src\\brjarvis\\skills\\builtin.py",
+    "src\\brjarvis\\skills\\builtin_connectors.py",
+    "src\\brjarvis\\skills\\builtin_editor.py",
+    "src\\brjarvis\\skills\\builtin_extras.py",
+    "src\\brjarvis\\skills\\builtin_pro.py",
+    "src\\brjarvis\\skills\\builtin_rag.py",
+    "src\\brjarvis\\skills\\builtin_writer.py",
+    "src\\brjarvis\\skills\\executor.py",
+    "src\\brjarvis\\skills\\installer.py",
+    "src\\brjarvis\\skills\\loader.py",
+    "src\\brjarvis\\skills\\registry.py",
+    "src\\brjarvis\\tools\\agent_tools.py",
+    "src\\brjarvis\\tools\\app_analyzer_tools.py",
+    "src\\brjarvis\\tools\\app_connectors.py",
+    "src\\brjarvis\\tools\\app_tracker_tools.py",
+    "src\\brjarvis\\tools\\audit_tools.py",
+    "src\\brjarvis\\tools\\automation_tools.py",
+    "src\\brjarvis\\tools\\autonomous_browser_agent.py",
+    "src\\brjarvis\\tools\\background_monitor_tools.py",
+    "src\\brjarvis\\tools\\batch_file_tool.py",
+    "src\\brjarvis\\tools\\browser_agent_v2.py",
+    "src\\brjarvis\\tools\\browser_automation.py",
+    "src\\brjarvis\\tools\\calendar_tools.py",
+    "src\\brjarvis\\tools\\code_refactor_tool.py",
+    "src\\brjarvis\\tools\\code_tools.py",
+    "src\\brjarvis\\tools\\connector_tools.py",
+    "src\\brjarvis\\tools\\contact_tools.py",
+    "src\\brjarvis\\tools\\custom_command_tools.py",
+    "src\\brjarvis\\tools\\diagnostics.py",
+    "src\\brjarvis\\tools\\doc_tools.py",
+    "src\\brjarvis\\tools\\excel_tools.py",
+    "src\\brjarvis\\tools\\export_tools.py",
+    "src\\brjarvis\\tools\\file_import_tools.py",
+    "src\\brjarvis\\tools\\file_processor_tools.py",
+    "src\\brjarvis\\tools\\file_search_semantic.py",
+    "src\\brjarvis\\tools\\file_tools.py",
+    "src\\brjarvis\\tools\\files.py",
+    "src\\brjarvis\\tools\\git_repo_tool.py",
+    "src\\brjarvis\\tools\\gmail_auth_tools.py",
+    "src\\brjarvis\\tools\\image_tools.py",
+    "src\\brjarvis\\tools\\legacy_actions_tools.py",
+    "src\\brjarvis\\tools\\live_os_tools.py",
+    "src\\brjarvis\\tools\\mcp_connector.py",
+    "src\\brjarvis\\tools\\memory_tools.py",
+    "src\\brjarvis\\tools\\pc_tools.py",
+    "src\\brjarvis\\tools\\pdf_tools.py",
+    "src\\brjarvis\\tools\\proactive_listener_tools.py",
+    "src\\brjarvis\\tools\\process_tools.py",
+    "src\\brjarvis\\tools\\qa_testing_tool.py",
+    "src\\brjarvis\\tools\\rag_tools.py",
+    "src\\brjarvis\\tools\\recall_tools.py",
+    "src\\brjarvis\\tools\\redteam_tools.py",
+    "src\\brjarvis\\tools\\reminder_tools.py",
+    "src\\brjarvis\\tools\\sandbox.py",
+    "src\\brjarvis\\tools\\sandbox_process.py",
+    "src\\brjarvis\\tools\\scratchpad_tools.py",
+    "src\\brjarvis\\tools\\skills_tools.py",
+    "src\\brjarvis\\tools\\smart_email_tools.py",
+    "src\\brjarvis\\tools\\system_diagnostic_tool.py",
+    "src\\brjarvis\\tools\\system_health.py",
+    "src\\brjarvis\\tools\\system_tools.py",
+    "src\\brjarvis\\tools\\telegram_tools.py",
+    "src\\brjarvis\\tools\\transcription_tools.py",
+    "src\\brjarvis\\tools\\video_tools.py",
+    "src\\brjarvis\\tools\\web.py",
+    "src\\brjarvis\\tools\\web_app_tools.py",
+    "src\\brjarvis\\tools\\web_extractor.py",
+    "src\\brjarvis\\tools\\web_tools.py",
+    "src\\brjarvis\\tools\\whatsapp_tools.py",
+    "src\\brjarvis\\tools\\window_manager.py",
+    "src\\brjarvis\\tools\\workspace_tools.py",
+    "src\\brjarvis\\web\\api\\routes\\__init__.py",
+    "src\\brjarvis\\workflow\\__init__.py",
+    "src\\brjarvis\\workflow\\task_dag.py",
+    "src\\brjarvis\\workflow\\tool_orchestration.py"
   ]
 }

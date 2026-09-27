@@ -179,12 +179,33 @@ def _synthesize_evidence_summary(tool_history: list[dict], user_input: str) -> s
 
 
 class JarvisOrchestrator:
-    def __init__(self, router: AgentRouter | None = None, use_vector_memory: bool = True):
+    def __init__(
+        self,
+        router: AgentRouter | None = None,
+        use_vector_memory: bool = True,
+        gateway: Any | None = None,
+        use_canonical_gateway: bool | None = None,
+    ):
         if router is None:
             from brjarvis.router import AgentRouter as _AR
 
             router = _AR()
         self.router = router
+        self.gateway = gateway
+        canonical_enabled = (
+            use_canonical_gateway
+            if use_canonical_gateway is not None
+            else os.environ.get("JARVIS_CANONICAL_GATEWAY_ENABLED", "false").strip().lower()
+            in {"1", "true", "yes", "on"}
+        )
+        if self.gateway is None and canonical_enabled:
+            try:
+                from jarvis.gateway.factory import build_configured_gateway
+
+                self.gateway = build_configured_gateway()
+                logger.info("[Orchestrator] Canonical model gateway enabled")
+            except Exception as exc:
+                logger.warning("[Orchestrator] Canonical gateway unavailable; retaining legacy router: %s", exc)
         self.working_memory = WorkingMemory(max_tokens=120_000)
         self.vector_memory = None
         self.current_mode = "general"
@@ -270,6 +291,10 @@ class JarvisOrchestrator:
     def session(self) -> Any:
         """Access the canonical active AgentSession container."""
         return self._agent_session
+
+    def run(self, query: str) -> str:
+        """Execute a query string through the orchestrator pipeline."""
+        return self.handle_query(query)
 
     def handle_query(self, query: str) -> str:
         """Handle a direct query or command with deterministic fallback."""
@@ -817,6 +842,32 @@ class JarvisOrchestrator:
             logger.debug(f"[Orchestrator] Fast-path bypass error: {exc}")
         return None
 
+    def _gateway_capability(self, user_input: str, profile: Any) -> str:
+        """Translate legacy profile and user intent into canonical gateway capability."""
+        text = user_input.lower()
+        if any(word in text for word in ("image", "photo", "screen", "camera", "vision")):
+            return "vision"
+        if any(word in text for word in ("code", "script", "function", "debug", "build", "program")):
+            return "code"
+        if any(word in text for word in ("reason", "analyze", "analysis", "plan")):
+            return "reasoning"
+        profile_name = getattr(profile, "value", str(profile)).lower()
+        if profile_name in {"ollama", "local"}:
+            return "chat"
+        return "chat"
+
+    def _canonical_generate(self, user_input: str, profile: Any, system: str) -> str:
+        """Generate through the canonical gateway and return normalized text."""
+        if self.gateway is None:
+            raise RuntimeError("Canonical gateway is not configured")
+        result = self.gateway.generate(
+            self.working_memory.get(),
+            system=system,
+            capability=self._gateway_capability(user_input, profile),
+            metadata={"legacy_profile": getattr(profile, "value", str(profile))},
+        )
+        return str(result.text)
+
     def _run_react_loop(
         self,
         user_input: str,
@@ -905,32 +956,59 @@ class JarvisOrchestrator:
             # ── LLM call ─────────────────────────────────────────────────────
             try:
                 if stream:
-                    backend = self.router.backends.get(profile) or self.router.backends.get(self.router.default)
-                    if backend is None:
-                        yield "No backend available."
-                        return
-
                     full_response = ""
-                    retry_delay = 1.0
-                    for attempt in range(3):
+                    if self.gateway is not None:
                         try:
-                            if hasattr(backend, "stream"):
-                                for chunk in backend.stream(self.working_memory.get(), system):
-                                    full_response += chunk
-                                    yield chunk
+                            for chunk in self.gateway.stream(
+                                self.working_memory.get(),
+                                system=system,
+                                capability=self._gateway_capability(user_input, profile),
+                                metadata={"legacy_profile": getattr(profile, "value", str(profile))},
+                            ):
+                                full_response += chunk
+                                yield chunk
+                            if full_response:
+                                response = full_response
                             else:
-                                full_response = backend.complete(self.working_memory.get(), system)
-                                yield full_response
-                            break
+                                logger.warning("Canonical gateway returned an empty stream; using legacy fallback")
+                                self.gateway = None
                         except Exception as exc:
-                            if attempt == 2:
-                                logger.error("Backend stream failed after retries: %s", exc, exc_info=True)
-                                yield "\n[Backend error: the provider failed after retries. Please try again.]"
-
+                            if full_response:
+                                logger.error("Canonical gateway stream failed after partial output: %s", exc)
                                 return
-                            time.sleep(retry_delay)
-                            retry_delay *= 2
-                    response = full_response
+                            logger.warning("Canonical gateway stream failed; using legacy fallback: %s", exc)
+                            self.gateway = None
+
+                    if self.gateway is None:
+                        backend = self.router.backends.get(profile) or self.router.backends.get(self.router.default)
+                        if backend is None:
+                            yield "No backend available."
+                            return
+                        retry_delay = 1.0
+                        for attempt in range(3):
+                            try:
+                                if hasattr(backend, "stream"):
+                                    for chunk in backend.stream(self.working_memory.get(), system):
+                                        full_response += chunk
+                                        yield chunk
+                                else:
+                                    full_response = backend.complete(self.working_memory.get(), system)
+                                    yield full_response
+                                break
+                            except Exception as exc:
+                                if attempt == 2:
+                                    logger.error("Backend stream failed after retries: %s", exc, exc_info=True)
+                                    yield "\n[Backend error: the provider failed after retries. Please try again.]"
+                                    return
+                                time.sleep(retry_delay)
+                                retry_delay *= 2
+                        response = full_response
+                elif self.gateway is not None:
+                    try:
+                        response = self._canonical_generate(user_input, profile, system)
+                    except Exception as exc:
+                        logger.warning("Canonical gateway failed; using legacy router fallback: %s", exc)
+                        response = self.router.run(profile, self.working_memory.get(), system)
                 else:
                     response = self.router.run(profile, self.working_memory.get(), system)
 

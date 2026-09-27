@@ -260,7 +260,7 @@ The manual-stop flow is deliberately explicit:
 
 Starting another command or shutting down cancels active recording and playback. Generation guards prevent stale callbacks from overwriting newer UI state. Selecting **Open workspace** checks backend readiness, starts the local server if necessary, waits for readiness, requests a one-time authenticated handoff, and then opens the workspace.
 
-The detailed feature contract is [`docs/FLOATING_WIDGET_VOICE_PROJECT_PLAN.md`](docs/FLOATING_WIDGET_VOICE_PROJECT_PLAN.md).
+The detailed feature contract is archived at [`docs/archive/FLOATING_WIDGET_VOICE_PROJECT_PLAN.md`](docs/archive/FLOATING_WIDGET_VOICE_PROJECT_PLAN.md).
 
 ## Memory, history, and persistence
 
@@ -337,7 +337,7 @@ python -m build
 python -m pip_audit
 ```
 
-For production-style verification, follow [`docs/runbooks/PRODUCTION_OPERATIONS.md`](docs/runbooks/PRODUCTION_OPERATIONS.md) and test the built wheel outside the source checkout. Avoid using `runtime`, `workspace`, `scratch`, and generated history trees as test discovery roots; the pytest configuration deliberately excludes them.[4]
+For production-style verification, follow [`docs/archive/runbooks/PRODUCTION_OPERATIONS.md`](docs/archive/runbooks/PRODUCTION_OPERATIONS.md) and test the built wheel outside the source checkout. Avoid using `runtime`, `workspace`, `scratch`, and generated history trees as test discovery roots; the pytest configuration deliberately excludes them.[4]
 
 ## Repository map
 
@@ -404,10 +404,9 @@ The forensic record identifies evolutionary complexity around competing bootstra
 | [`docs/architecture/request-lifecycle.png`](docs/architecture/request-lifecycle.png) | New request-to-verification sequence diagram. |
 | [`docs/architecture/task-state-machine.png`](docs/architecture/task-state-machine.png) | New durable task-state diagram. |
 | [`docs/architecture/production-architecture.png`](docs/architecture/production-architecture.png) | Existing production ownership and hardening map. |
-| [`docs/FLOATING_WIDGET_VOICE_PROJECT_PLAN.md`](docs/FLOATING_WIDGET_VOICE_PROJECT_PLAN.md) | Floating widget voice, history, and workspace handoff contract. |
-| [`docs/runbooks/PRODUCTION_OPERATIONS.md`](docs/runbooks/PRODUCTION_OPERATIONS.md) | Setup, security, validation, startup, shutdown, monitoring, and rollback. |
-| [`docs/audit/PRODUCTION_READINESS_2026-08-19.md`](docs/audit/PRODUCTION_READINESS_2026-08-19.md) | Production-readiness assessment and residual risks. |
-| [`docs/forensic/25_FINAL_ANALYSIS.md`](docs/forensic/25_FINAL_ANALYSIS.md) | Repository-wide forensic analysis summary. |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Verified description of the system as it currently stands, including known structural problems. |
+| [`docs/DECISIONS.md`](docs/DECISIONS.md) | Rebuild decision log — one entry per decision, with what was rejected and why. |
+| [`docs/archive/`](docs/archive/) | 282 documents from prior remediation cycles, kept for provenance and no longer maintained. |
 | [`CHANGELOG.md`](CHANGELOG.md) | Version history and compatibility notes. |
 
 ## References
@@ -417,7 +416,7 @@ The forensic record identifies evolutionary complexity around competing bootstra
 [3]: src/brjarvis/agent/task_state.py "Durable task state contract, approvals, checkpoints, and outcomes"
 [4]: pyproject.toml "Package metadata, dependencies, extras, entry points, pytest markers, and quality configuration"
 [5]: src/brjarvis/web/api/server.py "FastAPI application factory, security middleware, route composition, lifespan, and PWA serving"
-[6]: docs/forensic/25_FINAL_ANALYSIS.md "Repository-wide forensic analysis and known architectural complexity"
+[6]: docs/ARCHITECTURE.md "Verified current architecture and known structural problems"
 
 ## License
 

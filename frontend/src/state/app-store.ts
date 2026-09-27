@@ -1,5 +1,5 @@
 import { emptySnapshot } from '../platform/empty-state';
-import type { AppSnapshot, Task, ViewId } from '../contracts/domain';
+import type { AppSnapshot, Task, TimelineEvent, ViewId } from '../contracts/domain';
 
 export type AppAction =
   | { type: 'hydrate'; snapshot: AppSnapshot }
@@ -7,8 +7,8 @@ export type AppAction =
   | { type: 'active-task'; taskId: string }
   | { type: 'connection'; status: AppSnapshot['connection'] }
   | { type: 'task-upsert'; task: Task }
-  | { type: 'task-progress'; taskId: string; progress: number; detail?: string }
-  | { type: 'approval-resolved'; approvalId: string; taskId: string; approved: boolean };
+  | { type: 'timeline-append'; event: TimelineEvent }
+  | { type: 'notifications-read' };
 
 let snapshot: AppSnapshot = structuredClone(emptySnapshot);
 const listeners = new Set<() => void>();
@@ -28,9 +28,16 @@ export function subscribe(listener: () => void) {
 
 export function dispatch(action: AppAction) {
   switch (action.type) {
-    case 'hydrate':
-      snapshot = structuredClone(action.snapshot);
+    case 'hydrate': {
+      const selectedTaskStillExists = action.snapshot.tasks.some((task) => task.id === snapshot.activeTaskId);
+      snapshot = {
+        ...action.snapshot,
+        activeView: snapshot.activeView,
+        activeTaskId: selectedTaskStillExists ? snapshot.activeTaskId : (action.snapshot.activeTaskId || action.snapshot.tasks[0]?.id || ''),
+        connection: snapshot.connection,
+      };
       break;
+    }
     case 'view':
       snapshot = { ...snapshot, activeView: action.view };
       break;
@@ -41,19 +48,23 @@ export function dispatch(action: AppAction) {
       snapshot = { ...snapshot, connection: action.status };
       break;
     case 'task-upsert': {
-      const existing = snapshot.tasks.some((task) => task.id === action.task.id);
-      snapshot = { ...snapshot, tasks: existing ? snapshot.tasks.map((task) => task.id === action.task.id ? action.task : task) : [action.task, ...snapshot.tasks], activeTaskId: action.task.id };
-      break;
-    }
-    case 'task-progress':
-      snapshot = { ...snapshot, tasks: snapshot.tasks.map((task) => task.id === action.taskId ? { ...task, progress: action.progress, updatedAt: 'Just now', summary: action.detail ?? task.summary } : task) };
-      break;
-    case 'approval-resolved':
+      const exists = snapshot.tasks.some((task) => task.id === action.task.id);
       snapshot = {
         ...snapshot,
-        approvals: snapshot.approvals.filter((approval) => approval.id !== action.approvalId),
-        tasks: snapshot.tasks.map((task) => task.id === action.taskId && action.approved ? { ...task, status: 'running', requiresApproval: false, updatedAt: 'Just now' } : task),
+        tasks: exists ? snapshot.tasks.map((task) => task.id === action.task.id ? action.task : task) : [action.task, ...snapshot.tasks],
+        activeTaskId: action.task.id,
       };
+      break;
+    }
+    case 'timeline-append':
+      snapshot = {
+        ...snapshot,
+        timeline: [action.event, ...snapshot.timeline.filter((event) => event.id !== action.event.id)].slice(0, 50),
+        unreadNotifications: snapshot.unreadNotifications + (action.event.read ? 0 : 1),
+      };
+      break;
+    case 'notifications-read':
+      snapshot = { ...snapshot, unreadNotifications: 0, timeline: snapshot.timeline.map((event) => ({ ...event, read: true })) };
       break;
   }
   notify();

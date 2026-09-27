@@ -320,6 +320,10 @@ class TestTerminalSessionPrompts(unittest.TestCase):
     def setUp(self):
         self.session = TerminalSession(auto_welcome=False)
 
+    def test_agent_loop_receives_runtime_gateway(self):
+        self.assertIsNotNone(self.session.runtime)
+        self.assertIs(self.session.agent_loop.gateway, self.session.runtime.gateway)
+
     def test_general_prompt(self):
         self.session.current_mode = "general"
         self.session._prompt_state = PROMPT_NORMAL

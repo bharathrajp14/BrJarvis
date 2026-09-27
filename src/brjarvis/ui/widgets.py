@@ -19,7 +19,49 @@ logger = logging.getLogger("JARVIS.UI.Widgets")
 
 from brjarvis.ui import _WIN_HIDE, _base_dir  # noqa: F401
 
-from ._qt import *  # noqa: F401,F403
+from ._qt import (  # noqa: F401
+    QApplication,
+    QBrush,
+    QColor,
+    QConicalGradient,
+    QDragEnterEvent,
+    QDropEvent,
+    QEasingCurve,
+    QFileDialog,
+    QFont,
+    QFontDatabase,
+    QFrame,
+    QHBoxLayout,
+    QKeySequence,
+    QLabel,
+    QLineEdit,
+    QLinearGradient,
+    QMainWindow,
+    QMimeData,
+    QObject,
+    QPainter,
+    QPainterPath,
+    QPen,
+    QPixmap,
+    QPointF,
+    QProgressBar,
+    QPushButton,
+    QRadialGradient,
+    QRectF,
+    QScrollArea,
+    QShortcut,
+    QSize,
+    QSizePolicy,
+    QSplitter,
+    QStackedWidget,
+    QTextEdit,
+    QTimer,
+    QUrl,
+    QVBoxLayout,
+    QWidget,
+    Qt,
+    pyqtSignal,
+)
 
 BASE_DIR = _base_dir()
 CONFIG_DIR = BASE_DIR / "config"

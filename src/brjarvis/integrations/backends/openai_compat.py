@@ -52,11 +52,11 @@ class OpenAIBackend(BaseBackend):
 
     def complete(self, messages: list, system: str = "", tools: list = None, max_tokens: int = None) -> str:
         # Fast fail if pointing to localhost proxy that is not running
-        if ("localhost:8045" in self._gateway.base_url or "127.0.0.1:8045" in self._gateway.base_url) and not bool(
+        if any(p in self._gateway.base_url for p in ("localhost:8045", "127.0.0.1:8045", "localhost:20128", "127.0.0.1:20128")) and not bool(
             os.environ.get("OPENAI_API_KEY", "").startswith("sk-proj-")
         ):
             if not self._gateway.ping(timeout=0.3):
-                return "ERROR: Local Proxy Brain (:8045) is offline. Bypassing proxy for cloud fallback."
+                return f"ERROR: Local Proxy Brain ({self._gateway.base_url}) is offline. Bypassing proxy for cloud fallback."
         try:
             resp = self._gateway.complete(
                 messages=messages, model=self.model, system=system, tools=tools, max_tokens=max_tokens

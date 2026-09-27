@@ -1272,13 +1272,14 @@ B.R. JARVIS shifts the paradigm from static autocomplete AI to an autonomous sen
 - Local-first workspace execution with absolute path validation.
 - AST compilation checks and security vulnerability scanning.
 """
+    auto_open = bool(args.get("auto_open", False))
     res_word = document_creator(
         {
             "title": doc_title,
             "content": doc_text,
             "filename": "Reports/JARVIS_Product_Analysis.docx",
             "format": "docx",
-            "auto_open": True,
+            "auto_open": auto_open,
         }
     )
     res_pdf = document_creator(
@@ -1287,7 +1288,7 @@ B.R. JARVIS shifts the paradigm from static autocomplete AI to an autonomous sen
             "content": doc_text,
             "filename": "Reports/JARVIS_Product_Analysis.pdf",
             "format": "pdf",
-            "auto_open": True,
+            "auto_open": auto_open,
         }
     )
 

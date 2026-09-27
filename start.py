@@ -48,26 +48,28 @@ try:
 except Exception as _init_err:
     print(f"[Warning] Environment canonical check note: {_init_err}", file=sys.stderr)
 
-# Import root package & core version
-from brjarvis.apps.bootstrap import (  # noqa: E402
-    interactive_menu,
-    launch_career_studio,
-    launch_voice,
-    launch_web_server,
-    show_doctor,
-    show_help,
-    show_status,
-)
+# Import core version metadata (lightweight, zero-dependency)
 from brjarvis.core.version import BUILD, CODENAME, VERSION  # noqa: E402
-from brjarvis.diagnostics.doctor import run_diagnostics_audit  # noqa: E402
 
 
 # ── Backwards-Compatible Public API Re-Exports ──────────────────────────────
 def doctor(auto_confirm: bool = False) -> dict:
     """Backwards-compatible doctor entry point."""
+    from brjarvis.apps.bootstrap import show_doctor
+    from brjarvis.diagnostics.doctor import run_diagnostics_audit
+
     rep = run_diagnostics_audit(auto_repair=auto_confirm)
     show_doctor(rep)
     return rep
+
+
+def core_doctor() -> dict:
+    """Run only the rebuilt core readiness audit."""
+    from jarvis.core.bootstrap import run_doctor as run_core_doctor
+
+    report = run_core_doctor()
+    print(report)
+    return report
 
 
 def launch_career_sync() -> dict:
@@ -78,6 +80,13 @@ def launch_career_sync() -> dict:
     stats = db.get_stats() if hasattr(db, "get_stats") else {"total": len(db.list_applications())}
     print(f"✓ Career CRM synchronized. Total applications: {stats.get('total', len(db.list_applications()))}")
     return stats
+
+
+def launch_web_server(*args, **kwargs):
+    """Backwards-compatible web server launcher entry point."""
+    from brjarvis.apps.bootstrap import launch_web_server as _launch_web_server
+
+    return _launch_web_server(*args, **kwargs)
 
 
 def run_tests(extra_args: list[str] | None = None) -> int:
@@ -99,6 +108,8 @@ def main(argv: list[str] | None = None) -> int:
 
     # 1. No arguments -> Interactive Selection Menu & Overview
     if not raw_args:
+        from brjarvis.apps.bootstrap import interactive_menu
+
         return interactive_menu()
 
     first = raw_args[0].lower().strip().lstrip("-")
@@ -110,11 +121,15 @@ def main(argv: list[str] | None = None) -> int:
 
     # 3. Help Flag
     if first in ("h", "help", "?"):
+        from brjarvis.apps.bootstrap import show_help
+
         show_help()
         return 0
 
     # 4. Status Command
     if first in ("status", "info", "health"):
+        from brjarvis.apps.bootstrap import show_status
+
         show_status()
         return 0
 
@@ -122,6 +137,31 @@ def main(argv: list[str] | None = None) -> int:
     if first in ("doctor", "check", "diagnose", "diagnostics"):
         auto_fix = any(arg in raw_args for arg in ("--fix", "-f", "--repair", "--auto-fix"))
         doctor(auto_confirm=auto_fix)
+        return 0
+
+    # 5b. Rebuilt Core Doctor
+    if first in ("core-doctor", "core_doctor"):
+        core_doctor()
+        return 0
+
+    # 5c. Rebuilt Jarvis CLI REPL
+    if first in ("jarvis-cli", "new-cli"):
+        from jarvis.surfaces.cli.repl import run_cli
+
+        run_cli()
+        return 0
+
+    # 5d. Rebuilt Jarvis Web Control Plane
+    if first in ("jarvis-web", "new-web"):
+        import uvicorn
+        from jarvis.surfaces.web.server import create_app
+
+        parser = argparse.ArgumentParser(prog="start.py jarvis-web", add_help=False)
+        parser.add_argument("--port", "-p", type=int, default=8000)
+        parser.add_argument("--host", "-h", type=str, default="127.0.0.1")
+        parsed, _ = parser.parse_known_args(raw_args[1:])
+        print(f"Starting rebuilt JARVIS Control Plane on http://{parsed.host}:{parsed.port}")
+        uvicorn.run(create_app(), host=parsed.host, port=parsed.port)
         return 0
 
     # 6. Interactive CLI REPL
@@ -170,6 +210,8 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"  ... and {len(apps) - 10} more.")
             return 0
         else:
+            from brjarvis.apps.bootstrap import launch_career_studio
+
             launch_career_studio()
             return 0
 
@@ -180,6 +222,8 @@ def main(argv: list[str] | None = None) -> int:
 
     # 10. Voice Assistant HUD
     if first in ("voice", "hud", "speech"):
+        from brjarvis.apps.bootstrap import launch_voice
+
         launch_voice()
         return 0
 

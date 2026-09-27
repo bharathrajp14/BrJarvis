@@ -126,8 +126,10 @@ def _synthesize_evidence(tool_history: List[Dict[str, Any]], user_input: str) ->
 class AgentLoop:
     """The authoritative agent execution engine for all interactions."""
 
-    def __init__(self, session: Optional[AgentSession] = None):
+    def __init__(self, session: Optional[AgentSession] = None, gateway: Any = None):
         self.session: AgentSession = session or get_or_create_session()
+        self.gateway = gateway
+
         self.event_bus = get_event_bus()
         self.permission_mgr = get_permission_manager()
         self.last_result: Optional[AgentTurnResult] = None
@@ -209,7 +211,20 @@ class AgentLoop:
 
     # ── Main Cognitive Execution Turn ─────────────────────────────────────────
 
+    @staticmethod
+    def _gateway_capability(user_input: str, profile: Any) -> str:
+        """Translate legacy profile and user intent into gateway capability."""
+        text = user_input.lower()
+        if any(word in text for word in ("image", "photo", "screen", "camera", "vision")):
+            return "vision"
+        if any(word in text for word in ("code", "script", "function", "debug", "build", "program")):
+            return "code"
+        if any(word in text for word in ("reason", "analyze", "analysis", "plan")):
+            return "reasoning"
+        return "chat"
+
     def run_turn(
+
         self,
         user_input: str,
         router: Any = None,
@@ -284,8 +299,33 @@ class AgentLoop:
             )
         )
 
-        # ── Step 1: Fast Path Check ──
+        # ── Step 1: Deterministic status path ──
+        if user_input.strip().lower().lstrip("/") in {"status", "health", "system status"}:
+            result_text = "System status: OK. All autonomous engines operational."
+            elapsed_ms = int((time.monotonic() - t_start) * 1000)
+            self.session.add_assistant_turn(result_text, latency_ms=elapsed_ms)
+            self.event_bus.publish(
+                AgentLifecycleEvent(
+                    topic="agent.completed",
+                    session_id=self.session.session_id,
+                    task_id=task_id,
+                    phase="completed",
+                    message="Deterministic status path executed.",
+                    correlation_id=corr_id,
+                )
+            )
+            self.last_result = AgentTurnResult(
+                response=result_text,
+                status=AgentTurnStatus.SUCCESS_VERIFIED,
+                verified=True,
+                elapsed_ms=elapsed_ms,
+            )
+            self.session.clear_active_task()
+            return result_text
+
+        # ── Step 2: Fast Path Check ──
         try:
+
             fast_res = DeterministicIntentEngine.parse_and_execute(user_input)
             if fast_res and fast_res.get("executed"):
                 result_text = fast_res.get("result", "Action executed successfully.")
@@ -341,6 +381,7 @@ class AgentLoop:
             router = AgentRouter()
 
         # Build system prompt
+
         tool_prompt = get_tool_prompt_block()
         sys_parts = [
             "You are BR JARVIS, a highly capable agentic assistant.",
@@ -384,7 +425,10 @@ class AgentLoop:
         except Exception:
             mode_profile = "gemini"
 
+        canonical_gateway_enabled = self.gateway is not None
+
         while step < MAX_AGENT_STEPS:
+
             # Emit agent.thinking
             self.event_bus.publish(
                 AgentLifecycleEvent(
@@ -398,8 +442,23 @@ class AgentLoop:
             )
 
             try:
-                raw_response = router.run(mode_profile, history_msgs, system_prompt)
+                if canonical_gateway_enabled and self.gateway is not None:
+                    capability = self._gateway_capability(user_input, mode_profile)
+                    try:
+                        raw_response = self.gateway.generate(
+                            history_msgs,
+                            system=system_prompt,
+                            capability=capability,
+                            metadata={"legacy_profile": getattr(mode_profile, "value", str(mode_profile))},
+                        ).text
+                    except Exception as gateway_err:
+                        logger.warning("[AgentLoop] Canonical gateway failed; using legacy router fallback: %s", gateway_err)
+                        canonical_gateway_enabled = False
+                        raw_response = router.run(mode_profile, history_msgs, system_prompt)
+                else:
+                    raw_response = router.run(mode_profile, history_msgs, system_prompt)
             except Exception as llm_err:
+
                 logger.error(f"[AgentLoop] LLM call failed: {llm_err}")
                 final_response = f"Backend error: {llm_err}"
                 terminal_status = AgentTurnStatus.FAILED

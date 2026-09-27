@@ -1,5 +1,5 @@
 {
-  "manifest_version": "40.2",
+  "manifest_version": "41.0",
   "file_hashes": {
     "guardian/core.py": "504b3acad59572127c5f51c5f88ad83aff120114354cb3d9a16c59ec1d9df5eb",
     "guardian/kill_switch.py": "e9a6dbc8c6802fa2cbdaf21cb3af680fc20a1723b10cfb9bb9e931a4415b645c",
@@ -11,5 +11,5 @@
     "security/path_policy.py": "b13cf1e4b127501adb66ca56e4f5bd1f8a611ad13a72770726a7bd17735d550a",
     "permissions.py": "4f73b90e88d59de50b4c91d5f273df4c201225e7c7c5b010155831eaa406d37c"
   },
-  "version": "MK40.2-CERTIFIED"
+  "version": "MK41.0-CERTIFIED"
 }

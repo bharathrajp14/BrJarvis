@@ -1,11 +1,21 @@
 # config/models.yaml — BR JARVIS Central Model & Proxy Brain Configuration
-# Calibrated from Live Model Benchmark Probing against http://localhost:8045/v1 (15/24 Verified Online)
+# Calibrated from Live Model Benchmark Probing against http://127.0.0.1:20128/v1 (OmniRouter)
 
 proxy:
-  base_url: "http://localhost:8045/v1"
-  api_key_env: "OPENAI_API_KEY"
+  base_url: "http://127.0.0.1:20128/v1"
+  api_key_env: "BRJARVIS_PROXY_API_KEY"
   timeout_seconds: 60
   connect_timeout_seconds: 10
+
+# Secondary provider (free models, auto-enabled when OPENROUTER_API_KEY is set)
+openrouter:
+  base_url: "https://openrouter.ai/api/v1"
+  api_key_env: "OPENROUTER_API_KEY"
+
+# OmniRouter local gateway
+omnirouter:
+  base_url: "http://127.0.0.1:20128/v1"
+  api_key_env: "OMNIROUTER_API_KEY"
 
 privacy:
   mode: "proxy_only"
@@ -13,39 +23,43 @@ privacy:
 
 routing:
   default_backend: "gpt"
-  default_model: "gemini-3.6-flash-high"
+  default_model: "antigravity/gemini-3.7-flash-high"
   disable_gemini: true
-  
-  # Capability-specific mappings based on verified live proxy model availability
-  capabilities:
-    chat: "gemini-3.6-flash-high"
-    fast_chat: "gemini-3.6-flash-low"
-    reasoning: "claude-sonnet-4-6-thinking"
-    deep_reasoning: "claude-opus-4-6-thinking"
-    planning: "gemini-3-flash-agent"
-    agent: "gemini-3-flash-agent"
-    pro_agent: "gemini-3.7-flash-high"
-    code: "claude-sonnet-4-6-thinking"
-    code_review: "gemini-3.6-flash-high"
-    vision: "gemini-3.1-flash-image"
-    image: "gemini-3.1-flash-image"
-    summarization: "gemini-3.6-flash-high"
-    classification: "gemini-3.6-flash-low"
-    extraction: "gemini-3.6-flash-low"
-    long_context: "gemini-3.6-flash-high"
-    low_latency: "gemini-3.6-flash-low"
-    voice_live: "gemini-3.6-flash-tiered"
-    fallback: "gemini-3.6-flash-high"
-    gpt_compatible: "gpt-oss-120b-medium"
 
-  # Fallback sequence preference of verified online models
+  # Capability-specific model mappings — all proxied through OmniRouter (http://127.0.0.1:20128/v1)
+  capabilities:
+    chat:             "antigravity/gemini-3.7-flash-high"
+    fast_chat:        "antigravity/gemini-3.7-flash-high"
+    ultra_fast:       "antigravity/gemini-3.1-flash-lite"
+    reasoning:        "antigravity/claude-opus-4-6-thinking"
+    deep_reasoning:   "antigravity/claude-opus-4-6-thinking"
+    planning:         "antigravity/gemini-3.7-flash-high"
+    agent:            "antigravity/gemini-3.7-flash-high"
+    pro_agent:        "antigravity/gemini-3.7-flash-high"
+    super_agent:      "antigravity/gemini-3.7-flash-high"
+    code:             "antigravity/claude-sonnet-4-6"
+    code_review:      "antigravity/claude-sonnet-4-6"
+    vision:           "antigravity/gemini-3.7-flash-high"
+    image:            "openrouter/inclusionai/ling-3.0-flash-vl:free"
+    summarization:    "groq/qwen/qwen3.8-27b"
+    classification:   "antigravity/gemini-3.1-flash-lite"
+    extraction:       "antigravity/gemini-3.1-flash-lite"
+    long_context:     "antigravity/gemini-3.7-flash-high"
+    low_latency:      "antigravity/gemini-3.7-flash-high"
+    voice_live:       "antigravity/gemini-3.7-flash-high"
+    fallback:         "antigravity/gemini-3.7-flash-high"
+    gpt_compatible:   "groq/qwen/qwen3.8-27b"
+    pro_high:         "antigravity/gemini-3.7-flash-high"
+    pro_low:          "antigravity/gemini-3.1-flash-lite"
+
+  # Ordered fallback chain with verified responsive models
   fallback_hierarchy:
-    - "gemini-3.6-flash-high"
-    - "claude-sonnet-4-6-thinking"
-    - "gemini-3-flash-agent"
-    - "gemini-3.6-flash-low"
-    - "gemini-3.7-flash-high"
-    - "gemini-3.5-flash-medium"
+    - "antigravity/gemini-3.7-flash-high"
+    - "antigravity/gemini-3.1-flash-lite"
+    - "antigravity/claude-opus-4-6-thinking"
+    - "kr/claude-sonnet-4.5"
+    - "antigravity/gemini-3.7-flash-low"
+    - "groq/qwen/qwen3.8-27b"
 
 complexity_thresholds:
   lite_max: 20

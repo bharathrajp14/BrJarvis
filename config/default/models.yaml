@@ -2,7 +2,7 @@
 # Priority: Environment Variables > models.yaml > models.json > Defaults
 
 proxy:
-  base_url: "http://localhost:8045/v1"
+  base_url: "http://127.0.0.1:20128/v1"
   api_key_env: "BRJARVIS_PROXY_API_KEY"
   timeout_seconds: 60
   connect_timeout_seconds: 10
@@ -13,38 +13,44 @@ privacy:
 
 routing:
   default_backend: "gpt"
-  default_model: "gemini-3.6-flash-high"
+  default_model: "antigravity/gemini-3.7-flash-high"
   disable_gemini: true
   
   # Capability-specific defaults
   capabilities:
-    chat: "gemini-3.6-flash-high"
-    fast_chat: "gemini-3.6-flash-low"
-    reasoning: "claude-sonnet-4-6-thinking"
-    deep_reasoning: "claude-opus-4-6-thinking"
-    planning: "gemini-3-flash-agent"
-    agent: "gemini-3-flash-agent"
-    code: "claude-sonnet-4-6-thinking"
-    code_review: "gemini-3.6-flash-high"
-    vision: "gemini-3.1-flash-image"
-    image: "gemini-3.1-flash-image"
-    summarization: "gemini-3.6-flash-high"
-    classification: "gemini-3.6-flash-low"
-    extraction: "gemini-3.6-flash-low"
-    long_context: "gemini-3.6-flash-high"
-    low_latency: "gemini-3.6-flash-low"
-    voice_live: "gemini-3.6-flash-tiered"
-    fallback: "gemini-3.6-flash-high"
-    gpt_compatible: "gpt-oss-120b-medium"
+    chat: "antigravity/gemini-3.7-flash-high"
+    fast_chat: "antigravity/gemini-3.7-flash-high"
+    ultra_fast: "antigravity/gemini-3.1-pro-low"
+    reasoning: "auto/best-reasoning"
+    deep_reasoning: "antigravity/claude-opus-4-6-thinking"
+    planning: "antigravity/gemini-3.7-flash-high"
+    agent: "antigravity/gemini-3.7-flash-high"
+    pro_agent: "antigravity/gemini-pro-agent"
+    super_agent: "antigravity/gemini-3.7-flash-high"
+    code: "auto/best-coding"
+    code_review: "kr/claude-sonnet-4.5"
+    vision: "auto/best-vision"
+    image: "openrouter/google/gemini-3.1-flash-image-preview"
+    summarization: "auto/best-chat"
+    classification: "auto/fast"
+    extraction: "auto/fast"
+    long_context: "antigravity/gemini-3.1-pro-low"
+    low_latency: "antigravity/gemini-3.7-flash-high"
+    voice_live: "antigravity/gemini-3.7-flash-high"
+    fallback: "auto/chat"
+    gpt_compatible: "github/gpt-4o-mini"
+    pro_high: "antigravity/gemini-pro-agent"
+    pro_low: "antigravity/gemini-3.1-pro-low"
 
   # Fallback sequence preference
   fallback_hierarchy:
-    - "gemini-3.6-flash-high"
-    - "claude-sonnet-4-6-thinking"
-    - "gemini-3-flash-agent"
-    - "gemini-3.6-flash-low"
-    - "gemini-3.7-flash-high"
-    - "gemini-3.5-flash-medium"
+    - "antigravity/gemini-3.7-flash-high"
+    - "kr/claude-sonnet-4.5"
+    - "auto/best-chat"
+    - "auto/best-coding"
+    - "auto/best-reasoning"
+    - "auto/fast"
+    - "github/gpt-4o-mini"
 
 complexity_thresholds:
   lite_max: 20

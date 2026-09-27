@@ -5,6 +5,8 @@ export interface AuthSnapshot {
   scope: string;
 }
 
+const API_BASE = ((import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '').replace(/\/$/, '');
+
 function asBoolean(value: unknown): boolean {
   if (typeof value === 'boolean') return value;
   if (typeof value === 'number') return value !== 0;
@@ -29,7 +31,7 @@ function normalizeAuth(body: Record<string, unknown>): AuthSnapshot {
 
 export async function loadAuthSnapshot(): Promise<AuthSnapshot> {
   try {
-    const response = await fetch('/api/v1/auth/status', { credentials: 'include', headers: { Accept: 'application/json' } });
+    const response = await fetch(`${API_BASE}/api/v1/auth/status`, { credentials: 'include', headers: { Accept: 'application/json' } });
     if (!response.ok) return { authRequired: true, authenticated: false, label: 'Local session', scope: 'Unauthenticated' };
     return normalizeAuth(await response.json() as Record<string, unknown>);
   } catch {
@@ -38,7 +40,7 @@ export async function loadAuthSnapshot(): Promise<AuthSnapshot> {
 }
 
 export async function loginWithApiKey(apiKey: string): Promise<AuthSnapshot> {
-  const response = await fetch('/api/v1/auth/login', {
+  const response = await fetch(`${API_BASE}/api/v1/auth/login`, {
     method: 'POST',
     credentials: 'include',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
@@ -47,4 +49,8 @@ export async function loginWithApiKey(apiKey: string): Promise<AuthSnapshot> {
   const body = await response.json().catch(() => ({})) as { detail?: string; error?: { message?: string } };
   if (!response.ok) throw new Error(body.detail ?? body.error?.message ?? 'Authentication failed. Check the server API key.');
   return loadAuthSnapshot();
+}
+
+export async function logoutSession(): Promise<void> {
+  await fetch(`${API_BASE}/api/v1/auth/logout`, { method: 'POST', credentials: 'include', headers: { Accept: 'application/json' } });
 }

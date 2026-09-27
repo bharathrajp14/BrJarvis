@@ -84,7 +84,12 @@ class ApplicationRuntime:
         if self._orchestrator is None:
             from brjarvis.orchestrator import JarvisOrchestrator
 
-            self._orchestrator = JarvisOrchestrator(self.router, use_vector_memory=self._use_vector_memory)
+            self._orchestrator = JarvisOrchestrator(
+                self.router,
+                use_vector_memory=self._use_vector_memory,
+                gateway=self.gateway,
+            )
+
             self.container.register_instance(JarvisOrchestrator, self._orchestrator)
 
             # Register orchestrator shutdown hook
@@ -102,11 +107,12 @@ class ApplicationRuntime:
     def gateway(self) -> Any:
         if self._gateway is None:
             try:
-                from brjarvis.gateway.model_gateway import ModelGateway
+                from jarvis.gateway.factory import build_configured_gateway
 
-                self._gateway = ModelGateway()
-            except Exception as e:
-                self.logger.debug("ModelGateway init notice: %s", e)
+                self._gateway = build_configured_gateway()
+                self.container.register_instance(type(self._gateway), self._gateway)
+            except Exception as exc:
+                self.logger.debug("Canonical ModelGateway init notice: %s", exc)
         return self._gateway
 
     @property

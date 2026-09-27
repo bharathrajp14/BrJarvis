@@ -141,6 +141,18 @@ def load_available_backends(*, force_refresh: bool = False) -> dict:
             except Exception as exc:
                 logger.debug("[Router] Gemini init notice: %s", exc)
 
+        # 3. Claude Backend: Anthropic SDK or Gateway Proxy
+        try:
+            if ClaudeBackend is not None:
+                c = ClaudeBackend()
+                if c.available:
+                    backends[AgentProfile.CLAUDE] = c
+                elif AgentProfile.GPT in backends:
+                    claude_model = cfg.get("claude", "antigravity/claude-sonnet-4-6")
+                    backends[AgentProfile.CLAUDE] = OpenAIBackend(model=claude_model)
+        except Exception as exc:
+            logger.debug("[Router] Claude init notice: %s", exc)
+
         try:
             has_deepseek = (
                 os.environ.get("DEEPSEEK_API_KEY", "").strip() or os.environ.get("OPENROUTER_API_KEY", "").strip()
@@ -482,7 +494,7 @@ class AgentRouter:
         # All backends failed — return full structured diagnostic output
         diagnostic.final_reason = "ALL_BACKENDS_FAILED"
         diagnostic.recovery_action = (
-            "Verify API keys in .env, check local gateway proxy (:8045), and ensure model quota is available."
+            "Verify API keys in .env, check local gateway proxy (:20128), and ensure model quota is available."
         )
         diagnostic.user_friendly_message = diagnostic.format_user_facing_summary()
 

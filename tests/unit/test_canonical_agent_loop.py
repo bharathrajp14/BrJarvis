@@ -1,8 +1,11 @@
 # tests/unit/test_canonical_agent_loop.py — Unit Tests for Canonical AgentLoop
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 from brjarvis.agent.agent_loop import AgentLoop, AgentTurnStatus
 from brjarvis.agent.session import AgentSession
+
 from brjarvis.events.bus import get_event_bus
 
 
@@ -22,10 +25,35 @@ class FailingRouter:
         raise TimeoutError("provider deadline exceeded")
 
 
+class MockGateway:
+    def __init__(self, text: str = "canonical response") -> None:
+        self.text = text
+        self.calls = []
+
+    def generate(self, messages, **kwargs):
+        self.calls.append((messages, kwargs))
+        return SimpleNamespace(text=self.text)
+
+
 class TestCanonicalAgentLoop:
+
     """Test suite for AgentLoop execution, verification, and event emission."""
 
+    def test_canonical_gateway_is_used_before_legacy_router(self, monkeypatch):
+        sess = AgentSession(session_id="test-loop-canonical-gateway")
+        gateway = MockGateway()
+        loop = AgentLoop(session=sess, gateway=gateway)
+        loop.discover_context = lambda _prompt: ""
+        monkeypatch.setattr("brjarvis.agent.agent_loop.DeterministicIntentEngine.parse_and_execute", lambda _text: None)
+
+        result = loop.run_turn("build a gateway integration", router=MockRouter(["legacy response"]))
+
+        assert result == "canonical response"
+        assert len(gateway.calls) == 1
+        assert gateway.calls[0][1]["capability"] == "code"
+
     def test_fast_path_execution(self):
+
         sess = AgentSession(session_id="test-loop-fast")
         loop = AgentLoop(session=sess)
 

@@ -138,7 +138,7 @@ class ProxyBrainClient:
             base_url
             or os.environ.get("BRJARVIS_PROXY_BASE_URL")
             or os.environ.get("OPENAI_BASE_URL")
-            or "http://localhost:8045/v1"
+            or "http://127.0.0.1:20128/v1"
         ).rstrip("/")
 
         self.api_key = (

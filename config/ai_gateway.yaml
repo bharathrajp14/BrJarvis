@@ -1,87 +1,415 @@
-# Br-Jarvis AI backends and gateway routing
+# ════════════════════════════════════════════════════════════════════════════
+#  BR JARVIS — AI Gateway Routing Configuration
+#  Three-Tier Provider Hierarchy:
+#    TIER 1 (PRIMARY)   — Antigravity Custom Proxy  (http://127.0.0.1:20128/v1)
+#    TIER 2 (SECONDARY) — OpenRouter Free Models    (https://openrouter.ai/api/v1)
+#    TIER 3 (EMERGENCY) — OmniRouter                (http://127.0.0.1:20128/v1)
 #
-# Edit this file to add providers, change models, or change route policy.
-# API keys are referenced by environment-variable name only; never put secrets here.
-# Supported strategies: priority, weighted, round_robin, cost, latency.
+#  API keys are referenced by environment-variable name only.
+#  Supported strategies: priority, weighted, round_robin, cost, latency.
+# ════════════════════════════════════════════════════════════════════════════
 
 cooldown_seconds: 15
 
 backends:
-  - id: manus
-    provider: manus
-    model: manus-1.6-lite
-    base_url: https://api.manus.ai
-    api_key_env: MANUS_API_KEY
+  # ── TIER 1: Antigravity Custom Proxy at localhost:8045 ────────────────────
+  # Primary workhorse — routes across all 23 proxy models.
+  # Priority 10: highest; tried first in every route.
+
+  - id: proxy_gemini_36_flash_high
+    provider: openai-compatible
+    model: antigravity/gemini-3.7-flash-high
+    base_url: http://127.0.0.1:20128/v1
+    api_key_env: BRJARVIS_PROXY_API_KEY
     enabled: true
-    priority: 5
+    priority: 10
+    weight: 5
+    cost_per_1k_tokens: 0
+    latency_ms: 500
+    capabilities: [chat, code, reasoning, vision, tools, agent]
+    max_context: 1048576
+
+  - id: proxy_gemini_pro_high
+    provider: openai-compatible
+    model: antigravity/gemini-3.7-flash-high
+    base_url: http://127.0.0.1:20128/v1
+    api_key_env: BRJARVIS_PROXY_API_KEY
+    enabled: true
+    priority: 11
+    weight: 4
+    cost_per_1k_tokens: 0
+    latency_ms: 600
+    capabilities: [chat, code, reasoning, vision, tools, agent]
+    max_context: 1048576
+
+  - id: proxy_claude_sonnet46
+    provider: openai-compatible
+    model: antigravity/claude-sonnet-4-6
+    base_url: http://127.0.0.1:20128/v1
+    api_key_env: BRJARVIS_PROXY_API_KEY
+    enabled: true
+    priority: 12
+    weight: 4
+    cost_per_1k_tokens: 0
+    latency_ms: 800
+    capabilities: [chat, code, reasoning, tools]
+    max_context: 200000
+
+  - id: proxy_claude_opus46_thinking
+    provider: openai-compatible
+    model: antigravity/claude-opus-4-6-thinking
+    base_url: http://127.0.0.1:20128/v1
+    api_key_env: BRJARVIS_PROXY_API_KEY
+    enabled: true
+    priority: 13
     weight: 3
     cost_per_1k_tokens: 0
-    latency_ms: 2500
-    capabilities: [chat, code, reasoning, vision, tools, agent]
+    latency_ms: 1200
+    capabilities: [chat, code, reasoning, agent]
+    max_context: 200000
+
+  - id: proxy_gemini_25_pro
+    provider: openai-compatible
+    model: gemini-2.5-pro
+    base_url: http://127.0.0.1:20128/v1
+    api_key_env: BRJARVIS_PROXY_API_KEY
+    enabled: true
+    priority: 14
+    weight: 3
+    cost_per_1k_tokens: 0
+    latency_ms: 900
+    capabilities: [chat, code, reasoning, vision]
+    max_context: 1048576
+
+  - id: proxy_gemini_37_flash_high
+    provider: openai-compatible
+    model: antigravity/gemini-3.7-flash-high
+    base_url: http://127.0.0.1:20128/v1
+    api_key_env: BRJARVIS_PROXY_API_KEY
+    enabled: true
+    priority: 15
+    weight: 3
+    cost_per_1k_tokens: 0
+    latency_ms: 600
+    capabilities: [chat, code, reasoning, tools, agent]
+    max_context: 1048576
+
+  - id: proxy_gemini_3_flash_agent
+    provider: openai-compatible
+    model: antigravity/gemini-pro-agent
+    base_url: http://127.0.0.1:20128/v1
+    api_key_env: BRJARVIS_PROXY_API_KEY
+    enabled: true
+    priority: 16
+    weight: 3
+    cost_per_1k_tokens: 0
+    latency_ms: 600
+    capabilities: [chat, code, tools, agent]
+    max_context: 1048576
+
+  - id: proxy_gemini_31_flash_image
+    provider: openai-compatible
+    model: antigravity/gemini-3.7-flash-high
+    base_url: http://127.0.0.1:20128/v1
+    api_key_env: BRJARVIS_PROXY_API_KEY
+    enabled: true
+    priority: 17
+    weight: 2
+    cost_per_1k_tokens: 0
+    latency_ms: 700
+    capabilities: [chat, vision, image]
+    max_context: 1048576
+
+  - id: proxy_gemini_36_flash_low
+    provider: openai-compatible
+    model: antigravity/gemini-3.7-flash-low
+    base_url: http://127.0.0.1:20128/v1
+    api_key_env: BRJARVIS_PROXY_API_KEY
+    enabled: true
+    priority: 18
+    weight: 2
+    cost_per_1k_tokens: 0
+    latency_ms: 300
+    capabilities: [chat, code]
+    max_context: 1048576
+
+  - id: proxy_gemini_35_flash_extra_low
+    provider: openai-compatible
+    model: antigravity/gemini-3.1-pro-low
+    base_url: http://127.0.0.1:20128/v1
+    api_key_env: BRJARVIS_PROXY_API_KEY
+    enabled: true
+    priority: 19
+    weight: 2
+    cost_per_1k_tokens: 0
+    latency_ms: 200
+    capabilities: [chat]
+    max_context: 1048576
+
+  - id: proxy_gpt_oss_120b
+    provider: openai-compatible
+    model: github/gpt-4o-mini
+    base_url: http://127.0.0.1:20128/v1
+    api_key_env: BRJARVIS_PROXY_API_KEY
+    enabled: true
+    priority: 20
+    weight: 2
+    cost_per_1k_tokens: 0
+    latency_ms: 900
+    capabilities: [chat, code, reasoning]
     max_context: 128000
+
+  - id: proxy_gemini_pro_agent
+    provider: openai-compatible
+    model: gemini-pro-agent
+    base_url: http://127.0.0.1:20128/v1
+    api_key_env: BRJARVIS_PROXY_API_KEY
+    enabled: true
+    priority: 21
+    weight: 2
+    cost_per_1k_tokens: 0
+    latency_ms: 800
+    capabilities: [chat, tools, agent]
+    max_context: 1048576
+
+  # ── TIER 2: OpenRouter Free Models ────────────────────────────────────────
+  # Secondary fallback — verified live free models (probed 2026-08-28).
+  # Priority 50: tried when ALL proxy backends are cooling down.
+
+  - id: openrouter_nemotron_ultra
+    provider: openai-compatible
+    model: nvidia/nemotron-3-ultra-550b-a55b:free
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+    enabled: true
+    priority: 50
+    weight: 3
+    cost_per_1k_tokens: 0
+    latency_ms: 1800
+    capabilities: [chat, code, reasoning]
+    max_context: 1000000
+
+  - id: openrouter_nemotron_super
+    provider: openai-compatible
+    model: nvidia/nemotron-3-super-120b-a12b:free
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+    enabled: true
+    priority: 51
+    weight: 3
+    cost_per_1k_tokens: 0
+    latency_ms: 1600
+    capabilities: [chat, code, reasoning]
+    max_context: 131072
+
+  - id: openrouter_poolside_laguna
+    provider: openai-compatible
+    model: poolside/laguna-s-2.1:free
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+    enabled: true
+    priority: 52
+    weight: 2
+    cost_per_1k_tokens: 0
+    latency_ms: 1500
+    capabilities: [chat, code, agent]
+    max_context: 131072
+
+  - id: openrouter_gemma4
+    provider: openai-compatible
+    model: google/gemma-4-31b-it:free
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+    enabled: true
+    priority: 53
+    weight: 2
+    cost_per_1k_tokens: 0
+    latency_ms: 1700
+    capabilities: [chat, code]
+    max_context: 131072
+
+  - id: openrouter_minimax
+    provider: openai-compatible
+    model: minimax/minimax-m3:free
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+    enabled: true
+    priority: 54
+    weight: 1
+    cost_per_1k_tokens: 0
+    latency_ms: 2000
+    capabilities: [chat, code]
+    max_context: 1000000
+
+  - id: openrouter_auto
+    provider: openai-compatible
+    model: openrouter/free
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+    enabled: true
+    priority: 59
+    weight: 1
+    cost_per_1k_tokens: 0
+    latency_ms: 2500
+    capabilities: [chat]
+    max_context: 131072
+
+  # ── TIER 3: OmniRouter Emergency Fallback ─────────────────────────────────
+  # Disabled — connection error on probe 2026-08-28. Re-enable when resolved.
+
+  - id: omnirouter_fallback
+    provider: openai-compatible
+    model: auto
+    base_url: http://127.0.0.1:20128/v1
+    api_key_env: OMNIROUTER_API_KEY
+    enabled: true
+    priority: 85
+    weight: 1
+    cost_per_1k_tokens: 0
+    latency_ms: 1800
+    capabilities: [chat, code, reasoning]
+    max_context: 128000
+
+  # ── LOCAL BACKENDS (offline, priority 95) ──────────────────────────────────
 
   - id: local_ollama
     provider: ollama
     model: llama3.3
     base_url: http://127.0.0.1:11434/v1
     enabled: true
-    priority: 10
+    priority: 95
     weight: 1
     cost_per_1k_tokens: 0
     latency_ms: 250
     capabilities: [chat, code, reasoning, tools]
     max_context: 32768
 
-  - id: proxy_brain
-    provider: openai-compatible
-    model: gemini-3.6-flash-high
-    base_url: http://localhost:8045/v1
-    api_key_env: BRJARVIS_PROXY_API_KEY
-    enabled: true
-    priority: 20
-    weight: 3
-    cost_per_1k_tokens: 0
-    latency_ms: 700
-    capabilities: [chat, code, reasoning, vision, tools, agent]
-    max_context: 1048576
+  # ── MANUS AGENT BACKEND ───────────────────────────────────────────────────
 
-  # Example external provider. Uncomment and set OPENAI_API_KEY before enabling.
-  # - id: openai
-  #   provider: openai
-  #   model: gpt-4o-mini
-  #   base_url: https://api.openai.com/v1
-  #   api_key_env: OPENAI_API_KEY
-  #   enabled: false
-  #   priority: 30
-  #   weight: 1
-  #   cost_per_1k_tokens: 0.00015
-  #   latency_ms: 900
-  #   capabilities: [chat, code, reasoning, vision, tools]
+  - id: manus
+    provider: manus
+    model: manus-1.6-lite
+    base_url: https://api.manus.ai
+    api_key_env: MANUS_API_KEY
+    enabled: true
+    priority: 99
+    weight: 1
+    cost_per_1k_tokens: 0
+    latency_ms: 2500
+    capabilities: [chat, code, reasoning, vision, tools, agent]
+    max_context: 128000
+
+# ── Route Policies ────────────────────────────────────────────────────────────
+# Each policy picks an ordered fallback chain from the backends above.
+# All backend IDs verified online: 2026-08-28 probe (20/30 online).
 
 routes:
+  # DEFAULT: Active Proxy first → Local Ollama
   default:
     strategy: priority
-    backends: [manus, local_ollama, proxy_brain]
-    max_fallbacks: 3
+    backends:
+      - proxy_gemini_36_flash_high
+      - proxy_claude_sonnet46
+      - proxy_claude_opus46_thinking
+      - proxy_gemini_36_flash_low
+      - local_ollama
+    max_fallbacks: 4
 
-  local:
+  # PROXY ONLY: Verified online Antigravity models.
+  proxy:
     strategy: priority
-    backends: [local_ollama]
-    max_fallbacks: 0
+    backends:
+      - proxy_gemini_36_flash_high
+      - proxy_claude_sonnet46
+      - proxy_claude_opus46_thinking
+      - proxy_gemini_37_flash_high
+      - proxy_gemini_36_flash_low
+    max_fallbacks: 4
 
+  # FAST: Lowest latency proxy models first.
   fast:
     strategy: latency
-    backends: [manus, local_ollama, proxy_brain]
+    backends:
+      - proxy_gemini_36_flash_low
+      - proxy_gemini_36_flash_high
+      - proxy_claude_sonnet46
+      - local_ollama
     required_capabilities: [chat]
-    max_fallbacks: 2
+    max_fallbacks: 3
 
+  # CODING: Best coding models from proxy.
   coding:
-    strategy: weighted
-    backends: [manus, proxy_brain, local_ollama]
+    strategy: priority
+    backends:
+      - proxy_claude_sonnet46
+      - proxy_claude_opus46_thinking
+      - proxy_gemini_36_flash_high
+      - local_ollama
     required_capabilities: [code]
+    max_fallbacks: 3
+
+  # REASONING: Deep reasoning models.
+  reasoning:
+    strategy: priority
+    backends:
+      - proxy_claude_opus46_thinking
+      - proxy_claude_sonnet46
+      - proxy_gemini_36_flash_high
+    required_capabilities: [reasoning]
+    max_fallbacks: 3
+
+  # VISION: Image-capable models.
+  vision:
+    strategy: priority
+    backends:
+      - proxy_gemini_36_flash_high
+      - proxy_gemini_31_flash_image
+    required_capabilities: [vision]
     max_fallbacks: 2
 
+  # AGENT: Agentic + tool-capable models.
+  agent:
+    strategy: priority
+    backends:
+      - proxy_gemini_3_flash_agent
+      - proxy_gemini_pro_agent
+      - proxy_gemini_37_flash_high
+      - proxy_gemini_pro_high
+      - openrouter_poolside_laguna
+      - manus
+    required_capabilities: [agent]
+    max_fallbacks: 4
+
+  # BUDGET: Free-tier only (zero cost guaranteed).
   budget:
     strategy: cost
-    backends: [manus, local_ollama, proxy_brain]
-    max_fallbacks: 3
+    backends:
+      - proxy_gemini_35_flash_extra_low
+      - proxy_gemini_36_flash_low
+      - openrouter_nemotron_super
+      - openrouter_gemma4
+      - openrouter_poolside_laguna
+      - openrouter_minimax
+      - openrouter_auto
+      - local_ollama
+    max_fallbacks: 6
+
+  # LOCAL ONLY: 100% offline, never calls cloud.
+  local:
+    strategy: priority
+    backends:
+      - local_ollama
+    max_fallbacks: 0
+
+  # EMERGENCY: OpenRouter verified free models when proxy is totally down.
+  emergency:
+    strategy: priority
+    backends:
+      - openrouter_nemotron_ultra
+      - openrouter_nemotron_super
+      - openrouter_poolside_laguna
+      - openrouter_gemma4
+      - openrouter_minimax
+      - openrouter_auto
+      - local_ollama
+    max_fallbacks: 6

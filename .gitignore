@@ -60,6 +60,9 @@ env/
 # Build artifacts & packaging outputs
 build/
 dist/
+# The FastAPI package ships the production control-plane bundle.
+!src/brjarvis/web/static/dist/
+!src/brjarvis/web/static/dist/**
 *.egg-info/
 *.spec
 
@@ -99,6 +102,9 @@ workspace/snapshots/
 workspace/test_temp/
 workspace/test_temp_*/
 workspace/tmp_*/
+workspace/.imports/
+workspace/*_report.*
+workspace/omnirouter_*.json
 runtime/screenshots/
 runtime/snapshots/
 src/brjarvis/logs/

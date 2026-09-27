@@ -33,7 +33,7 @@ def _load_gemini_key() -> str:
 
 def _load_proxy_config() -> tuple[str, str]:
     """Return (base_url, api_key) for the local OpenAI-compatible proxy."""
-    base_url = os.environ.get("OPENAI_BASE_URL", "http://localhost:8045/v1").strip()
+    base_url = (os.environ.get("BRJARVIS_PROXY_BASE_URL") or os.environ.get("OPENAI_BASE_URL") or "http://127.0.0.1:20128/v1").strip()
     api_key = get_openai_key()
 
     return base_url, api_key or "none"

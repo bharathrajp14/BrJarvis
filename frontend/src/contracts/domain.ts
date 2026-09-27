@@ -22,6 +22,8 @@ export type TaskStatus =
 
 export type ExecutionMode = 'fast' | 'smart' | 'deep';
 export type CapabilityState = 'healthy' | 'degraded' | 'offline' | 'requires_approval' | 'unavailable';
+export type ConnectionState = 'connected' | 'connecting' | 'offline';
+export type BackendState = 'online' | 'degraded' | 'offline';
 
 export interface Capability {
   id: string;
@@ -48,6 +50,7 @@ export interface Task {
   duration: string;
   provider: string;
   summary: string;
+  phase?: string;
   steps: TaskStep[];
   artifactCount: number;
   requiresApproval?: boolean;
@@ -72,6 +75,7 @@ export interface Artifact {
   status: 'verified' | 'processing' | 'needs_review' | 'failed';
   size: string;
   updatedAt: string;
+  downloadUrl: string;
 }
 
 export interface WorkspaceEntry {
@@ -90,6 +94,8 @@ export interface TimelineEvent {
   label: string;
   detail: string;
   tone: 'neutral' | 'accent' | 'success' | 'warning';
+  read?: boolean;
+  category?: string;
 }
 
 export interface MemoryEntry {
@@ -104,8 +110,10 @@ export interface ContactSummary {
   id: string;
   name: string;
   organization: string;
+  title: string;
   email: string;
   phone: string;
+  notes: string;
   important: boolean;
 }
 
@@ -124,7 +132,25 @@ export interface ConnectorSummary {
   status: string;
   configured: boolean;
   requiresAuth: boolean;
+  authHint: string;
+  category: string;
   tools: string[];
+}
+
+export interface SearchResult {
+  entityType: string;
+  entityId: string;
+  title: string;
+  snippet: string;
+}
+
+export interface CareerJob {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  url?: string;
+  summary?: string;
 }
 
 export type PanelState = 'ready' | 'empty' | 'error';
@@ -137,7 +163,8 @@ export interface PanelHealth {
 export interface AppSnapshot {
   activeView: ViewId;
   activeTaskId: string;
-  connection: 'connected' | 'connecting' | 'offline';
+  connection: ConnectionState;
+  backend: BackendState;
   capabilities: Capability[];
   tasks: Task[];
   approvals: Approval[];
@@ -149,5 +176,6 @@ export interface AppSnapshot {
   contacts: ContactSummary[];
   connectors: ConnectorSummary[];
   timeline: TimelineEvent[];
-  panelHealth?: Record<string, PanelHealth>;
+  unreadNotifications: number;
+  panelHealth: Record<string, PanelHealth>;
 }

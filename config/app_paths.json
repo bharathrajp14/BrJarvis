@@ -139,7 +139,7 @@
   },
   "gethelp": {
     "name": "GetHelp.exe",
-    "path": "C:\\Program Files\\WindowsApps\\Microsoft.GetHelp_10.2409.42162.0_x64__8wekyb3d8bbwe\\GetHelp.exe",
+    "path": "C:\\Program Files\\WindowsApps\\Microsoft.GetHelp_10.2409.42492.0_x64__8wekyb3d8bbwe\\GetHelp.exe",
     "type": "executable",
     "source": "Registry App Paths"
   },
@@ -151,13 +151,13 @@
   },
   "mspaint": {
     "name": "mspaint.exe",
-    "path": "C:\\Program Files\\WindowsApps\\Microsoft.Paint_11.2605.71.0_x64__8wekyb3d8bbwe\\PaintApp\\mspaint.exe",
+    "path": "C:\\Program Files\\WindowsApps\\Microsoft.Paint_11.2605.81.0_x64__8wekyb3d8bbwe\\PaintApp\\mspaint.exe",
     "type": "executable",
     "source": "Registry App Paths"
   },
   "notepad": {
     "name": "notepad.exe",
-    "path": "C:\\Program Files\\WindowsApps\\Microsoft.WindowsNotepad_11.2606.15.0_x64__8wekyb3d8bbwe\\Notepad\\Notepad.exe",
+    "path": "C:\\Program Files\\WindowsApps\\Microsoft.WindowsNotepad_11.2607.14.0_x64__8wekyb3d8bbwe\\Notepad\\Notepad.exe",
     "type": "executable",
     "source": "Registry App Paths"
   },
@@ -170,12 +170,6 @@
   "pip3.12": {
     "name": "pip3.12.exe",
     "path": "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\pip3.12.exe",
-    "type": "executable",
-    "source": "Registry App Paths"
-  },
-  "pwsh": {
-    "name": "pwsh.exe",
-    "path": "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.6.5.0_x64__8wekyb3d8bbwe\\pwsh.exe",
     "type": "executable",
     "source": "Registry App Paths"
   },
@@ -199,37 +193,37 @@
   },
   "snippingtool": {
     "name": "SnippingTool.exe",
-    "path": "C:\\Program Files\\WindowsApps\\Microsoft.ScreenSketch_11.2602.49.0_x64__8wekyb3d8bbwe\\SnippingTool\\SnippingTool.exe",
+    "path": "C:\\Program Files\\WindowsApps\\Microsoft.ScreenSketch_11.2605.38.0_x64__8wekyb3d8bbwe\\SnippingTool\\SnippingTool.exe",
     "type": "executable",
     "source": "Registry App Paths"
   },
   "store": {
     "name": "store.exe",
-    "path": "C:\\Program Files\\WindowsApps\\Microsoft.WindowsStore_22606.1401.13.0_x64__8wekyb3d8bbwe\\store.exe",
+    "path": "C:\\Program Files\\WindowsApps\\Microsoft.WindowsStore_22608.1401.3.0_x64__8wekyb3d8bbwe\\store.exe",
     "type": "executable",
     "source": "Registry App Paths"
   },
   "windowspackagemanagerserver": {
     "name": "WindowsPackageManagerServer.exe",
-    "path": "C:\\Program Files\\WindowsApps\\Microsoft.DesktopAppInstaller_1.29.280.0_x64__8wekyb3d8bbwe\\WindowsPackageManagerServer.exe",
+    "path": "C:\\Program Files\\WindowsApps\\Microsoft.DesktopAppInstaller_1.29.290.0_x64__8wekyb3d8bbwe\\WindowsPackageManagerServer.exe",
     "type": "executable",
     "source": "Registry App Paths"
   },
   "winget": {
     "name": "winget.exe",
-    "path": "C:\\Program Files\\WindowsApps\\Microsoft.DesktopAppInstaller_1.29.280.0_x64__8wekyb3d8bbwe\\winget.exe",
+    "path": "C:\\Program Files\\WindowsApps\\Microsoft.DesktopAppInstaller_1.29.290.0_x64__8wekyb3d8bbwe\\winget.exe",
     "type": "executable",
     "source": "Registry App Paths"
   },
   "wintoys": {
     "name": "wintoys.exe",
-    "path": "C:\\Program Files\\WindowsApps\\11413PtruceanBogdan.Wintoys_2.6.69.0_x64__ankwhmsh70gj6\\Wintoys.exe",
+    "path": "C:\\Program Files\\WindowsApps\\11413PtruceanBogdan.Wintoys_2.6.71.0_x64__ankwhmsh70gj6\\Wintoys.exe",
     "type": "executable",
     "source": "Registry App Paths"
   },
   "wsl": {
     "name": "wsl.exe",
-    "path": "C:\\Program Files\\WindowsApps\\MicrosoftCorporationII.WindowsSubsystemForLinux_2.7.11.0_x64__8wekyb3d8bbwe\\wsl.exe",
+    "path": "C:\\Program Files\\WindowsApps\\MicrosoftCorporationII.WindowsSubsystemForLinux_2.7.14.0_x64__8wekyb3d8bbwe\\wsl.exe",
     "type": "executable",
     "source": "Registry App Paths"
   },
@@ -266,6 +260,12 @@
   "file explorer": {
     "name": "File Explorer",
     "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\File Explorer.lnk",
+    "type": "shortcut",
+    "source": "Start Menu"
+  },
+  "omniroute": {
+    "name": "OmniRoute",
+    "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\OmniRoute.lnk",
     "type": "shortcut",
     "source": "Start Menu"
   },
@@ -374,24 +374,6 @@
   "antigravity manager": {
     "name": "Antigravity Manager",
     "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Draculabo\\Antigravity Manager.lnk",
-    "type": "shortcut",
-    "source": "Start Menu"
-  },
-  "mongodb compass": {
-    "name": "MongoDB Compass",
-    "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\MongoDB Inc\\MongoDB Compass.lnk",
-    "type": "shortcut",
-    "source": "Start Menu"
-  },
-  "postman": {
-    "name": "Postman",
-    "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Postman\\Postman.lnk",
-    "type": "shortcut",
-    "source": "Start Menu"
-  },
-  "proton drive": {
-    "name": "Proton Drive",
-    "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Proton\\Proton Drive.lnk",
     "type": "shortcut",
     "source": "Start Menu"
   },
@@ -509,12 +491,6 @@
     "type": "shortcut",
     "source": "Start Menu"
   },
-  "com_usr_daemon_pro": {
-    "name": "com_usr_daemon_pro",
-    "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\com_usr_daemon_pro.lnk",
-    "type": "shortcut",
-    "source": "Start Menu"
-  },
   "command prompt": {
     "name": "Command Prompt",
     "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\System Tools\\Command Prompt.lnk",
@@ -536,12 +512,6 @@
   "telegram": {
     "name": "Telegram",
     "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Telegram Desktop\\Telegram.lnk",
-    "type": "shortcut",
-    "source": "Start Menu"
-  },
-  "turbovpn": {
-    "name": "TurboVPN",
-    "path": "C:\\Users\\bhara\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\TurboVPN\\TurboVPN.lnk",
     "type": "shortcut",
     "source": "Start Menu"
   },
@@ -590,12 +560,6 @@
   "audiorelay": {
     "name": "AudioRelay",
     "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\AudioRelay.lnk",
-    "type": "shortcut",
-    "source": "Start Menu"
-  },
-  "hma vpn": {
-    "name": "HMA VPN",
-    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\HMA VPN.lnk",
     "type": "shortcut",
     "source": "Start Menu"
   },
@@ -881,12 +845,6 @@
     "type": "shortcut",
     "source": "Start Menu"
   },
-  "proton vpn": {
-    "name": "Proton VPN",
-    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Proton\\Proton VPN.lnk",
-    "type": "shortcut",
-    "source": "Start Menu"
-  },
   "idle (python 3.14 64-bit)": {
     "name": "IDLE (Python 3.14 64-bit)",
     "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Python 3.14\\IDLE (Python 3.14 64-bit).lnk",
@@ -914,12 +872,6 @@
   "qbittorrent": {
     "name": "qBittorrent",
     "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\qBittorrent\\qBittorrent.lnk",
-    "type": "shortcut",
-    "source": "Start Menu"
-  },
-  "qoder ide": {
-    "name": "Qoder IDE",
-    "path": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Qoder IDE\\Qoder IDE.lnk",
     "type": "shortcut",
     "source": "Start Menu"
   },
@@ -1160,30 +1112,6 @@
   "gk": {
     "name": "gk",
     "path": "C:\\Users\\bhara\\AppData\\Local\\GitKrakenCLI\\gk.exe",
-    "type": "executable",
-    "source": "Standard Directory"
-  },
-  "mongodbcompass": {
-    "name": "MongoDBCompass",
-    "path": "C:\\Users\\bhara\\AppData\\Local\\MongoDBCompass\\MongoDBCompass.exe",
-    "type": "executable",
-    "source": "Standard Directory"
-  },
-  "build_electro": {
-    "name": "Build_Electro",
-    "path": "C:\\Users\\bhara\\AppData\\Local\\Temp\\Build_Electro.exe",
-    "type": "executable",
-    "source": "Standard Directory"
-  },
-  "proton%20drive%20setup%203.0.4": {
-    "name": "Proton%20Drive%20Setup%203.0.4",
-    "path": "C:\\Users\\bhara\\AppData\\Local\\Temp\\Proton%20Drive%20Setup%203.0.4.exe",
-    "type": "executable",
-    "source": "Standard Directory"
-  },
-  "protonmail-desktop": {
-    "name": "ProtonMail-desktop",
-    "path": "C:\\Users\\bhara\\AppData\\Local\\Temp\\ProtonMail-desktop.exe",
     "type": "executable",
     "source": "Standard Directory"
   },
@@ -1475,24 +1403,6 @@
     "type": "executable",
     "source": "Standard Directory"
   },
-  "installtapx64": {
-    "name": "installtapx64",
-    "path": "C:\\Program Files (x86)\\TurboVPN\\installtapx64.exe",
-    "type": "executable",
-    "source": "Standard Directory"
-  },
-  "tun2socks": {
-    "name": "tun2socks",
-    "path": "C:\\Program Files (x86)\\TurboVPN\\tun2socks.exe",
-    "type": "executable",
-    "source": "Standard Directory"
-  },
-  "turbo_vpn-service": {
-    "name": "turbo_vpn-service",
-    "path": "C:\\Program Files (x86)\\TurboVPN\\turbo_vpn-service.exe",
-    "type": "executable",
-    "source": "Standard Directory"
-  },
   "actionsmcphost": {
     "name": "ActionsMcpHost",
     "path": "C:\\Users\\bhara\\AppData\\Local\\Microsoft\\WindowsApps\\ActionsMcpHost.exe",
@@ -1601,6 +1511,12 @@
     "type": "executable",
     "source": "Uninstall Registry"
   },
+  "docker desktop": {
+    "name": "Docker Desktop",
+    "path": "C:\\Program Files\\Docker\\Docker\\Docker Desktop Installer.exe",
+    "type": "executable",
+    "source": "Uninstall Registry"
+  },
   "git": {
     "name": "Git",
     "path": "C:\\Program Files\\Git\\git-bash.exe",
@@ -1643,12 +1559,6 @@
     "type": "executable",
     "source": "Uninstall Registry"
   },
-  "turbovpn 3.7.0.0": {
-    "name": "TurboVPN 3.7.0.0",
-    "path": "C:\\Program Files (x86)\\TurboVPN\\TurboVPN.exe",
-    "type": "executable",
-    "source": "Uninstall Registry"
-  },
   "winscp 6.3.6": {
     "name": "WinSCP 6.3.6",
     "path": "C:\\Program Files (x86)\\WinSCP\\WinSCP.exe",
@@ -1676,12 +1586,6 @@
   "copilot cli": {
     "name": "Copilot CLI",
     "path": "C:\\Users\\bhara\\AppData\\Local\\Microsoft\\WinGet\\Packages\\GitHub.Copilot_Microsoft.Winget.Source_8wekyb3d8bbwe\\copilot.exe",
-    "type": "executable",
-    "source": "Uninstall Registry"
-  },
-  "postman x64 12.18.5": {
-    "name": "Postman x64 12.18.5",
-    "path": "C:\\Users\\bhara\\AppData\\Local\\Postman\\Postman.exe",
     "type": "executable",
     "source": "Uninstall Registry"
   },

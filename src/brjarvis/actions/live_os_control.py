@@ -303,11 +303,14 @@ def _calculate_conscious_step_budget(subgoals: list[dict], user_max_steps: int) 
     base_needed = len(subgoals) * 6
     conscious_budget = max(15, base_needed)
 
-    if user_max_steps > 0 and user_max_steps < 99999:
+    if user_max_steps == 0:
+        allocated_steps = 999999
+        label = "Unlimited Mode (999,999 Steps)"
+    elif user_max_steps > 0 and user_max_steps < 99999:
         allocated_steps = max(user_max_steps, conscious_budget)
         label = f"{allocated_steps} Conscious Steps (User Specified: {user_max_steps})"
     else:
-        # Automatic Conscious Budget Mode (Default 0 or Unlimited)
+        # Automatic Conscious Budget Mode
         allocated_steps = conscious_budget
         label = f"{allocated_steps} Conscious Steps (Auto-Allocated 🧠 based on {len(subgoals)} Subgoals)"
 
@@ -400,14 +403,15 @@ def _call_vision_llm(
 
     gateway_models = [
         model_name,
-        "gemini-3.6-flash",
-        "gemini-3.6-flash-high",
-        "gemini-3.1-flash-image",
-        "gemini-3-flash",
+        "antigravity/gemini-3.7-flash-high",
+        "openrouter/inclusionai/ling-3.0-flash-vl:free",
+        "cohere/c4ai-aya-vision-32b",
     ]
     # De-duplicate while preserving priority order
     seen = set()
     gateway_models = [m for m in gateway_models if m and not (m in seen or seen.add(m))]
+
+    gw_base = os.environ.get("OPENAI_BASE_URL", os.environ.get("BRJARVIS_PROXY_BASE_URL", "http://127.0.0.1:20128/v1")).rstrip("/")
 
     for gw_model in gateway_models:
         try:
@@ -428,7 +432,7 @@ def _call_vision_llm(
             api_key = os.environ.get("OPENAI_API_KEY", "").strip()
             if api_key:
                 headers["Authorization"] = f"Bearer {api_key}"
-            req = urllib.request.Request("http://localhost:8045/v1/chat/completions", data=data_bytes, headers=headers)
+            req = urllib.request.Request(f"{gw_base}/chat/completions", data=data_bytes, headers=headers)
             with urllib.request.urlopen(req, timeout=3.5) as resp:
                 body = json.loads(resp.read().decode("utf-8"))
                 content = body.get("choices", [{}])[0].get("message", {}).get("content", "").strip()

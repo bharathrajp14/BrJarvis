@@ -71,14 +71,14 @@ class GeminiBackend(BaseBackend):
                 from openai import OpenAI  # type: ignore
 
                 base_url = os.environ.get("BRJARVIS_PROXY_BASE_URL") or os.environ.get(
-                    "OPENAI_BASE_URL", "http://localhost:8045/v1"
+                    "OPENAI_BASE_URL", "http://127.0.0.1:20128/v1"
                 )
                 api_key_val = (
                     os.environ.get("BRJARVIS_PROXY_API_KEY")
                     or os.environ.get("OPENAI_API_KEY", "sk-5ec70bf9fa324084b7a7326babf52c45").strip()
                     or "sk-5ec70bf9fa324084b7a7326babf52c45"
                 )
-                self._client = OpenAI(base_url=base_url, api_key=api_key_val)
+                self._client = OpenAI(base_url=base_url, api_key=api_key_val, max_retries=1)
                 self._use_openai_client = True
                 self.model = model or self._pick_model()
                 logger.info(f"Routed via local proxy gateway: {base_url} (model: {self.model})")

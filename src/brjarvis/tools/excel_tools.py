@@ -8,6 +8,7 @@ custom header themes, auto-column sizing, summary formulas, and automatic Excel 
 from __future__ import annotations
 
 import logging
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -175,16 +176,19 @@ def analyze_project_to_excel(args: dict) -> str:
     root_dir = Path(args.get("project_path") or paths.PROJECT_ROOT).resolve()
     out_name = args.get("output_filename") or "JARVIS_Project_Full_Analysis.xlsx"
     out_path = paths.DOCUMENTS_DIR / out_name
+    auto_open = bool(args.get("auto_open", False))
 
     file_records = []
     total_loc = 0
     total_bytes = 0
     category_counts = {}
 
-    ignored_dirs = {"__pycache__", ".git", ".idea", ".vscode", "venv", "node_modules", ".gemini", "brain"}
+    ignored_dirs = {"__pycache__", ".git", ".idea", ".vscode", "venv", ".venv", "env", ".env", "node_modules", ".gemini", "brain", ".pytest_cache", ".mypy_cache", "build", "dist"}
 
-    for path in root_dir.rglob("*"):
-        if path.is_file() and not any(part in ignored_dirs for part in path.parts):
+    for root, dirs, files in os.walk(root_dir):
+        dirs[:] = [d for d in dirs if d not in ignored_dirs]
+        for fname in files:
+            path = Path(root) / fname
             try:
                 size_b = path.stat().st_size
                 ext = path.suffix.lower() or "no_ext"
@@ -256,7 +260,7 @@ def analyze_project_to_excel(args: dict) -> str:
         ["Total Repository Size", f"{round(total_bytes / (1024 * 1024), 2)} MB", "Uncompressed total workspace size"],
         ["Primary Language", "Python 3.14 + C Native Extension", "Core execution platform"],
         ["AI Operating Systems Version", "37.5.0 (Antigravity Mode)", "Ultra-Low Token Architecture"],
-        ["Local Gateway Endpoint", "http://localhost:8045/v1", "Active unlimited model proxy"],
+        ["Local Gateway Endpoint", "http://127.0.0.1:20128/v1", "Active unlimited model proxy"],
     ]
 
     for r_idx, row in enumerate(summary_data, start=4):
@@ -340,8 +344,8 @@ def analyze_project_to_excel(args: dict) -> str:
         out_path = root_dir / f"JARVIS_Project_Full_Analysis_{ts}.xlsx"
         wb.save(out_path)
 
-    # Auto-open on Windows
-    if sys.platform == "win32":
+    # Auto-open on Windows if requested
+    if auto_open and sys.platform == "win32":
         try:
             subprocess.Popen(["cmd", "/c", "start", "", str(out_path)], shell=False)
         except Exception as e:

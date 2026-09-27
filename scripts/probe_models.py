@@ -6,7 +6,7 @@ import time
 import requests
 
 def main():
-    base_url = os.environ.get('BRJARVIS_PROXY_BASE_URL', os.environ.get('OPENAI_BASE_URL', 'http://localhost:8045/v1')).rstrip('/')
+    base_url = os.environ.get('BRJARVIS_PROXY_BASE_URL', os.environ.get('OPENAI_BASE_URL', 'http://127.0.0.1:20128/v1')).rstrip('/')
     api_key = os.environ.get('BRJARVIS_PROXY_API_KEY', os.environ.get('OPENAI_API_KEY', ''))
     if not api_key:
         try:
@@ -14,10 +14,10 @@ def main():
             cfg_file = Path(__file__).resolve().parent.parent / "config" / "api_keys.json"
             if cfg_file.exists():
                 data = json.loads(cfg_file.read_text(encoding="utf-8"))
-                api_key = data.get("proxy_api_key") or data.get("openai_api_key") or "sk-5ec70bf9fa324084b7a7326babf52c45"
+                api_key = data.get("proxy_api_key") or data.get("openai_api_key") or os.environ.get("OPENAI_API_KEY", "")
         except Exception:
-            api_key = "sk-5ec70bf9fa324084b7a7326babf52c45"
-    api_key = api_key or "sk-5ec70bf9fa324084b7a7326babf52c45"
+            api_key = os.environ.get("OPENAI_API_KEY", "")
+    api_key = api_key or os.environ.get("OPENAI_API_KEY", "")
 
     print(f"Target Gateway: {base_url}", flush=True)
     print("-" * 80, flush=True)
@@ -39,25 +39,24 @@ def main():
 
     # 2. Candidate models
     candidates = [
-        "gemini-3.7-flash-tiered",
-        "gemini-3.6-flash-high",
-        "gemini-3.6-flash-medium",
-        "gemini-3.6-flash-low",
-        "gemini-3.6-flash-tiered",
-        "gemini-3.1-pro-high",
-        "gemini-3.1-pro-low",
-        "gemini-3.1-flash-lite",
-        "gemini-3.1-flash-image",
-        "gemini-3-flash",
-        "gemini-3-flash-agent",
-        "gemini-pro-agent",
-        "gemini-2.5-pro",
-        "gemini-2.5-flash",
-        "gemini-2.5-flash-lite",
-        "gemini-2.5-flash-thinking",
-        "claude-opus-4-6-thinking",
-        "claude-sonnet-4-6",
-        "gpt-oss-120b-medium",
+        "antigravity/gemini-3.7-flash-high",
+        "antigravity/gemini-3.7-flash-medium",
+        "antigravity/gemini-3.7-flash-low",
+        "antigravity/gemini-pro-agent",
+        "antigravity/gemini-3.1-pro-low",
+        "antigravity/gemini-3.1-flash-lite",
+        "antigravity/claude-sonnet-4-6",
+        "antigravity/claude-opus-4-6-thinking",
+        "kr/claude-sonnet-4.5",
+        "kr/deepseek-3.2",
+        "kr/qwen3-coder-next",
+        "auto/chat",
+        "auto/best-chat",
+        "auto/best-coding",
+        "auto/best-reasoning",
+        "auto/best-vision",
+        "auto/fast",
+        "github/gpt-4o-mini",
     ]
 
     test_list = list(dict.fromkeys(discovered + candidates)) if discovered else candidates

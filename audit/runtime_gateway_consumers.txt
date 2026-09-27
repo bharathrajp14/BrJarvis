@@ -1,0 +1,70 @@
+﻿
+Path                                                             LineNumber Lin
+                                                                            e  
+----                                                             ---------- ---
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\agent\cross_device_planner.py         18 fro
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\agent\goal_decomposer.py             136    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\agent\planner.py                      19 fro
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\terminal\session.py              16 fro
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\terminal\session.py              73    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\terminal\session.py              81    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\terminal\__init__.py             10 fro
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\terminal\__init__.py             48    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\terminal\__init__.py             59    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\cli.py                           10 fro
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\cli.py                           33 def
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\cli.py                           40    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\cli.py                           50    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\cli.py                           57 def
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\runtime.py                        1 # c
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\runtime.py                       21 cla
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\runtime.py                       60    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\runtime.py                       68    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\runtime.py                      105    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\runtime.py                      208 Cor
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\runtime.py                      211 _gl
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\runtime.py                      215 def
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\runtime.py                      216    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\core\runtime.py                      223    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\integrations\backends\open...         13 fro
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\integrations\mobile\device...         17 fro
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\integrations\mobile\device...         30    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\integrations\mobile\device...         40    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\integrations\mobile\__init...          7 fro
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\orchestrator\core.py                 194    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\orchestrator\core.py                 201    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\orchestrator\core.py                 203    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\orchestrator\core.py                 205    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\orchestrator\core.py                 857    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\orchestrator\core.py                 859    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\orchestrator\core.py                 956    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\orchestrator\core.py                 958    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\orchestrator\core.py                 970    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\orchestrator\core.py                 976    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\orchestrator\core.py                 978    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\orchestrator\core.py                1002    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\router\core.py                       196    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\router\core.py                       198    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\router\core.py                       204    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\router\core.py                       207    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\router\core.py                       212    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\router\core.py                       294    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\router\core.py                       309    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\router\smart_router.py                25 fro
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\router\smart_router.py                26 fro
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\router\smart_router.py                27 fro
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\router\smart_router.py                28 fro
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\router\smart_router.py                29 fro
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\router\smart_router.py               169    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\tools\web.py                         187    
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\web\api\routes\devices.py              9 fro
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\web\api\routes\websocket.py           18 fro
+D:\BRJARVIS\Br-Jarvis\src\brjarvis\__init__.py                           38    
+D:\BRJARVIS\Br-Jarvis\src\jarvis\core\bootstrap.py                       72    
+D:\BRJARVIS\Br-Jarvis\src\jarvis\core\bootstrap.py                       79    
+D:\BRJARVIS\Br-Jarvis\src\jarvis\core\bootstrap.py                      120    
+D:\BRJARVIS\Br-Jarvis\tests\unit\jarvis_gateway\test_gateway.py           7 fro
+D:\BRJARVIS\Br-Jarvis\tests\unit\jarvis_gateway\test_gateway.py          15 fro
+D:\BRJARVIS\Br-Jarvis\tests\test_ai_gateway_routing.py                    1 fro
+
+

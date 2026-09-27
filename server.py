@@ -27,8 +27,12 @@ from brjarvis.apps.web import main
 try:
     from brjarvis.web.api.server import create_app
     app = create_app()
-except Exception as e:
-    app = None  # type: ignore[assignment]
+except Exception:
+    try:
+        from jarvis.surfaces.web.server import create_app
+        app = create_app()
+    except Exception:
+        app = None  # type: ignore[assignment]
 
 def __getattr__(name: str):
     if name == "app":
@@ -38,7 +42,11 @@ def __getattr__(name: str):
                 from brjarvis.web.api.server import create_app
                 app = create_app()
             except Exception:
-                pass
+                try:
+                    from jarvis.surfaces.web.server import create_app
+                    app = create_app()
+                except Exception:
+                    pass
         return app
     import brjarvis.apps.web as _w
     return getattr(_w, name)

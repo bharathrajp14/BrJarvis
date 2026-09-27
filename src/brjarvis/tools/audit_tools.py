@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import ast
 import logging
+import os
 import re
 from pathlib import Path
 
@@ -41,13 +42,16 @@ def audit_codebase(args: dict) -> str:
     total_files = 0
     scanned_py = 0
 
-    ignored_dirs = {"__pycache__", ".git", ".idea", ".vscode", "venv", "node_modules", ".gemini", "brain"}
+    ignored_dirs = {"__pycache__", ".git", ".idea", ".vscode", "venv", ".venv", "env", ".env", "node_modules", ".gemini", "brain", ".pytest_cache", ".mypy_cache", "build", "dist"}
 
-    for p in target_path.rglob("*.py"):
-        if any(part in ignored_dirs for part in p.parts):
-            continue
-        total_files += 1
-        rel_str = str(p.relative_to(target_path)).replace("\\", "/")
+    for root, dirs, files in os.walk(target_path):
+        dirs[:] = [d for d in dirs if d not in ignored_dirs]
+        for fname in files:
+            if not fname.endswith(".py"):
+                continue
+            p = Path(root) / fname
+            total_files += 1
+            rel_str = str(p.relative_to(target_path)).replace("\\", "/")
 
         try:
             content = p.read_text(encoding="utf-8", errors="ignore")

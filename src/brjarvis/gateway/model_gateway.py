@@ -23,12 +23,11 @@ from .models_registry import ModelRegistry, get_model_registry
 logger = logging.getLogger("JARVIS.ModelGateway")
 
 _DEFAULT_FALLBACK_CHAIN = [
-    "gemini-3.6-flash-high",
-    "claude-sonnet-4-6-thinking",
-    "gemini-3-flash-agent",
-    "gemini-3.6-flash-low",
-    "gemini-3.7-flash-high",
-    "gemini-3.5-flash-medium",
+    "antigravity/gemini-3.7-flash-high",
+    "antigravity/claude-sonnet-4-6",
+    "antigravity/claude-opus-4-6-thinking",
+    "groq/qwen/qwen3.8-27b",
+    "antigravity/gemini-3.1-flash-lite",
 ]
 
 _MODEL_COOLDOWNS: dict[str, float] = {}
@@ -130,7 +129,7 @@ def _load_gateway_config() -> dict[str, Any]:
         except Exception:
             pass
 
-    base_url = (base_url or "http://localhost:8045/v1").strip()
+    base_url = (base_url or "http://127.0.0.1:20128/v1").strip()
     api_key = (api_key or "sk-5ec70bf9fa324084b7a7326babf52c45").strip()
 
     timeout_s = float(os.environ.get("BRJARVIS_REQUEST_TIMEOUT", "60.0"))
@@ -195,6 +194,7 @@ class ModelGateway:
                 base_url=self.base_url,
                 api_key=self.api_key,
                 timeout=self.timeout,
+                max_retries=1,
             )
             logger.info("OpenAI SDK client initialized pointing to %s", self.base_url)
         except ImportError:

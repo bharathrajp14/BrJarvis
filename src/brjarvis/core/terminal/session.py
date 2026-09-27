@@ -36,16 +36,18 @@ try:
     )
 except Exception:
     HAS_PROMPT_TOOLKIT = False
-    build_prompt_session = lambda **_: None  # type: ignore
-    get_history_path = lambda: None  # type: ignore
+
+    def build_prompt_session(**_: Any) -> None:
+        return None
+
+    def get_history_path() -> None:
+        return None
 
 try:
-    from rich.live import Live
-    from rich.markdown import Markdown
+    
+    
     from rich.prompt import Prompt
-    from rich.status import Status
-    from rich.table import Table
-    from rich.text import Text
+    
 
     HAS_RICH = True
 except ImportError:
@@ -133,7 +135,11 @@ class TerminalSession:
                 else "Gemini"
             ),
         )
-        self.agent_loop: AgentLoop = AgentLoop(session=self.agent_session)
+        self.agent_loop: AgentLoop = AgentLoop(
+            session=self.agent_session,
+            gateway=self.runtime.gateway if self.runtime else None,
+        )
+
         self.agent_loop.permission_mgr.set_interactive_resolver(self.prompt_permission)
 
         # ── prompt_toolkit session (with history + autocomplete) ──────────

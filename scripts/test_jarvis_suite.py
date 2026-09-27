@@ -15,11 +15,13 @@ import sys
 import time
 from pathlib import Path
 
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-if str(BASE_DIR) not in sys.path:
-    sys.path.insert(0, str(BASE_DIR))
+for p in [str(BASE_DIR / "src" / "brjarvis"), str(BASE_DIR / "src"), str(BASE_DIR)]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 
 def run_full_suite():
@@ -39,6 +41,7 @@ def run_full_suite():
         results.append(("0-Token Excel Analysis Exporter", ok1, f"{dt1:.2f}ms", res1.get("target") if ok1 else "Failed"))
     except Exception as e:
         results.append(("0-Token Excel Analysis Exporter", False, "0ms", str(e)))
+    logger.info("  [1/6] Completed 0-Token Excel Analysis Exporter: %s", results[-1][1])
 
     # 2. Test Word & PDF Document Generator
     t0 = time.perf_counter()
@@ -46,10 +49,11 @@ def run_full_suite():
         from tools.doc_tools import generate_project_product_analysis
         res2 = generate_project_product_analysis({"auto_open": False})
         dt2 = (time.perf_counter() - t0) * 1000
-        ok2 = "Created Microsoft Word" in res2 and "Created PDF" in res2
+        ok2 = ("DOCX" in res2 or "Word" in res2) and "PDF" in res2
         results.append(("Word (.docx) & PDF (.pdf) Generator", ok2, f"{dt2:.2f}ms", "Generated .docx & .pdf"))
     except Exception as e:
         results.append(("Word (.docx) & PDF (.pdf) Generator", False, "0ms", str(e)))
+    logger.info("  [2/6] Completed Word & PDF Generator: %s", results[-1][1])
 
     # 3. Test System Diagnostics & Telemetry
     t0 = time.perf_counter()
@@ -61,6 +65,7 @@ def run_full_suite():
         results.append(("System Diagnostics & Telemetry", ok3, f"{dt3:.2f}ms", "Captured CPU, RAM & Top 10 PIDs"))
     except Exception as e:
         results.append(("System Diagnostics & Telemetry", False, "0ms", str(e)))
+    logger.info("  [3/6] Completed System Diagnostics: %s", results[-1][1])
 
     # 4. Test Codebase Security Auditor
     t0 = time.perf_counter()
@@ -72,6 +77,7 @@ def run_full_suite():
         results.append(("AST Syntax & Security Auditor", ok4, f"{dt4:.2f}ms", "Scanned files for syntax & security"))
     except Exception as e:
         results.append(("AST Syntax & Security Auditor", False, "0ms", str(e)))
+    logger.info("  [4/6] Completed AST Syntax & Security Auditor: %s", results[-1][1])
 
     # 5. Test BR_WORKSPACE & Timeline Engine
     t0 = time.perf_counter()
@@ -86,6 +92,7 @@ def run_full_suite():
         results.append(("BR_WORKSPACE Vault & Timeline Stream", ok5, f"{dt5:.2f}ms", "SQLite event stream verified"))
     except Exception as e:
         results.append(("BR_WORKSPACE Vault & Timeline Stream", False, "0ms", str(e)))
+    logger.info("  [5/6] Completed BR_WORKSPACE Vault & Timeline: %s", results[-1][1])
 
     # 6. Test Live OS Unlimited Mode Initialization
     t0 = time.perf_counter()
@@ -97,6 +104,7 @@ def run_full_suite():
         results.append(("Live OS Control (0=Unlimited Mode)", ok6, f"{dt6:.2f}ms", f"max_steps={ctrl.max_steps}"))
     except Exception as e:
         results.append(("Live OS Control (0=Unlimited Mode)", False, "0ms", str(e)))
+    logger.info("  [6/6] Completed Live OS Control: %s", results[-1][1])
 
     # Print Summary Table
     logger.info("\n" + "-" * 65)

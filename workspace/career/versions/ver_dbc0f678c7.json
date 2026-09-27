@@ -1,0 +1,100 @@
+{
+  "resume_id": "res_9f184f81",
+  "title": "Bharath Raj \u2014 AI Engineer",
+  "target_role": "AI Engineer",
+  "template_id": "ats_classic",
+  "theme": {
+    "theme_id": "ats_pure",
+    "name": "ATS Pure",
+    "primary_color": "#000000",
+    "secondary_color": "#333333",
+    "accent_color": "#000000",
+    "text_color": "#111111",
+    "muted_text": "#444444",
+    "background_color": "#FFFFFF",
+    "card_background": "#F7FAFC",
+    "font_heading": "'Arial', 'Helvetica', sans-serif",
+    "font_body": "'Arial', 'Helvetica', sans-serif",
+    "font_code": "'Share Tech Mono', monospace",
+    "font_size_base": "10pt",
+    "line_height": "1.4",
+    "margin_pt": 36,
+    "border_radius": "4px"
+  },
+  "sections": [
+    {
+      "section_id": "summary",
+      "title": "Professional Summary",
+      "visible": true,
+      "order": 1,
+      "layout": "standard",
+      "custom_items": []
+    },
+    {
+      "section_id": "skills",
+      "title": "Core Technical Competencies",
+      "visible": true,
+      "order": 2,
+      "layout": "pills",
+      "custom_items": []
+    },
+    {
+      "section_id": "experience",
+      "title": "Professional Experience",
+      "visible": true,
+      "order": 3,
+      "layout": "standard",
+      "custom_items": []
+    },
+    {
+      "section_id": "projects",
+      "title": "Featured Engineering Projects",
+      "visible": true,
+      "order": 4,
+      "layout": "standard",
+      "custom_items": []
+    },
+    {
+      "section_id": "education",
+      "title": "Education & Academic Background",
+      "visible": true,
+      "order": 5,
+      "layout": "standard",
+      "custom_items": []
+    },
+    {
+      "section_id": "certifications",
+      "title": "Certifications & Credentials",
+      "visible": true,
+      "order": 6,
+      "layout": "standard",
+      "custom_items": []
+    },
+    {
+      "section_id": "achievements",
+      "title": "Honors & Achievements",
+      "visible": true,
+      "order": 7,
+      "layout": "standard",
+      "custom_items": []
+    }
+  ],
+  "full_name": "Bharath Raj",
+  "contact_email": "bharath@example.com",
+  "contact_phone": "+1-555-0199",
+  "location": "",
+  "links": {},
+  "summary": "Senior AI Systems Engineer",
+  "experience": [],
+  "education": [],
+  "skills": [],
+  "projects": [],
+  "certifications": [],
+  "achievements": [],
+  "is_master": false,
+  "parent_version_id": null,
+  "job_id_targeted": null,
+  "ats_score": 0.0,
+  "created_at": 1787597016.7540605,
+  "updated_at": 1787597016.7540605
+}

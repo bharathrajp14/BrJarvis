@@ -1,15 +1,17 @@
 import type { UiEvent } from '../contracts/events';
 
+const API_BASE = ((import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '').replace(/\/$/, '');
 type EventHandler = (event: UiEvent) => void;
 
 export class RealtimeClient {
   private socket: WebSocket | null = null;
-  private sequence = 0;
   private heartbeat: number | undefined;
   private reconnectTimer: number | undefined;
   private reconnectAttempt = 0;
   private connecting = false;
+  private stopped = true;
   private readonly seen = new Set<string>();
+  private readonly seenOrder: string[] = [];
   private readonly listeners = new Set<EventHandler>();
 
   constructor(private readonly onStatus: (status: 'connected' | 'connecting' | 'offline') => void) {}
@@ -20,42 +22,56 @@ export class RealtimeClient {
   }
 
   async connect() {
+    this.stopped = false;
     if (this.connecting || (this.socket && this.socket.readyState <= WebSocket.OPEN)) return;
     this.connecting = true;
     this.onStatus('connecting');
     try {
       const ticket = await this.requestTicket();
-      const protocol = globalThis.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const url = new URL(`${protocol}//${globalThis.location.host}/api/v1/ws`);
-      if (ticket) url.searchParams.set('ticket', ticket);
-      this.socket = new WebSocket(url.toString());
-      this.socket.onopen = () => {
+      if (this.stopped) return;
+      const origin = API_BASE ? new URL(API_BASE, globalThis.location.href) : new URL(globalThis.location.href);
+      origin.protocol = origin.protocol === 'https:' ? 'wss:' : 'ws:';
+      origin.pathname = '/api/v1/ws';
+      origin.search = '';
+      if (ticket) origin.searchParams.set('ticket', ticket);
+      const socket = new WebSocket(origin.toString());
+      this.socket = socket;
+      socket.onopen = () => {
+        if (this.stopped || socket !== this.socket) return;
         this.connecting = false;
         this.reconnectAttempt = 0;
+        this.clearHeartbeat();
         this.onStatus('connected');
-        this.socket?.send(JSON.stringify({ type: 'resume', cursor: this.sequence }));
-        this.heartbeat = window.setInterval(() => this.socket?.send(JSON.stringify({ type: 'ping' })), 20000);
+        this.heartbeat = window.setInterval(() => {
+          if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: 'ping' }));
+        }, 20000);
       };
-      this.socket.onmessage = (message) => this.receive(message.data);
-      this.socket.onclose = () => {
+      socket.onmessage = (message) => this.receive(message.data);
+      socket.onclose = () => {
+        if (socket !== this.socket) return;
+        this.socket = null;
         this.connecting = false;
-        this.scheduleReconnect();
+        this.clearHeartbeat();
+        if (!this.stopped) this.scheduleReconnect();
       };
-      this.socket.onerror = () => {
-        this.connecting = false;
+      socket.onerror = () => {
+        if (socket !== this.socket || this.stopped) return;
         this.onStatus('offline');
       };
     } catch {
       this.connecting = false;
-      this.scheduleReconnect();
+      if (!this.stopped) this.scheduleReconnect();
     }
   }
 
   disconnect() {
-    if (this.heartbeat) window.clearInterval(this.heartbeat);
+    this.stopped = true;
+    this.clearHeartbeat();
     if (this.reconnectTimer) window.clearTimeout(this.reconnectTimer);
-    this.socket?.close();
+    this.reconnectTimer = undefined;
+    const socket = this.socket;
     this.socket = null;
+    socket?.close();
     this.connecting = false;
   }
 
@@ -64,31 +80,38 @@ export class RealtimeClient {
   }
 
   private async requestTicket(): Promise<string | undefined> {
-    try {
-      const response = await fetch('/api/v1/auth/ws-ticket', { method: 'POST', credentials: 'include', headers: { Accept: 'application/json' } });
-      if (!response.ok) return undefined;
-      const body = await response.json() as { ticket?: string; data?: { ticket?: string } };
-      return body.ticket ?? body.data?.ticket;
-    } catch {
-      return undefined;
-    }
+    const response = await fetch(`${API_BASE}/api/v1/auth/ws-ticket`, { method: 'POST', credentials: 'include', headers: { Accept: 'application/json' } });
+    if (!response.ok) return undefined;
+    const body = await response.json() as { ticket?: string; data?: { ticket?: string } };
+    return body.ticket ?? body.data?.ticket;
   }
 
   private receive(raw: string) {
     try {
-      const parsed = JSON.parse(raw) as UiEvent & { event_id?: string; sequence?: number };
-      const eventId = parsed.event_id ?? `${parsed.type}:${parsed.sequence ?? 0}`;
-      if (this.seen.has(eventId)) return;
-      this.seen.add(eventId);
-      if (typeof parsed.sequence === 'number') this.sequence = Math.max(this.sequence, parsed.sequence);
+      const parsed = JSON.parse(raw) as UiEvent & { event_id?: string };
+      const eventId = parsed.event_id;
+      if (eventId) {
+        if (this.seen.has(eventId)) return;
+        this.seen.add(eventId);
+        this.seenOrder.push(eventId);
+        if (this.seenOrder.length > 500) {
+          const oldest = this.seenOrder.shift();
+          if (oldest) this.seen.delete(oldest);
+        }
+      }
       this.listeners.forEach((listener) => listener(parsed));
     } catch {
-      // Invalid events are ignored; the next authoritative snapshot repairs state.
+      // The next authoritative REST snapshot repairs malformed or unknown events.
     }
   }
 
+  private clearHeartbeat() {
+    if (this.heartbeat) window.clearInterval(this.heartbeat);
+    this.heartbeat = undefined;
+  }
+
   private scheduleReconnect() {
-    if (this.reconnectTimer) return;
+    if (this.stopped || this.reconnectTimer) return;
     this.onStatus('offline');
     const delay = Math.min(30000, 800 * 2 ** this.reconnectAttempt++);
     this.reconnectTimer = window.setTimeout(() => {
@@ -97,5 +120,3 @@ export class RealtimeClient {
     }, delay);
   }
 }
-
-
